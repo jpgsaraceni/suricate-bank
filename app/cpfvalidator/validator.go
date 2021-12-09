@@ -6,7 +6,7 @@
 package cpfvalidator
 
 import (
-	"fmt"
+	"errors"
 	"regexp"
 	"strconv"
 )
@@ -45,6 +45,8 @@ func (c Cpf) IsValid() (bool, error) {
 	return checkVerifyingDigits(unmasked), nil
 }
 
+var errInput = errors.New("invalid input")
+
 // Converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
 func (c Cpf) RemoveMask() (Cpf, error) {
 	cString := string(c)
@@ -64,13 +66,15 @@ func (c Cpf) RemoveMask() (Cpf, error) {
 
 	if len(trimmed) == len(cString) {
 
-		return unmaskedCpf, fmt.Errorf("invalid input")
+		return unmaskedCpf, errInput
 	}
 
 	unmaskedCpf = Cpf(trimmed)
 
 	return unmaskedCpf, nil
 }
+
+var errFormat = errors.New("invalid format")
 
 // Converts an 11 long numeric string to XXX.XXX.XXX-XX format
 func (c Cpf) Mask() (Cpf, error) {
@@ -81,7 +85,7 @@ func (c Cpf) Mask() (Cpf, error) {
 	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, cString)
 
 	if !inputIsNumeric {
-		return maskedCpf, fmt.Errorf("invalid format")
+		return maskedCpf, errFormat
 	}
 
 	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})`)
