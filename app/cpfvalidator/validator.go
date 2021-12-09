@@ -14,7 +14,7 @@ import (
 type Cpf string
 
 // These values pass the algorithm but are considered invalid.
-var knownInvalids = map[string]struct{}{
+var knownInvalids = map[Cpf]struct{}{
 	"00000000000": {},
 	"11111111111": {},
 	"22222222222": {},
@@ -27,15 +27,16 @@ var knownInvalids = map[string]struct{}{
 	"99999999999": {},
 }
 
-func IsValid(cpf Cpf) (bool, error) {
-	unmasked, err := RemoveMask(cpf)
+// Runs CPF algorithm to check if CPF is valid. Accepts XXX.XXX.XXX-XX and XXXXXXXXXXX formats.
+func (c Cpf) IsValid() (bool, error) {
+	unmasked, err := c.RemoveMask()
 
 	if err != nil {
 
 		return false, err
 	}
 
-	_, isKnownInvalid := knownInvalids[string(unmasked)]
+	_, isKnownInvalid := knownInvalids[unmasked]
 
 	if isKnownInvalid {
 		return false, nil
@@ -44,24 +45,24 @@ func IsValid(cpf Cpf) (bool, error) {
 	return checkVerifyingDigits(unmasked), nil
 }
 
-// Receives a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF and returns always 11 numeric digits.
-func RemoveMask(input Cpf) (Cpf, error) {
-	inputString := string(input)
+// Converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
+func (c Cpf) RemoveMask() (Cpf, error) {
+	cString := string(c)
 
 	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, inputString)
+	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, cString)
 
 	if inputIsNumeric {
 
-		return Cpf(input), nil
+		return c, nil
 	}
 
 	var unmaskedCpf Cpf
 
 	re := regexp.MustCompile(`^(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})`)
-	trimmed := re.ReplaceAllString(inputString, "$1$2$3$4")
+	trimmed := re.ReplaceAllString(cString, "$1$2$3$4")
 
-	if len(trimmed) == len(inputString) {
+	if len(trimmed) == len(cString) {
 
 		return unmaskedCpf, fmt.Errorf("invalid input")
 	}
@@ -71,19 +72,20 @@ func RemoveMask(input Cpf) (Cpf, error) {
 	return unmaskedCpf, nil
 }
 
-func Mask(input Cpf) (Cpf, error) {
-	inputString := string(input)
+// Converts an 11 long numeric string to XXX.XXX.XXX-XX format
+func (c Cpf) Mask() (Cpf, error) {
+	cString := string(c)
 	var maskedCpf Cpf
 
 	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, inputString)
+	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, cString)
 
 	if !inputIsNumeric {
 		return maskedCpf, fmt.Errorf("invalid format")
 	}
 
 	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})`)
-	maskedInput := re.ReplaceAllString(inputString, "$1.$2.$3-$4")
+	maskedInput := re.ReplaceAllString(cString, "$1.$2.$3-$4")
 
 	maskedCpf = Cpf(maskedInput)
 
@@ -114,13 +116,11 @@ func checkVerifyingDigits(cpf Cpf) bool {
 }
 
 func iterateDigits(cpf Cpf) string {
-	cpfString := string(cpf)
-
 	var sum int
-	var factor int = len(cpfString) + 1
+	var factor int = len(cpf) + 1
 
-	for i := 0; i < len(cpfString); i++ {
-		var char string = string(cpfString[i])
+	for i := 0; i < len(cpf); i++ {
+		var char = string(cpf[i])
 		digit, _ := strconv.Atoi(char)
 		sum += digit * factor
 		factor--
