@@ -41,15 +41,7 @@ func IsValid(cpf string) (bool, error) {
 		return false, nil
 	}
 
-	calculatedVerifyingDigits := getVerifyingDigits(string(unmasked[:9]))
-	inputVerifyingDigits := string(unmasked[9:])
-
-	if calculatedVerifyingDigits == string(inputVerifyingDigits) {
-
-		return true, nil
-	}
-
-	return false, nil
+	return checkVerifyingDigits(string(unmasked)), nil
 }
 
 // Receives a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF and returns always 11 numeric digits.
@@ -107,14 +99,17 @@ func convertRestToDigit(dividend, divisor int) string {
 	return strconv.Itoa(11 - rest)
 }
 
-// Recieves first 9 digits of CPF and calculates 2 verifying digits through the CPF algorithm.
-func getVerifyingDigits(cpfBody string) string {
+func checkVerifyingDigits(cpfBody string) bool {
 
-	cpfBody = iterateDigits(cpfBody)
+	firstVerifyingDigit := iterateDigits(cpfBody[:9])
 
-	cpfBody = iterateDigits(cpfBody)
+	if firstVerifyingDigit != string(cpfBody[9]) {
+		return false
+	}
 
-	return cpfBody[9:]
+	secondVerifyingDigit := iterateDigits(cpfBody[:10])
+
+	return secondVerifyingDigit == string(cpfBody[10])
 }
 
 func iterateDigits(cpfString string) string {
@@ -131,5 +126,5 @@ func iterateDigits(cpfString string) string {
 
 	digit := convertRestToDigit(sum, 11)
 
-	return cpfString + digit
+	return digit
 }
