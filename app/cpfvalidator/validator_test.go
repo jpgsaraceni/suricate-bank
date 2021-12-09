@@ -16,8 +16,13 @@ func TestIsValid(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:     "doesn't pass the algorithm",
+			name:     "doesn't pass the algorithm on second verifying digit",
 			cpf:      Cpf("12345678901"),
+			expected: false,
+		},
+		{
+			name:     "doesn't pass the algorithm on first verifying digit",
+			cpf:      Cpf("12345678910"),
 			expected: false,
 		},
 		{
@@ -58,5 +63,43 @@ func TestIsValid(t *testing.T) {
 }
 
 func TestMask(t *testing.T) {
-	//TODO
+	t.Parallel()
+
+	type testCase struct {
+		name     string
+		cpf      Cpf
+		expected Cpf
+		err      error
+	}
+
+	testCases := []testCase{
+		{
+			name:     "receive XXXXXXXXXXX and return XXX.XXX.XXX-XX format",
+			cpf:      Cpf("12345678901"),
+			expected: Cpf("123.456.789-01"),
+		},
+		{
+			name: "invalid input (non-numeric)",
+			cpf:  Cpf("123.45678901"),
+			err:  errInput,
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := tt.cpf.Mask()
+
+			if tt.err != nil && err == nil {
+				t.Errorf("got %v expected an error", got)
+
+				return
+			}
+
+			if got != tt.expected {
+				t.Errorf("got %v expected %v", got, tt.expected)
+			}
+		})
+	}
 }

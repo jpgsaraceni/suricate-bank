@@ -7,6 +7,7 @@ package cpfvalidator
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 )
@@ -76,7 +77,7 @@ func (c Cpf) RemoveMask() (Cpf, error) {
 
 var errFormat = errors.New("invalid format")
 
-// Converts an 11 long numeric string to XXX.XXX.XXX-XX format
+// Converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
 func (c Cpf) Mask() (Cpf, error) {
 	cString := string(c)
 	var maskedCpf Cpf
@@ -109,6 +110,8 @@ func convertRestToDigit(dividend, divisor int) string {
 
 func checkVerifyingDigits(cpf Cpf) bool {
 	firstVerifyingDigit := iterateDigits(cpf[:9])
+
+	fmt.Println(firstVerifyingDigit)
 
 	if firstVerifyingDigit != string(cpf[9]) {
 		return false
