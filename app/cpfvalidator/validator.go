@@ -27,7 +27,7 @@ var knownInvalids = map[string]struct{}{
 	"99999999999": {},
 }
 
-func IsValid(cpf string) (bool, error) {
+func IsValid(cpf Cpf) (bool, error) {
 	unmasked, err := RemoveMask(cpf)
 
 	if err != nil {
@@ -41,14 +41,15 @@ func IsValid(cpf string) (bool, error) {
 		return false, nil
 	}
 
-	return checkVerifyingDigits(string(unmasked)), nil
+	return checkVerifyingDigits(unmasked), nil
 }
 
 // Receives a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF and returns always 11 numeric digits.
-func RemoveMask(input string) (Cpf, error) {
+func RemoveMask(input Cpf) (Cpf, error) {
+	inputString := string(input)
 
 	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, input)
+	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, inputString)
 
 	if inputIsNumeric {
 
@@ -58,9 +59,9 @@ func RemoveMask(input string) (Cpf, error) {
 	var unmaskedCpf Cpf
 
 	re := regexp.MustCompile(`^(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})`)
-	trimmed := re.ReplaceAllString(input, "$1$2$3$4")
+	trimmed := re.ReplaceAllString(inputString, "$1$2$3$4")
 
-	if len(trimmed) == len(input) {
+	if len(trimmed) == len(inputString) {
 
 		return unmaskedCpf, fmt.Errorf("invalid input")
 	}
@@ -70,18 +71,19 @@ func RemoveMask(input string) (Cpf, error) {
 	return unmaskedCpf, nil
 }
 
-func Mask(input string) (Cpf, error) {
+func Mask(input Cpf) (Cpf, error) {
+	inputString := string(input)
 	var maskedCpf Cpf
 
 	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, input)
+	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, inputString)
 
 	if !inputIsNumeric {
 		return maskedCpf, fmt.Errorf("invalid format")
 	}
 
 	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})`)
-	maskedInput := re.ReplaceAllString(input, "$1.$2.$3-$4")
+	maskedInput := re.ReplaceAllString(inputString, "$1.$2.$3-$4")
 
 	maskedCpf = Cpf(maskedInput)
 
@@ -99,20 +101,21 @@ func convertRestToDigit(dividend, divisor int) string {
 	return strconv.Itoa(11 - rest)
 }
 
-func checkVerifyingDigits(cpfBody string) bool {
+func checkVerifyingDigits(cpf Cpf) bool {
+	firstVerifyingDigit := iterateDigits(cpf[:9])
 
-	firstVerifyingDigit := iterateDigits(cpfBody[:9])
-
-	if firstVerifyingDigit != string(cpfBody[9]) {
+	if firstVerifyingDigit != string(cpf[9]) {
 		return false
 	}
 
-	secondVerifyingDigit := iterateDigits(cpfBody[:10])
+	secondVerifyingDigit := iterateDigits(cpf[:10])
 
-	return secondVerifyingDigit == string(cpfBody[10])
+	return secondVerifyingDigit == string(cpf[10])
 }
 
-func iterateDigits(cpfString string) string {
+func iterateDigits(cpf Cpf) string {
+	cpfString := string(cpf)
+
 	var sum int
 	var factor int = len(cpfString) + 1
 

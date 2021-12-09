@@ -5,7 +5,7 @@ import (
 )
 
 func TestIsValid(t *testing.T) {
-	t.Run("Global test, will be detailed later", func(t *testing.T) {
+	t.Run("Global invalid cpf test, will be detailed later", func(t *testing.T) {
 		t.Parallel()
 
 		got, _ := IsValid("12345678901")
@@ -16,7 +16,7 @@ func TestIsValid(t *testing.T) {
 		}
 	})
 
-	t.Run("Global test, will be detailed later", func(t *testing.T) {
+	t.Run("Global valid cpf test, will be detailed later", func(t *testing.T) {
 		t.Parallel()
 
 		got, _ := IsValid("045.591.180-00")
