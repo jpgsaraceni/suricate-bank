@@ -1,4 +1,4 @@
-// Contains functions for validating CPF, the Brazilian unique identifacation number for every person in the country.
+// Package cpfvalidator contains functions for validating CPF, the Brazilian unique identifacation number for every person in the country.
 // CPFs must contain 11 numeric digits, being the last 2 for validation.
 // For the purpose of this validation, the first 9 digits can be considered random
 // (although there are rules related to the State in which it was emitted, for example).
@@ -28,7 +28,7 @@ var knownInvalids = map[Cpf]struct{}{
 	"99999999999": {},
 }
 
-// Runs CPF algorithm to check if CPF is valid. Accepts XXX.XXX.XXX-XX and XXXXXXXXXXX formats.
+// Isvalid runs CPF algorithm to check if CPF is valid. Accepts XXX.XXX.XXX-XX and XXXXXXXXXXX formats.
 func (c Cpf) IsValid() (bool, error) {
 	unmasked, err := c.RemoveMask()
 
@@ -48,7 +48,7 @@ func (c Cpf) IsValid() (bool, error) {
 
 var errInput = errors.New("invalid input")
 
-// Converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
+// RemoveMask converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
 func (c Cpf) RemoveMask() (Cpf, error) {
 	cString := string(c)
 
@@ -77,7 +77,7 @@ func (c Cpf) RemoveMask() (Cpf, error) {
 
 var errFormat = errors.New("invalid format")
 
-// Converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
+// Mask converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
 func (c Cpf) Mask() (Cpf, error) {
 	cString := string(c)
 	var maskedCpf Cpf
