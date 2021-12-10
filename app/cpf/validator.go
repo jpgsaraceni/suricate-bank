@@ -3,7 +3,7 @@
 // For the purpose of this validation, the first 9 digits can be considered random
 // (although there are rules related to the State in which it was emitted, for example).
 // The official refference can be found at http://sa.previdencia.gov.br/site/2015/07/rgrv_RegrasValidacao.pdf.
-package cpfvalidator
+package cpf
 
 import (
 	"errors"
@@ -12,10 +12,13 @@ import (
 	"strconv"
 )
 
-type Cpf string
+type Cpf struct {
+	value  string // 11 numeric digits
+	masked string // XXX.XXX.XXX-XX format
+}
 
-// These values pass the algorithm but are considered invalid.
-var knownInvalids = map[Cpf]struct{}{
+// knownInvalids pass the algorithm but are considered invalid.
+var knownInvalids = map[string]struct{}{
 	"00000000000": {},
 	"11111111111": {},
 	"22222222222": {},
@@ -28,73 +31,91 @@ var knownInvalids = map[Cpf]struct{}{
 	"99999999999": {},
 }
 
-// Isvalid runs CPF algorithm to check if CPF is valid. Accepts XXX.XXX.XXX-XX and XXXXXXXXXXX formats.
-func (c Cpf) IsValid() (bool, error) {
-	unmasked, err := c.RemoveMask()
+var errInvalid = errors.New("invalid cpf")
 
-	if err != nil {
+// NewCpf creates a Cpf struct with value and masked, or empty and returns error if invalid
+func NewCpf(input string) (Cpf, error) {
+	var c Cpf
 
-		return false, err
+	ok := c.validate(input)
+
+	if !ok {
+
+		return c, errInvalid
+	}
+
+	return c, nil
+}
+
+// Value returns a cpf with only numeric digits
+func (c Cpf) Value() string {
+	return c.value
+}
+
+// Masked returns a cpf in XXX.XXX.XXX-XX format
+func (c Cpf) Masked() string {
+	return c.masked
+}
+
+// validate runs CPF algorithm to check if CPF is valid and sets Cpf fields. Accepts XXX.XXX.XXX-XX and XXXXXXXXXXX formats.
+func (c *Cpf) validate(inputCpf string) bool {
+	unmasked, invalidFormat := removeMask(inputCpf)
+
+	if invalidFormat != nil {
+
+		return false
 	}
 
 	_, isKnownInvalid := knownInvalids[unmasked]
 
 	if isKnownInvalid {
-		return false, nil
+
+		return false
 	}
 
-	return checkVerifyingDigits(unmasked), nil
+	isValid := checkVerifyingDigits(unmasked)
+
+	if isValid {
+		c.value = unmasked
+		c.masked = mask(inputCpf)
+
+		return true
+	}
+
+	return false
 }
 
-var errInput = errors.New("invalid input")
-
-// RemoveMask converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
-func (c Cpf) RemoveMask() (Cpf, error) {
-	cString := string(c)
+// removeMask converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
+func removeMask(masked string) (string, error) {
 
 	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, cString)
+	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, masked)
 
 	if inputIsNumeric {
 
-		return c, nil
+		return masked, nil
 	}
 
-	var unmaskedCpf Cpf
+	var unmaskedCpf string
 
 	re := regexp.MustCompile(`^(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})`)
-	trimmed := re.ReplaceAllString(cString, "$1$2$3$4")
+	unmaskedCpf = re.ReplaceAllString(masked, "$1$2$3$4")
 
-	if len(trimmed) == len(cString) {
+	if len(unmaskedCpf) != 11 {
 
-		return unmaskedCpf, errInput
+		return "", errInvalid
 	}
-
-	unmaskedCpf = Cpf(trimmed)
 
 	return unmaskedCpf, nil
 }
 
-var errFormat = errors.New("invalid format")
-
-// Mask converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
-func (c Cpf) Mask() (Cpf, error) {
-	cString := string(c)
-	var maskedCpf Cpf
-
-	// The error here is unnecessary because the regex is being passsed directly.
-	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, cString)
-
-	if !inputIsNumeric {
-		return maskedCpf, errFormat
-	}
+// mask converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
+func mask(cString string) string {
 
 	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})`)
-	maskedInput := re.ReplaceAllString(cString, "$1.$2.$3-$4")
+	masked := re.ReplaceAllString(cString, "$1.$2.$3-$4")
 
-	maskedCpf = Cpf(maskedInput)
-
-	return maskedCpf, nil
+	return masked
 }
 
 func convertRestToDigit(dividend, divisor int) string {
@@ -108,7 +129,7 @@ func convertRestToDigit(dividend, divisor int) string {
 	return strconv.Itoa(11 - rest)
 }
 
-func checkVerifyingDigits(cpf Cpf) bool {
+func checkVerifyingDigits(cpf string) bool {
 	firstVerifyingDigit := iterateDigits(cpf[:9])
 
 	fmt.Println(firstVerifyingDigit)
@@ -122,7 +143,7 @@ func checkVerifyingDigits(cpf Cpf) bool {
 	return secondVerifyingDigit == string(cpf[10])
 }
 
-func iterateDigits(cpf Cpf) string {
+func iterateDigits(cpf string) string {
 	var sum int
 	var factor int = len(cpf) + 1
 
