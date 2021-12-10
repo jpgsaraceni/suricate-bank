@@ -32,14 +32,52 @@ func TestIsValid(t *testing.T) {
 			err:  errInvalid,
 		},
 		{
-			name:           "passes the algorthm",
+			name: "passes the algorithm but is a known invalid",
+			cpf:  "11111111111",
+			err:  errInvalid,
+		},
+		{
+			name:           "masked valid cpf",
+			cpf:            "220.614.460-35",
+			expectedValue:  "22061446035",
+			expectedMasked: "220.614.460-35",
+		},
+		{
+			name:           "unmasked valid cpf",
+			cpf:            "22061446035",
+			expectedValue:  "22061446035",
+			expectedMasked: "220.614.460-35",
+		},
+		{
+			name:           "masked valid cpf beginning and ending with 0",
 			cpf:            "045.591.180-00",
 			expectedValue:  "04559118000",
 			expectedMasked: "045.591.180-00",
 		},
 		{
-			name: "invalid format",
-			cpf:  "123.456-789.01",
+			name:           "masked valid cpf beginning and ending with 0",
+			cpf:            "04559118000",
+			expectedValue:  "04559118000",
+			expectedMasked: "045.591.180-00",
+		},
+		{
+			name: "valid cpf digits invalid because symbols in wrong place",
+			cpf:  "045.591-180.00",
+			err:  errInvalid,
+		},
+		{
+			name: "valid cpf digits invalid because missing some symbols",
+			cpf:  "045.591.18000",
+			err:  errInvalid,
+		},
+		{
+			name: "valid cnpj not valid as cpf",
+			cpf:  "34.728.944/0001-00",
+			err:  errInvalid,
+		},
+		{
+			name: "valid cnpj without symbols not valid as cpf",
+			cpf:  "34728944000100",
 			err:  errInvalid,
 		},
 	}
