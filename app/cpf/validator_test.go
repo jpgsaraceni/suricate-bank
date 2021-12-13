@@ -88,61 +88,19 @@ func TestIsValid(t *testing.T) {
 			t.Parallel()
 			got, err := NewCpf(tt.cpf)
 
-			if tt.err != nil && err == nil {
-				t.Errorf("got %v expected an error", got)
+			if tt.err != err {
+				t.Errorf("got error %s expected error %s", got, tt.err)
 
 				return
 			}
 
 			if got.Value() != tt.expectedValue {
-				t.Errorf("got %v expected %v", got, tt.expectedValue)
+				t.Errorf("got %s expected %s", got, tt.expectedValue)
 			}
 
 			if got.Masked() != tt.expectedMasked {
-				t.Errorf("got %v expected %v", got, tt.expectedMasked)
+				t.Errorf("got %s expected %s", got, tt.expectedMasked)
 			}
 		})
 	}
 }
-
-// func TestMask(t *testing.T) {
-// 	t.Parallel()
-
-// 	type testCase struct {
-// 		name     string
-// 		cpf      Cpf
-// 		expected Cpf
-// 		err      error
-// 	}
-
-// 	testCases := []testCase{
-// 		{
-// 			name:     "receive XXXXXXXXXXX and return XXX.XXX.XXX-XX format",
-// 			cpf:      Cpf("12345678901"),
-// 			expected: Cpf("123.456.789-01"),
-// 		},
-// 		{
-// 			name: "invalid input (non-numeric)",
-// 			cpf:  Cpf("123.45678901"),
-// 			err:  errInput,
-// 		},
-// 	}
-
-// 	for _, tt := range testCases {
-// 		tt := tt
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			t.Parallel()
-// 			got, err := tt.cpf.Mask()
-
-// 			if tt.err != nil && err == nil {
-// 				t.Errorf("got %v expected an error", got)
-
-// 				return
-// 			}
-
-// 			if got != tt.expected {
-// 				t.Errorf("got %v expected %v", got, tt.expected)
-// 			}
-// 		})
-// 	}
-// }
