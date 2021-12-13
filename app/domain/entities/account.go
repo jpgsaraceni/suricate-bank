@@ -1,15 +1,18 @@
 package entities
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 )
 
-type ( // TODO consider moving these types out of entities
+type (
 	AccountId uuid.UUID
-	Cpf       string // TODO get from cpf package
+	Cpf       string
 	Secret    string
 	Money     int
 )
@@ -17,32 +20,44 @@ type ( // TODO consider moving these types out of entities
 type Account struct {
 	Id        AccountId
 	Name      string
-	Cpf       Cpf
+	Cpf       string
 	Secret    Secret
 	Balance   Money
 	CreatedAt time.Time
 }
 
-func NewAccount(name string, cpf Cpf, secret string) (Account, error) {
+var errCpf = errors.New("invalid cpf")
+var errHash = errors.New("hash failed")
+
+func NewAccount(name string, cpfInput string, secret string) (Account, error) {
+	cpf, err := cpf.NewCpf(cpfInput)
+
+	if err != nil {
+
+		return Account{}, errCpf
+	}
+
 	hashedSecret, err := createHash(secret)
 
 	if err != nil {
 
-		return Account{}, err
+		return Account{}, errHash
 	}
 
 	return Account{
 		Id:        newAccountId(),
 		Name:      name,
-		Cpf:       cpf, // TODO validate this
+		Cpf:       cpf.Value(),
 		Secret:    hashedSecret,
 		Balance:   0,
 		CreatedAt: time.Now(),
 	}, nil
 }
 
+const hashCost = 10
+
 func createHash(secret string) (Secret, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(secret), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(secret), hashCost)
 
 	if err != nil {
 
