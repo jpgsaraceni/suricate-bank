@@ -32,7 +32,7 @@ func NewAccount(name string, cpf Cpf, secret string) (Account, error) {
 	}
 
 	return Account{
-		Id:        AccountId(uuid.New()),
+		Id:        newAccountId(),
 		Name:      name,
 		Cpf:       cpf, // TODO validate this
 		Secret:    hashedSecret,
@@ -50,4 +50,8 @@ func createHash(secret string) (Secret, error) {
 	}
 
 	return Secret(hash), nil
+}
+
+func newAccountId() AccountId {
+	return AccountId(uuid.New())
 }
