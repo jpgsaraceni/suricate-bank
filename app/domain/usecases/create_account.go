@@ -9,7 +9,6 @@ import (
 var (
 	errCreate = errors.New("failed to create account")
 	errName   = errors.New("invalid name length")
-	errCpf    = errors.New("invalid cpf length")
 	errSecret = errors.New("invalid password length")
 )
 
@@ -20,9 +19,11 @@ const (
 	minPasswordLength = 6
 )
 
-// CreateAccount checks if lengths of arguments are ok, then calls entities.NewAccount,
-// and returns the created Account struct.
-func CreateAccount(name, cpf, secret string) (account.Account, error) {
+type Usecase struct {
+	repository account.Repository
+}
+
+func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 	var newAccount account.Account
 
 	if len(name) < minNameLength || len(name) > maxNameLength {
@@ -36,6 +37,12 @@ func CreateAccount(name, cpf, secret string) (account.Account, error) {
 	}
 
 	newAccount, err := account.NewAccount(name, cpf, secret)
+
+	if err != nil {
+		return newAccount, errCreate
+	}
+
+	err = uc.repository.Create(&newAccount)
 
 	if err != nil {
 		return newAccount, errCreate
