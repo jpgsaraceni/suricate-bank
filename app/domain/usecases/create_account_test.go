@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jpgsaraceni/suricate-bank/app/domain/entities"
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
 func TestCreateAccount(t *testing.T) {
@@ -19,7 +19,7 @@ func TestCreateAccount(t *testing.T) {
 	type testCase struct {
 		name string
 		args arg
-		want entities.Account
+		want account.Account
 		err  error
 	}
 

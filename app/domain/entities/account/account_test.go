@@ -1,4 +1,4 @@
-package entities
+package account
 
 import (
 	"reflect"

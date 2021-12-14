@@ -3,7 +3,7 @@ package usecase
 import (
 	"errors"
 
-	"github.com/jpgsaraceni/suricate-bank/app/domain/entities"
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
 var (
@@ -17,25 +17,17 @@ const (
 	minNameLength = 3
 	maxNameLength = 100
 
-	rawCpfLength    = 11
-	maskedCpfLength = 14
-
 	minPasswordLength = 6
 )
 
 // CreateAccount checks if lengths of arguments are ok, then calls entities.NewAccount,
 // and returns the created Account struct.
-func CreateAccount(name, cpf, secret string) (entities.Account, error) {
-	var newAccount entities.Account
+func CreateAccount(name, cpf, secret string) (account.Account, error) {
+	var newAccount account.Account
 
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
 		return newAccount, errName
-	}
-
-	if len(cpf) != rawCpfLength || len(cpf) != maskedCpfLength {
-
-		return newAccount, errCpf
 	}
 
 	if len(secret) < minPasswordLength {
@@ -43,7 +35,7 @@ func CreateAccount(name, cpf, secret string) (entities.Account, error) {
 		return newAccount, errSecret
 	}
 
-	newAccount, err := entities.NewAccount(name, cpf, secret)
+	newAccount, err := account.NewAccount(name, cpf, secret)
 
 	if err != nil {
 		return newAccount, errCreate

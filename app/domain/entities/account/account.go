@@ -1,19 +1,17 @@
-package entities
+package account
 
 import (
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/hash"
 )
 
 type (
 	AccountId uuid.UUID
-	Cpf       string
-	Secret    string
 	Money     int
 )
 
@@ -21,7 +19,7 @@ type Account struct {
 	Id        AccountId
 	Name      string
 	Cpf       string
-	Secret    Secret
+	Secret    string
 	Balance   Money
 	CreatedAt time.Time
 }
@@ -37,7 +35,7 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 		return Account{}, errCpf
 	}
 
-	hashedSecret, err := createHash(secret)
+	hashedSecret, err := hash.NewHash(secret)
 
 	if err != nil {
 
@@ -48,23 +46,10 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 		Id:        newAccountId(),
 		Name:      name,
 		Cpf:       cpf.Value(),
-		Secret:    hashedSecret,
+		Secret:    hashedSecret.Value(),
 		Balance:   0,
 		CreatedAt: time.Now(),
 	}, nil
-}
-
-const hashCost = 10
-
-func createHash(secret string) (Secret, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(secret), hashCost)
-
-	if err != nil {
-
-		return "", err
-	}
-
-	return Secret(hash), nil
 }
 
 func newAccountId() AccountId {
