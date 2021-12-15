@@ -1,6 +1,10 @@
 package hash
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Secret struct {
 	hash string
@@ -8,14 +12,16 @@ type Secret struct {
 
 const hashCost = 10
 
-func NewHash(secret string) (Secret, error) {
+var errHash = errors.New("error hashing")
+
+func NewHash(inputSecret string) (Secret, error) {
 	s := Secret{}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(secret), hashCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(inputSecret), hashCost)
 
 	if err != nil {
 
-		return s, err
+		return s, errHash
 	}
 
 	s.hash = string(hash)
@@ -23,8 +29,8 @@ func NewHash(secret string) (Secret, error) {
 	return s, nil
 }
 
-func (s Secret) Compare(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(s.hash), []byte(password))
+func (s Secret) Compare(inputHash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(s.hash), []byte(inputHash))
 
 	return err == nil
 }
