@@ -24,10 +24,24 @@ type Account struct {
 	CreatedAt time.Time
 }
 
-var errCpf = errors.New("invalid cpf")
-var errHash = errors.New("hash failed")
+var (
+	errCpf    = errors.New("invalid cpf")
+	errHash   = errors.New("hash failed")
+	errName   = errors.New("empty name")
+	errSecret = errors.New("empty name")
+)
 
 func NewAccount(name string, cpfInput string, secret string) (Account, error) {
+	if len(name) == 0 {
+
+		return Account{}, errName
+	}
+
+	if len(secret) == 0 {
+
+		return Account{}, errSecret
+	}
+
 	cpf, err := cpf.NewCpf(cpfInput)
 
 	if err != nil {
