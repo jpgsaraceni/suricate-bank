@@ -3,7 +3,9 @@ package usecase
 import (
 	"reflect"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
@@ -24,11 +26,18 @@ func TestCreate(t *testing.T) {
 		err  error
 	}
 
+	var testUUID, _ = uuid.NewUUID()
+	var testAccountId = account.AccountId(testUUID)
+	var testTime = time.Now()
+
 	testCases := []testCase{
 		{
 			name: "successfully create account",
 			uc: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
+					account.Id = testAccountId
+					account.CreatedAt = testTime
+					account.Secret = "hashedpassphrase"
 					return nil
 				},
 			},
@@ -38,8 +47,11 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{
-				Name: "meee",
-				Cpf:  "22061446035",
+				Name:      "meee",
+				Cpf:       "22061446035",
+				Id:        testAccountId,
+				CreatedAt: testTime,
+				Secret:    "hashedpassphrase",
 			},
 		},
 	}
@@ -56,10 +68,6 @@ func TestCreate(t *testing.T) {
 			if err != tt.err {
 				t.Errorf("got %s expected %s", err, tt.err)
 			}
-
-			newAccount.Id = tt.want.Id
-			newAccount.Secret = tt.want.Secret
-			newAccount.CreatedAt = tt.want.CreatedAt
 
 			if !reflect.DeepEqual(newAccount, tt.want) {
 				t.Errorf("got %v expected %v", newAccount, tt.want)
