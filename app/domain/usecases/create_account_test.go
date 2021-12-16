@@ -16,16 +16,9 @@ func TestCreate(t *testing.T) {
 		secret string
 	}
 
-	uc := Usecase{
-		account.MockRepository{
-			OnCreate: func(account *account.Account) error {
-				return nil
-			},
-		}}
-
 	type testCase struct {
 		name string
-		uc   Usecase
+		uc   account.Repository
 		args args
 		want account.Account
 		err  error
@@ -34,7 +27,11 @@ func TestCreate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "successfully create account",
-			uc:   uc,
+			uc: account.MockRepository{
+				OnCreate: func(account *account.Account) error {
+					return nil
+				},
+			},
 			args: args{
 				name:   "meee",
 				cpf:    "220.614.460-35",
@@ -52,13 +49,9 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			newAccount, err := tt.uc.Create(tt.args.name, tt.args.cpf, tt.args.secret)
+			uc := Usecase{tt.uc}
 
-			if err != tt.err {
-				t.Errorf("got %s expected %s", err, tt.err)
-			}
-
-			err = tt.uc.Repository.Create(&newAccount)
+			newAccount, err := uc.Create(tt.args.name, tt.args.cpf, tt.args.secret)
 
 			if err != tt.err {
 				t.Errorf("got %s expected %s", err, tt.err)
