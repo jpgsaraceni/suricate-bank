@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	errCreate = errors.New("failed to create account")
-	errName   = errors.New("invalid name length")
-	errSecret = errors.New("invalid password length")
+	errCreate      = errors.New("failed to create account")
+	errNameLength  = errors.New("invalid name length")
+	errShortSecret = errors.New("invalid password length")
+	errRepository  = errors.New("repository error")
 )
 
 const (
@@ -28,12 +29,12 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
-		return newAccount, errName
+		return newAccount, errNameLength
 	}
 
 	if len(secret) < minPasswordLength {
 
-		return newAccount, errSecret
+		return newAccount, errShortSecret
 	}
 
 	newAccount, err := account.NewAccount(name, cpf, secret)
@@ -45,7 +46,7 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 	err = uc.Repository.Create(&newAccount)
 
 	if err != nil {
-		return newAccount, errCreate
+		return newAccount, errRepository
 	}
 
 	return newAccount, nil

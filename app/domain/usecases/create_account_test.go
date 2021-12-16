@@ -31,15 +31,79 @@ func TestCreate(t *testing.T) {
 	var testAccountId = account.AccountId(testUUID)
 	var testTime = time.Now()
 
+	var mockCreateSuccess = func(account *account.Account) error {
+		account.Id = testAccountId
+		account.CreatedAt = testTime
+		account.Secret = "hashedpassphrase"
+		return nil
+	}
+
 	testCases := []testCase{
 		{
 			name: "successfully create account",
+			repository: account.MockRepository{
+				OnCreate: mockCreateSuccess,
+			},
+			args: args{
+				name:   "meee",
+				cpf:    "220.614.460-35",
+				secret: "reallygoodpassphrase",
+			},
+			want: account.Account{
+				Name:      "meee",
+				Cpf:       "22061446035",
+				Id:        testAccountId,
+				CreatedAt: testTime,
+				Secret:    "hashedpassphrase",
+			},
+		},
+		{
+			name: "fail to create account because password is too short",
+			repository: account.MockRepository{
+				OnCreate: mockCreateSuccess,
+			},
+			args: args{
+				name:   "meee",
+				cpf:    "220.614.460-35",
+				secret: "123",
+			},
+			want: account.Account{},
+			err:  errShortSecret,
+		},
+		{
+			name: "fail to create account because name is too short",
+			repository: account.MockRepository{
+				OnCreate: mockCreateSuccess,
+			},
+			args: args{
+				name:   "me",
+				cpf:    "220.614.460-35",
+				secret: "123",
+			},
+			want: account.Account{},
+			err:  errNameLength,
+		},
+		{
+			name: "fail to create account because NewAccount returned error",
+			repository: account.MockRepository{
+				OnCreate: mockCreateSuccess,
+			},
+			args: args{
+				name:   "meee",
+				cpf:    "220.614.4",
+				secret: "123456",
+			},
+			want: account.Account{},
+			err:  errCreate,
+		},
+		{
+			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
 					account.Id = testAccountId
 					account.CreatedAt = testTime
 					account.Secret = "hashedpassphrase"
-					return nil
+					return errRepository
 				},
 			},
 			args: args{
@@ -54,6 +118,7 @@ func TestCreate(t *testing.T) {
 				CreatedAt: testTime,
 				Secret:    "hashedpassphrase",
 			},
+			err: errRepository,
 		},
 	}
 
