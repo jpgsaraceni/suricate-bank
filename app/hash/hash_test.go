@@ -1,6 +1,7 @@
 package hash
 
 import (
+	"errors"
 	"testing"
 
 	"golang.org/x/crypto/bcrypt"
@@ -37,10 +38,8 @@ func TestNewHash(t *testing.T) {
 
 			got, err := NewHash(tt.secret)
 
-			if err != tt.err {
-				t.Errorf("got error %v expected error %v", err, tt.err)
-
-				return
+			if errors.Is(err, tt.err) {
+				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
 			gotHashBytes := []byte(got.Value())

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -133,10 +134,8 @@ func TestNewAccount(t *testing.T) {
 			t.Parallel()
 			got, err := NewAccount(tt.args.name, tt.args.cpf, tt.args.secret)
 
-			if err != tt.err {
-				t.Errorf("got error %v expected error %v", err, tt.err)
-
-				return
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
 			if got.Id != AccountId(uuid.Nil) {

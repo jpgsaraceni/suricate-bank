@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -19,11 +20,11 @@ func TestCreate(t *testing.T) {
 	}
 
 	type testCase struct {
-		name string
-		uc   account.Repository
-		args args
-		want account.Account
-		err  error
+		name       string
+		repository account.Repository
+		args       args
+		want       account.Account
+		err        error
 	}
 
 	var testUUID, _ = uuid.NewUUID()
@@ -33,7 +34,7 @@ func TestCreate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "successfully create account",
-			uc: account.MockRepository{
+			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
 					account.Id = testAccountId
 					account.CreatedAt = testTime
@@ -61,12 +62,12 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.uc}
+			uc := Usecase{tt.repository}
 
 			newAccount, err := uc.Create(tt.args.name, tt.args.cpf, tt.args.secret)
 
-			if err != tt.err {
-				t.Errorf("got %s expected %s", err, tt.err)
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("got %s expected %s", err, tt.err)
 			}
 
 			if !reflect.DeepEqual(newAccount, tt.want) {
