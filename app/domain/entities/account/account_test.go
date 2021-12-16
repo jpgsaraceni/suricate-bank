@@ -33,7 +33,7 @@ func TestNewAccount(t *testing.T) {
 				secret: "123456",
 			},
 			want: Account{},
-			err:  errCpf,
+			err:  errInvalidCpf,
 		},
 		{
 			name: "creates new account",
@@ -113,7 +113,7 @@ func TestNewAccount(t *testing.T) {
 				secret: "123456",
 			},
 			want: Account{},
-			err:  errName,
+			err:  errEmptyName,
 		},
 		{
 			name: "fails to create new account with empty secret",
@@ -123,7 +123,7 @@ func TestNewAccount(t *testing.T) {
 				secret: "",
 			},
 			want: Account{},
-			err:  errSecret,
+			err:  errEmptySecret,
 		},
 	}
 
