@@ -1,53 +1,76 @@
 package usecase
 
-// import (
-// 	"reflect"
-// 	"testing"
+import (
+	"reflect"
+	"testing"
 
-// 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-// )
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+)
 
-// func TestCreateAccount(t *testing.T) {
-// 	t.Parallel()
+func TestCreate(t *testing.T) {
+	t.Parallel()
 
-// 	type arg struct {
-// 		name   string
-// 		cpf    string
-// 		secret string
-// 	}
+	type args struct {
+		name   string
+		cpf    string
+		secret string
+	}
 
-// 	type testCase struct {
-// 		name string
-// 		args arg
-// 		want account.Account
-// 		err  error
-// 	}
+	uc := Usecase{
+		account.MockRepository{
+			OnCreate: func(account *account.Account) error {
+				return nil
+			},
+		}}
 
-// 	testCases := []testCase{
-// 		{
-// 			name: "name is too short",
-// 			args: arg{
-// 				name:   "me",
-// 				cpf:    "123.456.789-01",
-// 				secret: "123456",
-// 			},
-// 			err: errName,
-// 		},
-// 	}
+	type testCase struct {
+		name string
+		uc   Usecase
+		args args
+		want account.Account
+		err  error
+	}
 
-// 	for _, tt := range testCases {
-// 		tt := tt
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			t.Parallel()
-// 			got, err := Usecase.Create(tt.args.name, tt.args.cpf, tt.args.secret)
+	testCases := []testCase{
+		{
+			name: "successfully create account",
+			uc:   uc,
+			args: args{
+				name:   "meee",
+				cpf:    "220.614.460-35",
+				secret: "reallygoodpassphrase",
+			},
+			want: account.Account{
+				Name: "meee",
+				Cpf:  "22061446035",
+			},
+		},
+	}
 
-// 			if err != tt.err {
-// 				t.Errorf("got error %s expected error %s", err, tt.err)
-// 			}
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-// 			if !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("got %v expected %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+			newAccount, err := tt.uc.Create(tt.args.name, tt.args.cpf, tt.args.secret)
+
+			if err != tt.err {
+				t.Errorf("got %s expected %s", err, tt.err)
+			}
+
+			err = tt.uc.Repository.Create(&newAccount)
+
+			if err != tt.err {
+				t.Errorf("got %s expected %s", err, tt.err)
+			}
+
+			newAccount.Id = tt.want.Id
+			newAccount.Secret = tt.want.Secret
+			newAccount.CreatedAt = tt.want.CreatedAt
+
+			if !reflect.DeepEqual(newAccount, tt.want) {
+				t.Errorf("got %v expected %v", newAccount, tt.want)
+			}
+		})
+	}
+}

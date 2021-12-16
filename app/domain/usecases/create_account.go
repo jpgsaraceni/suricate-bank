@@ -20,7 +20,7 @@ const (
 )
 
 type Usecase struct {
-	repository account.Repository
+	Repository account.Repository
 }
 
 func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
@@ -42,7 +42,7 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 		return newAccount, errCreate
 	}
 
-	err = uc.repository.Create(&newAccount)
+	err = uc.Repository.Create(&newAccount)
 
 	if err != nil {
 		return newAccount, errCreate
