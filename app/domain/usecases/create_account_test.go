@@ -112,9 +112,6 @@ func TestCreate(t *testing.T) {
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
-					account.Id = testAccountId
-					account.CreatedAt = testTime
-					account.Secret = wantHash("hashedpassphrase")
 					return errRepository
 				},
 			},
@@ -123,14 +120,8 @@ func TestCreate(t *testing.T) {
 				cpf:    "220.614.460-35",
 				secret: "reallygoodpassphrase",
 			},
-			want: account.Account{
-				Name:      "meee",
-				Cpf:       wantCpf("22061446035"),
-				Id:        testAccountId,
-				CreatedAt: testTime,
-				Secret:    wantHash("hashedpassphrase"),
-			},
-			err: errRepository,
+			want: account.Account{},
+			err:  errRepository,
 		},
 	}
 

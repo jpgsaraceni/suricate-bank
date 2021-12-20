@@ -25,28 +25,28 @@ type Usecase struct {
 }
 
 func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
-	var newAccount account.Account
-
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
-		return newAccount, errNameLength
+		return account.Account{}, errNameLength
 	}
 
 	if len(secret) < minPasswordLength {
 
-		return newAccount, errShortSecret
+		return account.Account{}, errShortSecret
 	}
 
 	newAccount, err := account.NewAccount(name, cpf, secret)
 
 	if err != nil {
-		return newAccount, errCreate
+
+		return account.Account{}, errCreate
 	}
 
 	err = uc.Repository.Create(&newAccount)
 
 	if err != nil {
-		return newAccount, errRepository
+
+		return account.Account{}, errRepository
 	}
 
 	return newAccount, nil
