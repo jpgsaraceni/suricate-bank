@@ -20,10 +20,6 @@ const (
 	minPasswordLength = 6
 )
 
-type Usecase struct {
-	Repository account.Repository
-}
-
 func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
