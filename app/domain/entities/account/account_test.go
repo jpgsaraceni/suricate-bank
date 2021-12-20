@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 )
 
 func TestNewAccount(t *testing.T) {
@@ -23,6 +24,11 @@ func TestNewAccount(t *testing.T) {
 		args arg
 		want Account
 		err  error
+	}
+
+	var wantCpf = func(input string) cpf.Cpf {
+		newCpf, _ := cpf.NewCpf(input)
+		return newCpf
 	}
 
 	testCases := []testCase{
@@ -45,7 +51,7 @@ func TestNewAccount(t *testing.T) {
 			},
 			want: Account{
 				Name:      "Me",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("220.614.460-35"),
 				Balance:   0,
 				CreatedAt: time.Now(),
 			},
@@ -59,7 +65,7 @@ func TestNewAccount(t *testing.T) {
 			},
 			want: Account{
 				Name:      "Me",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Balance:   0,
 				CreatedAt: time.Now(),
 			},
@@ -73,7 +79,7 @@ func TestNewAccount(t *testing.T) {
 			},
 			want: Account{
 				Name:      "fajkldsjkl jalksfjasdlkads ajdsklghkjlahrwgfirpequfhaksljdgh ropuq trwj ewjfdsg opgthr wdhwfhsadgjkl",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Balance:   0,
 				CreatedAt: time.Now(),
 			},
@@ -87,7 +93,7 @@ func TestNewAccount(t *testing.T) {
 			},
 			want: Account{
 				Name:      "Me",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Balance:   0,
 				CreatedAt: time.Now(),
 			},
@@ -101,7 +107,7 @@ func TestNewAccount(t *testing.T) {
 			},
 			want: Account{
 				Name:      "a",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Balance:   0,
 				CreatedAt: time.Now(),
 			},

@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/hash"
 )
 
 func TestCreate(t *testing.T) {
@@ -31,11 +33,21 @@ func TestCreate(t *testing.T) {
 	var testAccountId = account.AccountId(testUUID)
 	var testTime = time.Now()
 
+	var wantHash = func(secret string) hash.Secret {
+		newHash, _ := hash.NewHash(secret)
+		return newHash
+	}
+
 	var mockCreateSuccess = func(account *account.Account) error {
 		account.Id = testAccountId
 		account.CreatedAt = testTime
-		account.Secret = "hashedpassphrase"
+		account.Secret = wantHash("hashedpassphrase")
 		return nil
+	}
+
+	var wantCpf = func(input string) cpf.Cpf {
+		newCpf, _ := cpf.NewCpf(input)
+		return newCpf
 	}
 
 	testCases := []testCase{
@@ -51,10 +63,10 @@ func TestCreate(t *testing.T) {
 			},
 			want: account.Account{
 				Name:      "meee",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Id:        testAccountId,
 				CreatedAt: testTime,
-				Secret:    "hashedpassphrase",
+				Secret:    wantHash("hashedpassphrase"),
 			},
 		},
 		{
@@ -102,7 +114,7 @@ func TestCreate(t *testing.T) {
 				OnCreate: func(account *account.Account) error {
 					account.Id = testAccountId
 					account.CreatedAt = testTime
-					account.Secret = "hashedpassphrase"
+					account.Secret = wantHash("hashedpassphrase")
 					return errRepository
 				},
 			},
@@ -113,10 +125,10 @@ func TestCreate(t *testing.T) {
 			},
 			want: account.Account{
 				Name:      "meee",
-				Cpf:       "22061446035",
+				Cpf:       wantCpf("22061446035"),
 				Id:        testAccountId,
 				CreatedAt: testTime,
-				Secret:    "hashedpassphrase",
+				Secret:    wantHash("hashedpassphrase"),
 			},
 			err: errRepository,
 		},
@@ -134,6 +146,8 @@ func TestCreate(t *testing.T) {
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
 			}
+
+			tt.want.Secret = newAccount.Secret
 
 			if !reflect.DeepEqual(newAccount, tt.want) {
 				t.Errorf("got %v expected %v", newAccount, tt.want)

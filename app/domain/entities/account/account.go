@@ -18,8 +18,8 @@ type (
 type Account struct {
 	Id        AccountId
 	Name      string
-	Cpf       string
-	Secret    string
+	Cpf       cpf.Cpf
+	Secret    hash.Secret
 	Balance   Money
 	CreatedAt time.Time
 }
@@ -59,8 +59,8 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 	return Account{
 		Id:        newAccountId(),
 		Name:      name,
-		Cpf:       cpf.Value(),
-		Secret:    hashedSecret.Value(),
+		Cpf:       cpf,
+		Secret:    hashedSecret,
 		Balance:   0,
 		CreatedAt: time.Now(),
 	}, nil
