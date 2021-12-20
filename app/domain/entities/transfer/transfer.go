@@ -1,6 +1,7 @@
 package transfer
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,7 +21,22 @@ type Transfer struct {
 	CreatedAt            time.Time
 }
 
+var (
+	errSameAccounts = errors.New("origin and destination must be different accounts")
+	errAmountZero   = errors.New("amount cannot be zero")
+)
+
 func NewTransfer(amount money.Money, originId, destinationId account.AccountId) (Transfer, error) {
+	if originId == destinationId {
+
+		return Transfer{}, errSameAccounts
+	}
+
+	if amount.Cents() == 0 {
+
+		return Transfer{}, errAmountZero
+	}
+
 	newTransfer := Transfer{
 		Id:                   newTransferId(),
 		AccountOriginId:      originId,

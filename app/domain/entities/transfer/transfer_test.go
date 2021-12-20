@@ -32,8 +32,7 @@ func TestNewTransfer(t *testing.T) {
 	var testUUID3, _ = uuid.NewUUID()
 
 	var testMoney100, _ = money.NewMoney(100)
-	// var testMoney200, _ = money.NewMoney(200)
-	// var testMoney0, _ = money.NewMoney(0)
+	var testMoney0, _ = money.NewMoney(0)
 
 	var testTime = time.Now()
 
@@ -53,6 +52,26 @@ func TestNewTransfer(t *testing.T) {
 				CreatedAt:            testTime,
 			},
 		},
+		{
+			name: "fails transfer when origin and destination are the same",
+			args: args{
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID1),
+				amount:        testMoney100,
+			},
+			want: Transfer{},
+			err:  errSameAccounts,
+		},
+		{
+			name: "fails transfer when amount is zero",
+			args: args{
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+				amount:        testMoney0,
+			},
+			want: Transfer{},
+			err:  errAmountZero,
+		},
 	}
 
 	for _, tt := range testCases {
@@ -65,8 +84,10 @@ func TestNewTransfer(t *testing.T) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
-			got.CreatedAt = testTime
-			got.Id = TransferId(testUUID3)
+			if !reflect.DeepEqual(got, Transfer{}) {
+				got.Id = TransferId(testUUID3)
+				got.CreatedAt = testTime
+			}
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got %v expected %v", got, tt.want)
