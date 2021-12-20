@@ -8,11 +8,11 @@ import (
 
 	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/money"
 )
 
 type (
 	AccountId uuid.UUID
-	Money     int
 )
 
 type Account struct {
@@ -20,7 +20,7 @@ type Account struct {
 	Name      string
 	Cpf       cpf.Cpf
 	Secret    hash.Secret
-	Balance   Money
+	Balance   money.Money
 	CreatedAt time.Time
 }
 
@@ -56,12 +56,14 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 		return Account{}, errNewHash
 	}
 
+	newMoney, _ := money.NewMoney(0)
+
 	return Account{
 		Id:        newAccountId(),
 		Name:      name,
 		Cpf:       cpf,
 		Secret:    hashedSecret,
-		Balance:   0,
+		Balance:   newMoney,
 		CreatedAt: time.Now(),
 	}, nil
 }
