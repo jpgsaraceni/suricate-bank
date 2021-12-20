@@ -1,4 +1,4 @@
-package usecase
+package accountuc
 
 import "github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 
