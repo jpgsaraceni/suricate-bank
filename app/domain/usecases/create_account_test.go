@@ -72,7 +72,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to create account because password is too short",
 			repository: account.MockRepository{
-				OnCreate: mockCreateSuccess,
+				OnCreate: nil,
 			},
 			args: args{
 				name:   "meee",
