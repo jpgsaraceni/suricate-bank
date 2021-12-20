@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/money"
 )
 
 type (
@@ -15,11 +16,11 @@ type Transfer struct {
 	Id                   TransferId
 	AccountOriginId      account.AccountId
 	AccountDestinationId account.AccountId
-	Amount               account.Money // does this type make sense to come from account pkg?
+	Amount               money.Money // does this type make sense to come from account pkg?
 	CreatedAt            time.Time
 }
 
-func NewTransfer(amount account.Money, originId, destinationId account.AccountId) (Transfer, error) {
+func NewTransfer(amount money.Money, originId, destinationId account.AccountId) (Transfer, error) {
 	newTransfer := Transfer{
 		Id:                   newTransferId(),
 		AccountOriginId:      originId,
