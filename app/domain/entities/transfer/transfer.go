@@ -16,7 +16,7 @@ type Transfer struct {
 	Id                   TransferId
 	AccountOriginId      account.AccountId
 	AccountDestinationId account.AccountId
-	Amount               money.Money // does this type make sense to come from account pkg?
+	Amount               money.Money
 	CreatedAt            time.Time
 }
 

@@ -44,8 +44,8 @@ func TestNewMoney(t *testing.T) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
-			if newMoney.Value() != tt.want {
-				t.Errorf("got %v expected %v", newMoney.Value(), tt.want)
+			if newMoney.Cents() != tt.want {
+				t.Errorf("got %v expected %v", newMoney.Cents(), tt.want)
 			}
 		})
 	}
@@ -111,8 +111,8 @@ func TestAdd(t *testing.T) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
-			if newMoney.Value() != tt.want {
-				t.Errorf("got %v expected %v", newMoney.Value(), tt.want)
+			if newMoney.Cents() != tt.want {
+				t.Errorf("got %v expected %v", newMoney.Cents(), tt.want)
 			}
 		})
 	}
@@ -191,8 +191,8 @@ func TestSubtract(t *testing.T) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
-			if newMoney.Value() != tt.want {
-				t.Errorf("got %v expected %v", newMoney.Value(), tt.want)
+			if newMoney.Cents() != tt.want {
+				t.Errorf("got %v expected %v", newMoney.Cents(), tt.want)
 			}
 		})
 	}

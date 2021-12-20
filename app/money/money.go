@@ -5,7 +5,7 @@ package money
 import "errors"
 
 type Money struct {
-	value int
+	cents int
 }
 
 var (
@@ -20,11 +20,11 @@ func NewMoney(amount int) (Money, error) {
 		return Money{}, ErrNegative
 	}
 
-	return Money{value: amount}, nil
+	return Money{cents: amount}, nil
 }
 
-func (m Money) Value() int {
-	return m.value
+func (m Money) Cents() int {
+	return m.cents
 }
 
 func (m *Money) Add(amount int) error {
@@ -37,7 +37,7 @@ func (m *Money) Add(amount int) error {
 
 		return ErrChangeByZero
 	}
-	m.value += amount
+	m.cents += amount
 
 	return nil
 }
@@ -53,11 +53,11 @@ func (m *Money) Subtract(amount int) error {
 		return ErrChangeByZero
 	}
 
-	if amount > m.value {
+	if amount > m.cents {
 
 		return ErrInsuficientFunds
 	}
-	m.value -= amount
+	m.cents -= amount
 
 	return nil
 }
