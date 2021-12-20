@@ -46,16 +46,16 @@ func TestGetBalance(t *testing.T) {
 			want: 100,
 		},
 		{
-			name: "invalid Id",
+			name: "repository throws error",
 			repository: account.MockRepository{
 				OnGetBalance: func(id account.AccountId) (int, error) {
 
-					return 0, ErrInvalidId
+					return 0, ErrGetBalanceRepository
 				},
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  ErrInvalidId,
+			err:  ErrGetBalanceRepository,
 		},
 	}
 
