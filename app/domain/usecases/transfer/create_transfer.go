@@ -6,7 +6,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Create(originId, destinationId account.AccountId, amount money.Money) (transfer.Transfer, error) {
+func (uc Usecase) Create(amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
 
