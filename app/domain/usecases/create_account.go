@@ -33,7 +33,7 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 
 	if err != nil {
 
-		return account.Account{}, ErrRepository
+		return account.Account{}, ErrCreateAccountRepository
 	}
 
 	return newAccount, nil
