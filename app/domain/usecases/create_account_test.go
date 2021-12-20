@@ -112,7 +112,7 @@ func TestCreate(t *testing.T) {
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
-					return ErrRepository
+					return ErrCreateAccountRepository
 				},
 			},
 			args: args{
@@ -121,7 +121,7 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  ErrRepository,
+			err:  ErrCreateAccountRepository,
 		},
 	}
 

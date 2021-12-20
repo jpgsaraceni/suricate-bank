@@ -12,9 +12,11 @@ type Usecase struct {
 }
 
 var (
-	ErrCreateAccount        = errors.New("failed to create account")
-	ErrNameLength           = errors.New("invalid name length")
-	ErrShortSecret          = errors.New("invalid password length")
-	ErrRepository           = errors.New("repository error")
-	ErrGetBalanceRepository = errors.New("failed to get balance")
+	ErrCreateAccount           = errors.New("failed to create account")
+	ErrNameLength              = errors.New("invalid name length")
+	ErrShortSecret             = errors.New("invalid password length")
+	ErrCreateAccountRepository = errors.New("repository error")
+	ErrGetBalanceRepository    = errors.New("failed to get balance")
+	ErrFetchAccounts           = errors.New("couldn't fetch accounts")
+	ErrNoAccountsToFetch       = errors.New("no accounts to fetch")
 )
