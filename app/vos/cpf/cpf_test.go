@@ -89,7 +89,7 @@ func TestIsValid(t *testing.T) {
 			t.Parallel()
 			got, err := NewCpf(tt.cpf)
 
-			if errors.Is(err, tt.err) {
+			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", got, tt.err)
 			}
 

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jpgsaraceni/suricate-bank/app/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/money"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestNewAccount(t *testing.T) {

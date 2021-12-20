@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"github.com/jpgsaraceni/suricate-bank/app/money"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 type (
