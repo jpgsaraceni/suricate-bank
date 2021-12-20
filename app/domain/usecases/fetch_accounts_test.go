@@ -20,7 +20,10 @@ func TestFetch(t *testing.T) {
 		err        error
 	}
 
-	var testUUID, _ = uuid.NewUUID()
+	var testUUID1, _ = uuid.NewUUID()
+	var testUUID2, _ = uuid.NewUUID()
+	var testUUID3, _ = uuid.NewUUID()
+	var testUUID4, _ = uuid.NewUUID()
 	var testCpf = func(input string) cpf.Cpf {
 		newCpf, _ := cpf.NewCpf(input)
 		return newCpf
@@ -34,7 +37,7 @@ func TestFetch(t *testing.T) {
 
 					return []account.Account{
 						{
-							Id:      account.AccountId(testUUID),
+							Id:      account.AccountId(testUUID1),
 							Name:    "Account 1",
 							Cpf:     testCpf("220.614.460-35"),
 							Balance: 10,
@@ -44,10 +47,70 @@ func TestFetch(t *testing.T) {
 			},
 			want: []account.Account{
 				{
-					Id:      account.AccountId(testUUID),
+					Id:      account.AccountId(testUUID1),
 					Name:    "Account 1",
 					Cpf:     testCpf("220.614.460-35"),
 					Balance: 10,
+				},
+			},
+		},
+		{
+			name: "successfully fetch 4 accounts",
+			repository: account.MockRepository{
+				OnFetch: func() ([]account.Account, error) {
+
+					return []account.Account{
+						{
+							Id:      account.AccountId(testUUID1),
+							Name:    "Account 1",
+							Cpf:     testCpf("220.614.460-35"),
+							Balance: 10,
+						},
+						{
+							Id:      account.AccountId(testUUID2),
+							Name:    "Account 2",
+							Cpf:     testCpf("232.598.190-88"),
+							Balance: 0,
+						},
+						{
+							Id:      account.AccountId(testUUID3),
+							Name:    "Account 3",
+							Cpf:     testCpf("816.413.860-61"),
+							Balance: 2313124,
+						},
+						{
+							Id:      account.AccountId(testUUID4),
+							Name:    "Account 4",
+							Cpf:     testCpf("924.498.310-96"),
+							Balance: 1,
+						},
+					}, nil
+				},
+			},
+			want: []account.Account{
+				{
+					Id:      account.AccountId(testUUID1),
+					Name:    "Account 1",
+					Cpf:     testCpf("220.614.460-35"),
+					Balance: 10,
+				},
+				{
+					Id:      account.AccountId(testUUID2),
+					Name:    "Account 2",
+					Cpf:     testCpf("232.598.190-88"),
+					Balance: 0,
+				},
+				{
+					Id:      account.AccountId(testUUID3),
+					Name:    "Account 3",
+					Cpf:     testCpf("816.413.860-61"),
+					Balance: 2313124,
+				},
+				{
+					Id:      account.AccountId(testUUID4),
+					Name:    "Account 4",
+					Cpf:     testCpf("924.498.310-96"),
+					Balance: 1,
 				},
 			},
 		},
