@@ -3,6 +3,7 @@ package account
 type MockRepository struct {
 	OnCreate     func(account *Account) error
 	OnGetBalance func(id AccountId) (int, error)
+	OnFetch      func() ([]Account, error)
 }
 
 var _ Repository = (*MockRepository)(nil)
@@ -13,4 +14,8 @@ func (mock MockRepository) Create(account *Account) error {
 
 func (mock MockRepository) GetBalance(id AccountId) (int, error) {
 	return mock.OnGetBalance(id)
+}
+
+func (mock MockRepository) Fetch() ([]Account, error) {
+	return mock.OnFetch()
 }
