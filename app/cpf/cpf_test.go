@@ -1,6 +1,7 @@
 package cpf
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -88,10 +89,8 @@ func TestIsValid(t *testing.T) {
 			t.Parallel()
 			got, err := NewCpf(tt.cpf)
 
-			if tt.err != err {
-				t.Errorf("got error %s expected error %s", got, tt.err)
-
-				return
+			if errors.Is(err, tt.err) {
+				t.Fatalf("got error %s expected error %s", got, tt.err)
 			}
 
 			if got.Value() != tt.expectedValue {
