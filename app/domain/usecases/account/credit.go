@@ -5,12 +5,19 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func Credit(account *account.Account, amount money.Money) error {
-	err := account.Balance.Add(amount.Cents())
+func (uc Usecase) Credit(id account.AccountId, amount money.Money) (account.Account, error) {
+	account, err := uc.GetById(id)
 
 	if err != nil {
-		return err
+
+		return account, err
 	}
 
-	return nil
+	err = account.Balance.Add(amount.Cents())
+
+	if err != nil {
+		return account, err
+	}
+
+	return account, nil
 }
