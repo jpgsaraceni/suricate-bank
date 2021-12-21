@@ -5,12 +5,19 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func Debit(account *account.Account, amount money.Money) error {
-	err := account.Balance.Subtract(amount.Cents())
+func (uc Usecase) Debit(id account.AccountId, amount money.Money) (account.Account, error) {
+	account, err := uc.GetById(id)
 
 	if err != nil {
-		return err
+
+		return account, err
 	}
 
-	return nil
+	err = account.Balance.Subtract(amount.Cents())
+
+	if err != nil {
+		return account, err
+	}
+
+	return account, nil
 }
