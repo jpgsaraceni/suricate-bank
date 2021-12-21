@@ -40,17 +40,15 @@ func TestCreate(t *testing.T) {
 
 	var testTime = time.Now()
 
-	var mockCreateSuccess = func(transfer *transfer.Transfer) error {
-		transfer.Id = testTransferId
-		transfer.CreatedAt = testTime
-		return nil
-	}
-
 	testCases := []testCase{
 		{
 			name: "create transfer",
 			repository: transfer.MockRepository{
-				OnCreate: mockCreateSuccess,
+				OnCreate: func(transfer *transfer.Transfer) error {
+					transfer.Id = testTransferId
+					transfer.CreatedAt = testTime
+					return nil
+				},
 			},
 			args: args{
 				amount:        testMoney100,
@@ -64,6 +62,36 @@ func TestCreate(t *testing.T) {
 				AccountDestinationId: account.AccountId(testUUID2),
 				CreatedAt:            testTime,
 			},
+		},
+		{
+			name: "fail transfer to same account",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					return ErrCreateTransfer
+				},
+			},
+			args: args{
+				amount:        testMoney100,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID1),
+			},
+			want: transfer.Transfer{},
+			err:  ErrCreateTransfer,
+		},
+		{
+			name: "fail because of repository error",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					return ErrCreateTransferRepository
+				},
+			},
+			args: args{
+				amount:        testMoney100,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+			},
+			want: transfer.Transfer{},
+			err:  ErrCreateTransferRepository,
 		},
 	}
 
