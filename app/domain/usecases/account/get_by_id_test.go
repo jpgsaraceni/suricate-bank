@@ -28,7 +28,7 @@ func TestGetById(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetById: func(id account.AccountId) (account.Account, error) {
 					return account.Account{
-						Id: account.AccountId(testUUID),
+						Id: id,
 					}, nil
 				},
 			},

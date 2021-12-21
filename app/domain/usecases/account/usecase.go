@@ -19,4 +19,5 @@ var (
 	ErrGetBalanceRepository    = errors.New("failed to get balance")
 	ErrFetchAccounts           = errors.New("couldn't fetch accounts")
 	ErrNoAccountsToFetch       = errors.New("no accounts to fetch")
+	ErrAccountNotFound         = errors.New("account not found")
 )
