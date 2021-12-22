@@ -116,6 +116,26 @@ func TestCredit(t *testing.T) {
 			amount: testMoney100,
 			err:    ErrAccountNotFound,
 		},
+		{
+			name: "repository error",
+			testAccount: account.Account{
+				Id:      account.AccountId(testUUID),
+				Balance: testMoney0,
+			},
+			repository: account.MockRepository{
+				OnGetById: func(id account.AccountId) (account.Account, error) {
+					return account.Account{
+						Id:      account.AccountId(testUUID),
+						Balance: testMoney0,
+					}, nil
+				},
+				OnCreditAccount: func(account *account.Account, amount money.Money) error {
+					return errCreditAccountRepository
+				},
+			},
+			amount: testMoney100,
+			err:    errCreditAccountRepository,
+		},
 	}
 
 	for _, tt := range testCases {

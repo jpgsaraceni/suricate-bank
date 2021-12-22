@@ -1,9 +1,13 @@
 package accountuc
 
 import (
+	"errors"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
+
+var errCreditAccountRepository = errors.New("repository error when crediting account")
 
 func (uc Usecase) Credit(id account.AccountId, amount money.Money) error {
 	account, err := uc.GetById(id)
@@ -24,7 +28,7 @@ func (uc Usecase) Credit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return err
+		return errCreditAccountRepository
 	}
 
 	return nil

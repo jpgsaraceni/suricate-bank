@@ -156,6 +156,30 @@ func TestDebit(t *testing.T) {
 			},
 			err: money.ErrInsuficientFunds,
 		},
+		{
+			name: "repository error",
+			testAccount: account.Account{
+				Id:      account.AccountId(testUUID),
+				Balance: testMoney100,
+			},
+			repository: account.MockRepository{
+				OnGetById: func(id account.AccountId) (account.Account, error) {
+					return account.Account{
+						Id:      account.AccountId(testUUID),
+						Balance: testMoney100,
+					}, nil
+				},
+				OnDebitAccount: func(account *account.Account, amount money.Money) error {
+					return errDebitAccountRepository
+				},
+			},
+			amount: testMoney100,
+			want: account.Account{
+				Id:      account.AccountId(testUUID),
+				Balance: testMoney0,
+			},
+			err: errDebitAccountRepository,
+		},
 	}
 
 	for _, tt := range testCases {
