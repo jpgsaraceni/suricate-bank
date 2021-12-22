@@ -22,8 +22,8 @@ type Transfer struct {
 }
 
 var (
-	errSameAccounts = errors.New("origin and destination must be different accounts")
-	errAmountZero   = errors.New("amount cannot be zero")
+	errSameAccounts      = errors.New("origin and destination must be different accounts")
+	errAmountNotPositive = errors.New("amount must be greater than zero")
 )
 
 func NewTransfer(amount money.Money, originId, destinationId account.AccountId) (Transfer, error) {
@@ -32,9 +32,9 @@ func NewTransfer(amount money.Money, originId, destinationId account.AccountId) 
 		return Transfer{}, errSameAccounts
 	}
 
-	if amount.Cents() == 0 {
+	if amount.Cents() <= 0 {
 
-		return Transfer{}, errAmountZero
+		return Transfer{}, errAmountNotPositive
 	}
 
 	newTransfer := Transfer{

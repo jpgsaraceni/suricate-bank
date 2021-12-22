@@ -70,7 +70,7 @@ func TestNewTransfer(t *testing.T) {
 				amount:        testMoney0,
 			},
 			want: Transfer{},
-			err:  errAmountZero,
+			err:  errAmountNotPositive,
 		},
 	}
 
