@@ -71,27 +71,6 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 }
 
 func newAccountId() AccountId {
+
 	return AccountId(uuid.New())
-}
-
-func CreditAccount(account *Account, amount money.Money) error {
-	err := account.Balance.Add(amount.Cents())
-
-	if err != nil {
-
-		return errCredit
-	}
-
-	return nil
-}
-
-func DebitAccount(account *Account, amount money.Money) error {
-	err := account.Balance.Subtract(amount.Cents())
-
-	if err != nil {
-
-		return errDebit
-	}
-
-	return nil
 }
