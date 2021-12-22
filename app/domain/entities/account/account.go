@@ -6,13 +6,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/jpgsaraceni/suricate-bank/app/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 type (
 	AccountId uuid.UUID
-	Money     int
 )
 
 type Account struct {
@@ -20,7 +20,7 @@ type Account struct {
 	Name      string
 	Cpf       cpf.Cpf
 	Secret    hash.Secret
-	Balance   Money
+	Balance   money.Money
 	CreatedAt time.Time
 }
 
@@ -29,6 +29,8 @@ var (
 	errNewHash     = errors.New("hash failed")
 	errEmptyName   = errors.New("empty name")
 	errEmptySecret = errors.New("empty secret")
+	errCredit      = errors.New("failed to credit account")
+	errDebit       = errors.New("failed to debit account")
 )
 
 func NewAccount(name string, cpfInput string, secret string) (Account, error) {
@@ -56,16 +58,19 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 		return Account{}, errNewHash
 	}
 
+	newMoney, _ := money.NewMoney(0)
+
 	return Account{
 		Id:        newAccountId(),
 		Name:      name,
 		Cpf:       cpf,
 		Secret:    hashedSecret,
-		Balance:   0,
+		Balance:   newMoney,
 		CreatedAt: time.Now(),
 	}, nil
 }
 
 func newAccountId() AccountId {
+
 	return AccountId(uuid.New())
 }

@@ -1,4 +1,4 @@
-package usecase
+package accountuc
 
 import (
 	"errors"
@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"github.com/jpgsaraceni/suricate-bank/app/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestCreate(t *testing.T) {

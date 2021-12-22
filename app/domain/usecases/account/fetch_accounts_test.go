@@ -1,4 +1,4 @@
-package usecase
+package accountuc
 
 import (
 	"errors"
@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jpgsaraceni/suricate-bank/app/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
 
 func TestFetch(t *testing.T) {
@@ -37,20 +37,18 @@ func TestFetch(t *testing.T) {
 
 					return []account.Account{
 						{
-							Id:      account.AccountId(testUUID1),
-							Name:    "Account 1",
-							Cpf:     testCpf("220.614.460-35"),
-							Balance: 10,
+							Id:   account.AccountId(testUUID1),
+							Name: "Account 1",
+							Cpf:  testCpf("220.614.460-35"),
 						},
 					}, nil
 				},
 			},
 			want: []account.Account{
 				{
-					Id:      account.AccountId(testUUID1),
-					Name:    "Account 1",
-					Cpf:     testCpf("220.614.460-35"),
-					Balance: 10,
+					Id:   account.AccountId(testUUID1),
+					Name: "Account 1",
+					Cpf:  testCpf("220.614.460-35"),
 				},
 			},
 		},
@@ -61,56 +59,48 @@ func TestFetch(t *testing.T) {
 
 					return []account.Account{
 						{
-							Id:      account.AccountId(testUUID1),
-							Name:    "Account 1",
-							Cpf:     testCpf("220.614.460-35"),
-							Balance: 10,
+							Id:   account.AccountId(testUUID1),
+							Name: "Account 1",
+							Cpf:  testCpf("220.614.460-35"),
 						},
 						{
-							Id:      account.AccountId(testUUID2),
-							Name:    "Account 2",
-							Cpf:     testCpf("232.598.190-88"),
-							Balance: 0,
+							Id:   account.AccountId(testUUID2),
+							Name: "Account 2",
+							Cpf:  testCpf("232.598.190-88"),
 						},
 						{
-							Id:      account.AccountId(testUUID3),
-							Name:    "Account 3",
-							Cpf:     testCpf("816.413.860-61"),
-							Balance: 2313124,
+							Id:   account.AccountId(testUUID3),
+							Name: "Account 3",
+							Cpf:  testCpf("816.413.860-61"),
 						},
 						{
-							Id:      account.AccountId(testUUID4),
-							Name:    "Account 4",
-							Cpf:     testCpf("924.498.310-96"),
-							Balance: 1,
+							Id:   account.AccountId(testUUID4),
+							Name: "Account 4",
+							Cpf:  testCpf("924.498.310-96"),
 						},
 					}, nil
 				},
 			},
 			want: []account.Account{
 				{
-					Id:      account.AccountId(testUUID1),
-					Name:    "Account 1",
-					Cpf:     testCpf("220.614.460-35"),
-					Balance: 10,
+					Id:   account.AccountId(testUUID1),
+					Name: "Account 1",
+					Cpf:  testCpf("220.614.460-35"),
 				},
 				{
-					Id:      account.AccountId(testUUID2),
-					Name:    "Account 2",
-					Cpf:     testCpf("232.598.190-88"),
-					Balance: 0,
+					Id:   account.AccountId(testUUID2),
+					Name: "Account 2",
+					Cpf:  testCpf("232.598.190-88"),
 				},
 				{
-					Id:      account.AccountId(testUUID3),
-					Name:    "Account 3",
-					Cpf:     testCpf("816.413.860-61"),
-					Balance: 2313124,
+					Id:   account.AccountId(testUUID3),
+					Name: "Account 3",
+					Cpf:  testCpf("816.413.860-61"),
 				},
 				{
-					Id:      account.AccountId(testUUID4),
-					Name:    "Account 4",
-					Cpf:     testCpf("924.498.310-96"),
-					Balance: 1,
+					Id:   account.AccountId(testUUID4),
+					Name: "Account 4",
+					Cpf:  testCpf("924.498.310-96"),
 				},
 			},
 		},

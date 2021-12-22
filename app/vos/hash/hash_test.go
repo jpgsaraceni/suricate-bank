@@ -38,7 +38,7 @@ func TestNewHash(t *testing.T) {
 
 			got, err := NewHash(tt.secret)
 
-			if errors.Is(err, tt.err) {
+			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
