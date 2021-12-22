@@ -38,7 +38,7 @@ func TestCreate(t *testing.T) {
 	var testTransferId = transfer.TransferId(testUUID3)
 
 	var testMoney100, _ = money.NewMoney(100)
-	// var testMoney0, _ = money.NewMoney(0)
+	var testMoney0, _ = money.NewMoney(0)
 
 	var testTime = time.Now()
 
@@ -95,21 +95,114 @@ func TestCreate(t *testing.T) {
 			want: transfer.Transfer{},
 			err:  errSameAccounts,
 		},
-		// {
-		// 	name: "fail because of repository error",
-		// 	repository: transfer.MockRepository{
-		// 		OnCreate: func(transfer *transfer.Transfer) error {
-		// 			return ErrCreateTransferRepository
-		// 		},
-		// 	},
-		// 	args: args{
-		// 		amount:        testMoney100,
-		// 		originId:      account.AccountId(testUUID1),
-		// 		destinationId: account.AccountId(testUUID2),
-		// 	},
-		// 	want: transfer.Transfer{},
-		// 	err:  ErrCreateTransferRepository,
-		// },
+		{
+			name: "fail to debit from origin",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					transfer.Id = testTransferId
+					transfer.CreatedAt = testTime
+					return nil
+				},
+			},
+			debiter: MockDebiter{
+				OnDebit: func(id account.AccountId, amount money.Money) error {
+					return errDebit
+				},
+			},
+			crediter: MockCrediter{
+				OnCredit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			args: args{
+				amount:        testMoney100,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+			},
+			want: transfer.Transfer{},
+			err:  errDebit,
+		},
+		{
+			name: "fail to credti to destination",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					transfer.Id = testTransferId
+					transfer.CreatedAt = testTime
+					return nil
+				},
+			},
+			debiter: MockDebiter{
+				OnDebit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			crediter: MockCrediter{
+				OnCredit: func(id account.AccountId, amount money.Money) error {
+					return errCredit
+				},
+			},
+			args: args{
+				amount:        testMoney100,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+			},
+			want: transfer.Transfer{},
+			err:  errCredit,
+		},
+		{
+			name: "fail to create transfer amount 0",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					transfer.Id = testTransferId
+					transfer.CreatedAt = testTime
+					return nil
+				},
+			},
+			debiter: MockDebiter{
+				OnDebit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			crediter: MockCrediter{
+				OnCredit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			args: args{
+				amount:        testMoney0,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+			},
+			want: transfer.Transfer{},
+			err:  ErrCreateTransfer,
+		},
+		{
+			name: "repository error creating transfer",
+			repository: transfer.MockRepository{
+				OnCreate: func(transfer *transfer.Transfer) error {
+					transfer.Id = testTransferId
+					transfer.CreatedAt = testTime
+					return ErrCreateTransferRepository
+				},
+			},
+			debiter: MockDebiter{
+				OnDebit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			crediter: MockCrediter{
+				OnCredit: func(id account.AccountId, amount money.Money) error {
+					return nil
+				},
+			},
+			args: args{
+				amount:        testMoney100,
+				originId:      account.AccountId(testUUID1),
+				destinationId: account.AccountId(testUUID2),
+			},
+			want: transfer.Transfer{},
+			err:  ErrCreateTransferRepository,
+		},
 	}
 
 	for _, tt := range testCases {

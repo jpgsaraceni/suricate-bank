@@ -1,4 +1,4 @@
-package transferuc
+package transferuc // TODO refactor rollback
 
 import (
 	"errors"
@@ -8,8 +8,11 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-// tudo bem ter esse erro repetido na entidade e na usecase?
-var errSameAccounts = errors.New("origin and destination must be different accounts")
+var (
+	errSameAccounts = errors.New("origin and destination must be different accounts")
+	errDebit        = errors.New("failed to debit from origin account")
+	errCredit       = errors.New("failed to credit to destination account")
+)
 
 func (uc Usecase) Create(amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
 
@@ -18,31 +21,35 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 		return transfer.Transfer{}, errSameAccounts
 	}
 
-	err := uc.Debiter.Debit(originId, amount) // deveria não retornar a conta?
+	err := uc.Debiter.Debit(originId, amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, err // TODO translate this error
+		return transfer.Transfer{}, errDebit
 	}
 
-	// doesn't exist, negative or zero amount
 	err = uc.Crediter.Credit(destinationId, amount)
 
 	if err != nil {
-		uc.Crediter.Credit(originId, amount) // deveria tratar o erro que pode retornar aqui?
+		uc.Crediter.Credit(originId, amount)
 
-		return transfer.Transfer{}, err
+		return transfer.Transfer{}, errCredit
 	}
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
 
 	if err != nil {
+		uc.Debiter.Debit(destinationId, amount)
+		uc.Crediter.Credit(originId, amount)
+
 		return transfer.Transfer{}, ErrCreateTransfer
 	}
 
 	err = uc.Repository.Create(&newTransfer)
 
 	if err != nil {
+		uc.Debiter.Debit(destinationId, amount)
+		uc.Crediter.Credit(originId, amount)
 
 		return transfer.Transfer{}, ErrCreateTransferRepository
 	}
