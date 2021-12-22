@@ -214,8 +214,8 @@ func TestCreate(t *testing.T) {
 
 			newTransfer, err := uc.Create(tt.args.amount, tt.args.originId, tt.args.destinationId)
 
-			if !errors.Is(tt.err, err) {
-				t.Fatalf("got error %v expected %v", tt.err, err)
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("got error %v expected %v", err, tt.err)
 			}
 
 			if !reflect.DeepEqual(newTransfer, transfer.Transfer{}) {
