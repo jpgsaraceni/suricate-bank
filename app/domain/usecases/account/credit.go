@@ -20,5 +20,12 @@ func (uc Usecase) Credit(id account.AccountId, amount money.Money) error {
 		return err
 	}
 
+	err = uc.Repository.CreditAccount(&account, amount)
+
+	if err != nil {
+
+		return err
+	}
+
 	return nil
 }

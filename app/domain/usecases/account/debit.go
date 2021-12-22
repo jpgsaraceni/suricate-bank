@@ -10,12 +10,20 @@ func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return err
+		return err // TODO translate this error
 	}
 
 	err = account.Balance.Subtract(amount.Cents())
 
 	if err != nil {
+
+		return err
+	}
+
+	err = uc.Repository.DebitAccount(&account, amount)
+
+	if err != nil {
+
 		return err
 	}
 
