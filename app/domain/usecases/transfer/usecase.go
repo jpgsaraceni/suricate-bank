@@ -15,11 +15,11 @@ type Usecase struct {
 }
 
 type Debiter interface {
-	Debit(id account.AccountId, amount money.Money) (account.Account, error)
+	Debit(id account.AccountId, amount money.Money) error
 }
 
 type Crediter interface {
-	Credit(id account.AccountId, amount money.Money) (account.Account, error)
+	Credit(id account.AccountId, amount money.Money) error
 }
 
 var (

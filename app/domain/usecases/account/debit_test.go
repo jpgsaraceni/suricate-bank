@@ -2,7 +2,6 @@ package accountuc
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
@@ -160,14 +159,10 @@ func TestDebit(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			account, err := uc.Debit(tt.testAccount.Id, tt.amount)
+			err := uc.Debit(tt.testAccount.Id, tt.amount)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
-			}
-
-			if !reflect.DeepEqual(account, tt.want) {
-				t.Errorf("got %v expected %v", account, tt.want)
 			}
 		})
 	}

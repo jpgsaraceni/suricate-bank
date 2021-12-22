@@ -2,7 +2,6 @@ package accountuc
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
@@ -18,14 +17,12 @@ func TestCredit(t *testing.T) {
 		repository  account.Repository
 		amount      money.Money
 		testAccount account.Account
-		want        account.Account
 		err         error
 	}
 
 	var (
 		testMoney100, _ = money.NewMoney(100)
 		testMoney10, _  = money.NewMoney(10)
-		testMoney110, _ = money.NewMoney(110)
 		testMoney0, _   = money.NewMoney(0)
 	)
 
@@ -48,10 +45,6 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney100,
-			want: account.Account{
-				Id:      account.AccountId(testUUID),
-				Balance: testMoney100,
-			},
 		},
 		{
 			name: "successfully credit 100 to account with 10 initial balance",
@@ -68,10 +61,6 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney100,
-			want: account.Account{
-				Id:      account.AccountId(testUUID),
-				Balance: testMoney110,
-			},
 		},
 		{
 			name: "fail to credit 0 to account with 10 initial balance",
@@ -88,11 +77,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			want: account.Account{
-				Id:      account.AccountId(testUUID),
-				Balance: testMoney10,
-			},
-			err: money.ErrChangeByZero,
+			err:    money.ErrChangeByZero,
 		},
 		{
 			name: "fail to credit 0 to account with 0 initial balance",
@@ -109,11 +94,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			want: account.Account{
-				Id:      account.AccountId(testUUID),
-				Balance: testMoney0,
-			},
-			err: money.ErrChangeByZero,
+			err:    money.ErrChangeByZero,
 		},
 		{
 			name: "fail to credit inexistent account",
@@ -127,7 +108,6 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney100,
-			want:   account.Account{},
 			err:    ErrAccountNotFound,
 		},
 	}
@@ -139,14 +119,10 @@ func TestCredit(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			account, err := uc.Credit(tt.testAccount.Id, tt.amount)
+			err := uc.Credit(tt.testAccount.Id, tt.amount)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
-			}
-
-			if !reflect.DeepEqual(account, tt.want) {
-				t.Errorf("got %v expected %v", account, tt.want)
 			}
 		})
 	}
