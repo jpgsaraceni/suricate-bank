@@ -50,12 +50,12 @@ func TestGetBalance(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetBalance: func(id account.AccountId) (int, error) {
 
-					return 0, ErrGetBalanceRepository
+					return 0, errGetBalanceRepository
 				},
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  ErrGetBalanceRepository,
+			err:  errGetBalanceRepository,
 		},
 	}
 

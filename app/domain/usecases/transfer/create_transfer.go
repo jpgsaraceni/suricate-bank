@@ -1,18 +1,9 @@
 package transferuc
 
 import (
-	"errors"
-
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
-)
-
-var (
-	errSameAccounts = errors.New("origin and destination must be different accounts")
-	errDebit        = errors.New("failed to debit from origin account")
-	errCredit       = errors.New("failed to credit to destination account")
-	// errRollback     = errors.New("failed to rollback after transfer error")
 )
 
 func (uc Usecase) Create(amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
@@ -42,7 +33,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, ErrCreateTransfer
+		return transfer.Transfer{}, errCreateTransfer
 	}
 
 	err = uc.Repository.Create(&newTransfer)
@@ -50,7 +41,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, ErrCreateTransferRepository
+		return transfer.Transfer{}, errCreateTransferRepository
 	}
 
 	return newTransfer, nil

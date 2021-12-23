@@ -174,7 +174,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  ErrCreateTransfer,
+			err:  errCreateTransfer,
 		},
 		{
 			name: "repository error creating transfer",
@@ -182,7 +182,7 @@ func TestCreate(t *testing.T) {
 				OnCreate: func(transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
-					return ErrCreateTransferRepository
+					return errCreateTransferRepository
 				},
 			},
 			debiter: MockDebiter{
@@ -201,7 +201,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  ErrCreateTransferRepository,
+			err:  errCreateTransferRepository,
 		},
 	}
 

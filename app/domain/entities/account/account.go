@@ -29,8 +29,6 @@ var (
 	errNewHash     = errors.New("hash failed")
 	errEmptyName   = errors.New("empty name")
 	errEmptySecret = errors.New("empty secret")
-	errCredit      = errors.New("failed to credit account")
-	errDebit       = errors.New("failed to debit account")
 )
 
 func NewAccount(name string, cpfInput string, secret string) (Account, error) {

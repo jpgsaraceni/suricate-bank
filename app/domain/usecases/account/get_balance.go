@@ -7,7 +7,7 @@ func (uc Usecase) GetBalance(id account.AccountId) (int, error) {
 
 	if err != nil {
 
-		return 0, ErrGetBalanceRepository
+		return 0, errGetBalanceRepository
 	}
 
 	return balance, nil

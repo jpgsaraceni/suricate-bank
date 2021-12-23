@@ -113,18 +113,18 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			want: []account.Account{},
-			err:  ErrNoAccountsToFetch,
+			err:  errNoAccountsToFetch,
 		},
 		{
 			name: "repository throws error",
 			repository: account.MockRepository{
 				OnFetch: func() ([]account.Account, error) {
 
-					return []account.Account{}, ErrFetchAccounts
+					return []account.Account{}, errFetchAccounts
 				},
 			},
 			want: []account.Account{},
-			err:  ErrFetchAccounts,
+			err:  errFetchAccounts,
 		},
 	}
 

@@ -6,11 +6,13 @@ func (uc Usecase) Fetch() ([]account.Account, error) {
 	accountList, err := uc.Repository.Fetch()
 
 	if err != nil {
-		return []account.Account{}, ErrFetchAccounts
+
+		return []account.Account{}, errFetchAccounts
 	}
 
 	if len(accountList) == 0 {
-		return accountList, ErrNoAccountsToFetch
+
+		return accountList, errNoAccountsToFetch
 	}
 
 	return accountList, nil

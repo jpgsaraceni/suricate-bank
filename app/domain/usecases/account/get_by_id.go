@@ -7,7 +7,7 @@ func (uc Usecase) GetById(id account.AccountId) (account.Account, error) {
 
 	if err != nil {
 
-		return account, ErrAccountNotFound
+		return account, errAccountNotFound
 	}
 
 	return account, nil

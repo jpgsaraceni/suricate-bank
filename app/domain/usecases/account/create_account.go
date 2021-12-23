@@ -14,26 +14,26 @@ const (
 func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
-		return account.Account{}, ErrNameLength
+		return account.Account{}, errNameLength
 	}
 
 	if len(secret) < minPasswordLength {
 
-		return account.Account{}, ErrShortSecret
+		return account.Account{}, errShortSecret
 	}
 
 	newAccount, err := account.NewAccount(name, cpf, secret)
 
 	if err != nil {
 
-		return account.Account{}, ErrCreateAccount
+		return account.Account{}, errCreateAccount
 	}
 
 	err = uc.Repository.Create(&newAccount)
 
 	if err != nil {
 
-		return account.Account{}, ErrCreateAccountRepository
+		return account.Account{}, errCreateAccountRepository
 	}
 
 	return newAccount, nil
