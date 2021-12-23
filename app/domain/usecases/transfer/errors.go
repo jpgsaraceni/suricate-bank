@@ -9,4 +9,6 @@ var (
 	// errRollback     = errors.New("failed to rollback after transfer error")
 	errCreateTransfer           = errors.New("failed transfer")
 	errCreateTransferRepository = errors.New("repository error")
+	errFetchTransfers           = errors.New("couldn't fetch transfers")
+	errNoTransfersToFetch       = errors.New("no transfers to fetch")
 )
