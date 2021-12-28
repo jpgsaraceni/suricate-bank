@@ -80,7 +80,7 @@ func TestCreate(t *testing.T) {
 				secret: "123",
 			},
 			want: account.Account{},
-			err:  errShortSecret,
+			err:  ErrShortSecret,
 		},
 		{
 			name: "fail to create account because name is too short",
@@ -93,7 +93,7 @@ func TestCreate(t *testing.T) {
 				secret: "123",
 			},
 			want: account.Account{},
-			err:  errNameLength,
+			err:  ErrNameLength,
 		},
 		{
 			name: "fail to create account because NewAccount returned error",
@@ -106,13 +106,13 @@ func TestCreate(t *testing.T) {
 				secret: "123456",
 			},
 			want: account.Account{},
-			err:  errCreateAccount,
+			err:  account.ErrInvalidCpf,
 		},
 		{
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
-					return errCreateAccountRepository
+					return errRepository
 				},
 			},
 			args: args{
@@ -121,7 +121,7 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  errCreateAccountRepository,
+			err:  errRepository,
 		},
 	}
 

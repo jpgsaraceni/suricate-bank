@@ -97,7 +97,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney10,
 			},
-			err: errNotPositive,
+			err: money.ErrChangeByZero,
 		},
 		{
 			name: "fail to debit 0 from account with 0 initial balance",
@@ -118,7 +118,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: errNotPositive,
+			err: money.ErrChangeByZero,
 		},
 		{
 			name: "fail to debit inexistent account",
@@ -128,12 +128,12 @@ func TestDebit(t *testing.T) {
 			},
 			repository: account.MockRepository{
 				OnGetById: func(id account.AccountId) (account.Account, error) {
-					return account.Account{}, errAccountNotFound
+					return account.Account{}, errRepository
 				},
 			},
 			amount: testMoney100,
 			want:   account.Account{},
-			err:    errAccountNotFound,
+			err:    errRepository,
 		},
 		{
 			name: "fail to debit 10 from account with 0 initial balance",
@@ -154,7 +154,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: errInsuficientFunds,
+			err: money.ErrInsuficientFunds,
 		},
 		{
 			name: "repository error",
@@ -170,7 +170,7 @@ func TestDebit(t *testing.T) {
 					}, nil
 				},
 				OnDebitAccount: func(account *account.Account, amount money.Money) error {
-					return errDebitAccountRepository
+					return errRepository
 				},
 			},
 			amount: testMoney100,
@@ -178,7 +178,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: errDebitAccountRepository,
+			err: errRepository,
 		},
 	}
 

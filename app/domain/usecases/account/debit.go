@@ -1,6 +1,8 @@
 package accountuc
 
 import (
+	"fmt"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -10,26 +12,21 @@ func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return errAccountNotFound
-	}
-
-	if amount.Cents() <= 0 {
-
-		return errNotPositive
+		return fmt.Errorf("failed to get account by id: %w", err)
 	}
 
 	err = account.Balance.Subtract(amount.Cents())
 
 	if err != nil {
 
-		return errInsuficientFunds
+		return fmt.Errorf("failed to debit amount: %w", err)
 	}
 
 	err = uc.Repository.DebitAccount(&account, amount)
 
 	if err != nil {
 
-		return errDebitAccountRepository
+		return fmt.Errorf("repository failed to debit account: %w", err)
 	}
 
 	return nil

@@ -83,7 +83,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			err:    errNotPositive,
+			err:    money.ErrChangeByZero,
 		},
 		{
 			name: "fail to credit 0 to account with 0 initial balance",
@@ -100,7 +100,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			err:    errNotPositive,
+			err:    money.ErrChangeByZero,
 		},
 		{
 			name: "fail to credit inexistent account",
@@ -110,11 +110,11 @@ func TestCredit(t *testing.T) {
 			},
 			repository: account.MockRepository{
 				OnGetById: func(id account.AccountId) (account.Account, error) {
-					return account.Account{}, errAccountNotFound
+					return account.Account{}, errRepository
 				},
 			},
 			amount: testMoney100,
-			err:    errAccountNotFound,
+			err:    errRepository,
 		},
 		{
 			name: "repository error",
@@ -130,11 +130,11 @@ func TestCredit(t *testing.T) {
 					}, nil
 				},
 				OnCreditAccount: func(account *account.Account, amount money.Money) error {
-					return errCreditAccountRepository
+					return errRepository
 				},
 			},
 			amount: testMoney100,
-			err:    errCreditAccountRepository,
+			err:    errRepository,
 		},
 	}
 
