@@ -60,7 +60,7 @@ func TestNewTransfer(t *testing.T) {
 				amount:        testMoney100,
 			},
 			want: Transfer{},
-			err:  errSameAccounts,
+			err:  ErrSameAccounts,
 		},
 		{
 			name: "fails transfer when amount is zero",
@@ -70,7 +70,7 @@ func TestNewTransfer(t *testing.T) {
 				amount:        testMoney0,
 			},
 			want: Transfer{},
-			err:  errAmountNotPositive,
+			err:  ErrAmountNotPositive,
 		},
 	}
 
