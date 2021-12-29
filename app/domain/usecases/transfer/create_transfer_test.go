@@ -42,6 +42,8 @@ func TestCreate(t *testing.T) {
 
 	var testTime = time.Now()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "create transfer",
@@ -93,7 +95,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID1),
 			},
 			want: transfer.Transfer{},
-			err:  errSameAccounts,
+			err:  ErrSameAccounts,
 		},
 		{
 			name: "fail to debit from origin",
@@ -106,7 +108,7 @@ func TestCreate(t *testing.T) {
 			},
 			debiter: MockDebiter{
 				OnDebit: func(id account.AccountId, amount money.Money) error {
-					return errDebit
+					return errRepository
 				},
 			},
 			crediter: MockCrediter{
@@ -120,10 +122,10 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errDebit,
+			err:  ErrDebitOrigin,
 		},
 		{
-			name: "fail to credti to destination",
+			name: "fail to credit to destination",
 			repository: transfer.MockRepository{
 				OnCreate: func(transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
@@ -138,7 +140,7 @@ func TestCreate(t *testing.T) {
 			},
 			crediter: MockCrediter{
 				OnCredit: func(id account.AccountId, amount money.Money) error {
-					return errCredit
+					return errRepository
 				},
 			},
 			args: args{
@@ -147,7 +149,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errCredit,
+			err:  ErrCreditDestination,
 		},
 		{
 			name: "fail to create transfer amount 0",
@@ -174,7 +176,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errCreateTransfer,
+			err:  transfer.ErrAmountNotPositive,
 		},
 		{
 			name: "repository error creating transfer",
@@ -182,7 +184,7 @@ func TestCreate(t *testing.T) {
 				OnCreate: func(transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
-					return errCreateTransferRepository
+					return errRepository
 				},
 			},
 			debiter: MockDebiter{
@@ -201,7 +203,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errCreateTransferRepository,
+			err:  ErrCreateTransfer,
 		},
 	}
 

@@ -1,6 +1,8 @@
 package transferuc
 
 import (
+	"fmt"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
@@ -10,14 +12,14 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 
 	if originId == destinationId {
 
-		return transfer.Transfer{}, errSameAccounts
+		return transfer.Transfer{}, ErrSameAccounts
 	}
 
 	err := uc.Debiter.Debit(originId, amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, errDebit
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
 	}
 
 	err = uc.Crediter.Credit(destinationId, amount)
@@ -25,7 +27,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, false, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, errCredit
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
 	}
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
@@ -33,7 +35,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, errCreateTransfer
+		return transfer.Transfer{}, fmt.Errorf("failed to create transfer instance: %w", err)
 	}
 
 	err = uc.Repository.Create(&newTransfer)
@@ -41,7 +43,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, errCreateTransferRepository
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 
 	return newTransfer, nil
