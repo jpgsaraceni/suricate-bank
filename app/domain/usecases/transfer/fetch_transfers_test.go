@@ -24,6 +24,8 @@ func TestFetch(t *testing.T) {
 	var testUUID3, _ = uuid.NewUUID()
 	var testUUID4, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully fetch 1 transfer",
@@ -88,18 +90,18 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			want: []transfer.Transfer{},
-			err:  errNoTransfersToFetch,
+			err:  ErrNoTransfersToFetch,
 		},
 		{
 			name: "repository throws error",
 			repository: transfer.MockRepository{
 				OnFetch: func() ([]transfer.Transfer, error) {
 
-					return []transfer.Transfer{}, errFetchTransfers
+					return []transfer.Transfer{}, errRepository
 				},
 			},
 			want: []transfer.Transfer{},
-			err:  errFetchTransfers,
+			err:  ErrFetchTransfers,
 		},
 	}
 
