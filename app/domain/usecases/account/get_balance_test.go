@@ -22,6 +22,8 @@ func TestGetBalance(t *testing.T) {
 
 	var testUUID, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "get 0 balance",
@@ -50,12 +52,12 @@ func TestGetBalance(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetBalance: func(id account.AccountId) (int, error) {
 
-					return 0, errGetBalanceRepository
+					return 0, errRepository
 				},
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  errGetBalanceRepository,
+			err:  ErrGetBalance,
 		},
 	}
 

@@ -9,15 +9,15 @@ type Money struct {
 }
 
 var (
-	errNegative         = errors.New("negative values not allowed")
-	errChangeByZero     = errors.New("cannot add or subtract 0")
-	errInsuficientFunds = errors.New("subtract amount greater than available amount")
+	ErrNegative         = errors.New("negative values not allowed")
+	ErrChangeByZero     = errors.New("cannot add or subtract 0")
+	ErrInsuficientFunds = errors.New("subtract amount greater than available amount")
 )
 
 func NewMoney(amount int) (Money, error) {
 	if amount < 0 {
 
-		return Money{}, errNegative
+		return Money{}, ErrNegative
 	}
 
 	return Money{cents: amount}, nil
@@ -30,12 +30,12 @@ func (m Money) Cents() int {
 func (m *Money) Add(amount int) error {
 	if amount < 0 {
 
-		return errNegative
+		return ErrNegative
 	}
 
 	if amount == 0 {
 
-		return errChangeByZero
+		return ErrChangeByZero
 	}
 	m.cents += amount
 
@@ -45,17 +45,17 @@ func (m *Money) Add(amount int) error {
 func (m *Money) Subtract(amount int) error {
 	if amount < 0 {
 
-		return errNegative
+		return ErrNegative
 	}
 
 	if amount == 0 {
 
-		return errChangeByZero
+		return ErrChangeByZero
 	}
 
 	if amount > m.cents {
 
-		return errInsuficientFunds
+		return ErrInsuficientFunds
 	}
 	m.cents -= amount
 

@@ -29,7 +29,7 @@ func TestNewMoney(t *testing.T) {
 		{
 			name:   "fail to create money with negative value",
 			amount: -1,
-			err:    errNegative,
+			err:    ErrNegative,
 		},
 	}
 
@@ -74,28 +74,28 @@ func TestAdd(t *testing.T) {
 			initialValue: 0,
 			amount:       0,
 			want:         0,
-			err:          errChangeByZero,
+			err:          ErrChangeByZero,
 		},
 		{
 			name:         "fail to add 0 to money containing 10",
 			initialValue: 10,
 			amount:       0,
 			want:         10,
-			err:          errChangeByZero,
+			err:          ErrChangeByZero,
 		},
 		{
 			name:         "fail to add negative to money containing 0",
 			initialValue: 0,
 			amount:       -10,
 			want:         0,
-			err:          errNegative,
+			err:          ErrNegative,
 		},
 		{
 			name:         "fail to add negative to money containing 10",
 			initialValue: 10,
 			amount:       -10,
 			want:         10,
-			err:          errNegative,
+			err:          ErrNegative,
 		},
 	}
 
@@ -147,35 +147,35 @@ func TestSubtract(t *testing.T) {
 			initialValue: 0,
 			amount:       0,
 			want:         0,
-			err:          errChangeByZero,
+			err:          ErrChangeByZero,
 		},
 		{
 			name:         "fail to subtract 0 from money containing 10",
 			initialValue: 10,
 			amount:       0,
 			want:         10,
-			err:          errChangeByZero,
+			err:          ErrChangeByZero,
 		},
 		{
 			name:         "fail to subtract negative from money containing 0",
 			initialValue: 0,
 			amount:       -10,
 			want:         0,
-			err:          errNegative,
+			err:          ErrNegative,
 		},
 		{
 			name:         "fail to subtract negative from money containing 10",
 			initialValue: 10,
 			amount:       -10,
 			want:         10,
-			err:          errNegative,
+			err:          ErrNegative,
 		},
 		{
 			name:         "fail to subtract 10 from money containing 5",
 			initialValue: 5,
 			amount:       10,
 			want:         5,
-			err:          errInsuficientFunds,
+			err:          ErrInsuficientFunds,
 		},
 	}
 
