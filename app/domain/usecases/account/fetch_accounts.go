@@ -11,7 +11,7 @@ func (uc Usecase) Fetch() ([]account.Account, error) {
 
 	if err != nil {
 
-		return []account.Account{}, fmt.Errorf("repository failed to fetch accounts: %w", err)
+		return []account.Account{}, fmt.Errorf("failed to fetch accounts: %w", err)
 	}
 
 	if len(accountList) == 0 {

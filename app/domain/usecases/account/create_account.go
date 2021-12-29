@@ -35,7 +35,7 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 
 	if err != nil {
 
-		return account.Account{}, fmt.Errorf("repository failed to create account: %w", err)
+		return account.Account{}, fmt.Errorf("failed to save account: %w", err)
 	}
 
 	return newAccount, nil

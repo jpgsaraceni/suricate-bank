@@ -26,7 +26,7 @@ func (uc Usecase) Credit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return fmt.Errorf("repository failed to credit account: %w", err)
+		return fmt.Errorf("failed to save credit to account: %w", err)
 	}
 
 	return nil

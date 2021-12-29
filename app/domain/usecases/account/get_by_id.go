@@ -11,7 +11,7 @@ func (uc Usecase) GetById(id account.AccountId) (account.Account, error) {
 
 	if err != nil {
 
-		return account, fmt.Errorf("repository failed to get account: %w", err)
+		return account, fmt.Errorf("failed to get account: %w", err)
 	}
 
 	return account, nil

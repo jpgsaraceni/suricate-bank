@@ -43,7 +43,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("repository failed to create transfer: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("failed to save transfer: %w", err)
 	}
 
 	return newTransfer, nil
