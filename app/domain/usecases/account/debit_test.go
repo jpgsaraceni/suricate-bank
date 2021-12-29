@@ -31,6 +31,8 @@ func TestDebit(t *testing.T) {
 	var testUUID, _ = uuid.NewUUID()
 	var testUUID2, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully debit 100 from account with 100 initial balance",
@@ -128,12 +130,12 @@ func TestDebit(t *testing.T) {
 			},
 			repository: account.MockRepository{
 				OnGetById: func(id account.AccountId) (account.Account, error) {
-					return account.Account{}, ErrAccountNotFound
+					return account.Account{}, errRepository
 				},
 			},
 			amount: testMoney100,
 			want:   account.Account{},
-			err:    ErrAccountNotFound,
+			err:    ErrGetAccount,
 		},
 		{
 			name: "fail to debit 10 from account with 0 initial balance",
@@ -170,7 +172,7 @@ func TestDebit(t *testing.T) {
 					}, nil
 				},
 				OnDebitAccount: func(account *account.Account, amount money.Money) error {
-					return errDebitAccountRepository
+					return errRepository
 				},
 			},
 			amount: testMoney100,
@@ -178,7 +180,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: errDebitAccountRepository,
+			err: ErrDebitAccount,
 		},
 	}
 

@@ -29,6 +29,8 @@ func TestCredit(t *testing.T) {
 	var testUUID, _ = uuid.NewUUID()
 	var testUUID2, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully credit 100 to account with 0 initial balance",
@@ -110,11 +112,11 @@ func TestCredit(t *testing.T) {
 			},
 			repository: account.MockRepository{
 				OnGetById: func(id account.AccountId) (account.Account, error) {
-					return account.Account{}, ErrAccountNotFound
+					return account.Account{}, errRepository
 				},
 			},
 			amount: testMoney100,
-			err:    ErrAccountNotFound,
+			err:    ErrGetAccount,
 		},
 		{
 			name: "repository error",
@@ -130,11 +132,11 @@ func TestCredit(t *testing.T) {
 					}, nil
 				},
 				OnCreditAccount: func(account *account.Account, amount money.Money) error {
-					return errCreditAccountRepository
+					return errRepository
 				},
 			},
 			amount: testMoney100,
-			err:    errCreditAccountRepository,
+			err:    ErrCreditAccount,
 		},
 	}
 

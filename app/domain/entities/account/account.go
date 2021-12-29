@@ -25,37 +25,35 @@ type Account struct {
 }
 
 var (
-	errInvalidCpf  = errors.New("invalid cpf")
-	errNewHash     = errors.New("hash failed")
-	errEmptyName   = errors.New("empty name")
-	errEmptySecret = errors.New("empty secret")
-	errCredit      = errors.New("failed to credit account")
-	errDebit       = errors.New("failed to debit account")
+	ErrInvalidCpf  = errors.New("invalid cpf")
+	ErrNewHash     = errors.New("hash failed")
+	ErrEmptyName   = errors.New("empty name")
+	ErrEmptySecret = errors.New("empty secret")
 )
 
 func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 	if len(name) == 0 {
 
-		return Account{}, errEmptyName
+		return Account{}, ErrEmptyName
 	}
 
 	if len(secret) == 0 {
 
-		return Account{}, errEmptySecret
+		return Account{}, ErrEmptySecret
 	}
 
 	cpf, err := cpf.NewCpf(cpfInput)
 
 	if err != nil {
 
-		return Account{}, errInvalidCpf
+		return Account{}, ErrInvalidCpf
 	}
 
 	hashedSecret, err := hash.NewHash(secret)
 
 	if err != nil {
 
-		return Account{}, errNewHash
+		return Account{}, ErrNewHash
 	}
 
 	newMoney, _ := money.NewMoney(0)

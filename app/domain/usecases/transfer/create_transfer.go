@@ -1,32 +1,25 @@
 package transferuc
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-var (
-	errSameAccounts = errors.New("origin and destination must be different accounts")
-	errDebit        = errors.New("failed to debit from origin account")
-	errCredit       = errors.New("failed to credit to destination account")
-	// errRollback     = errors.New("failed to rollback after transfer error")
-)
-
 func (uc Usecase) Create(amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
 
 	if originId == destinationId {
 
-		return transfer.Transfer{}, errSameAccounts
+		return transfer.Transfer{}, ErrSameAccounts
 	}
 
 	err := uc.Debiter.Debit(originId, amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, errDebit
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
 	}
 
 	err = uc.Crediter.Credit(destinationId, amount)
@@ -34,7 +27,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, false, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, errCredit
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
 	}
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
@@ -42,7 +35,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, ErrCreateTransfer
+		return transfer.Transfer{}, fmt.Errorf("failed to create transfer instance: %w", err)
 	}
 
 	err = uc.Repository.Create(&newTransfer)
@@ -50,7 +43,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, ErrCreateTransferRepository
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 
 	return newTransfer, nil

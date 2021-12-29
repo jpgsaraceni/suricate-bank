@@ -29,6 +29,8 @@ func TestFetch(t *testing.T) {
 		return newCpf
 	}
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully fetch 1 account",
@@ -120,7 +122,7 @@ func TestFetch(t *testing.T) {
 			repository: account.MockRepository{
 				OnFetch: func() ([]account.Account, error) {
 
-					return []account.Account{}, ErrFetchAccounts
+					return []account.Account{}, errRepository
 				},
 			},
 			want: []account.Account{},

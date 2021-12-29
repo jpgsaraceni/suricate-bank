@@ -50,6 +50,8 @@ func TestCreate(t *testing.T) {
 		return newCpf
 	}
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully create account",
@@ -106,13 +108,13 @@ func TestCreate(t *testing.T) {
 				secret: "123456",
 			},
 			want: account.Account{},
-			err:  ErrCreateAccount,
+			err:  account.ErrInvalidCpf,
 		},
 		{
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
 				OnCreate: func(account *account.Account) error {
-					return ErrCreateAccountRepository
+					return errRepository
 				},
 			},
 			args: args{
@@ -121,7 +123,7 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  ErrCreateAccountRepository,
+			err:  ErrCreateAccount,
 		},
 	}
 

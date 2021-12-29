@@ -1,6 +1,8 @@
 package accountuc
 
 import (
+	"fmt"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
@@ -26,14 +28,14 @@ func (uc Usecase) Create(name, cpf, secret string) (account.Account, error) {
 
 	if err != nil {
 
-		return account.Account{}, ErrCreateAccount
+		return account.Account{}, fmt.Errorf("failed to create account instance: %w", err)
 	}
 
 	err = uc.Repository.Create(&newAccount)
 
 	if err != nil {
 
-		return account.Account{}, ErrCreateAccountRepository
+		return account.Account{}, fmt.Errorf("%w: %s", ErrCreateAccount, err.Error())
 	}
 
 	return newAccount, nil
