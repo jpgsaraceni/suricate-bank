@@ -31,6 +31,8 @@ func TestDebit(t *testing.T) {
 	var testUUID, _ = uuid.NewUUID()
 	var testUUID2, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully debit 100 from account with 100 initial balance",

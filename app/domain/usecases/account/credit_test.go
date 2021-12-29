@@ -29,6 +29,8 @@ func TestCredit(t *testing.T) {
 	var testUUID, _ = uuid.NewUUID()
 	var testUUID2, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully credit 100 to account with 0 initial balance",

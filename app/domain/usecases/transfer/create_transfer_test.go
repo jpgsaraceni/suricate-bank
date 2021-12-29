@@ -42,6 +42,8 @@ func TestCreate(t *testing.T) {
 
 	var testTime = time.Now()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "create transfer",

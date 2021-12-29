@@ -22,6 +22,8 @@ func TestGetBalance(t *testing.T) {
 
 	var testUUID, _ = uuid.NewUUID()
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "get 0 balance",

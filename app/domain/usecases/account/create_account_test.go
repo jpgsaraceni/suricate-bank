@@ -50,6 +50,8 @@ func TestCreate(t *testing.T) {
 		return newCpf
 	}
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully create account",

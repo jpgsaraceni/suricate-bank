@@ -29,6 +29,8 @@ func TestFetch(t *testing.T) {
 		return newCpf
 	}
 
+	var errRepository = errors.New("repository error")
+
 	testCases := []testCase{
 		{
 			name: "successfully fetch 1 account",
