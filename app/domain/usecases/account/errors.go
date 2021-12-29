@@ -14,4 +14,5 @@ var (
 	ErrFetchAccounts     = errors.New("failed to fetch accounts")
 	ErrGetBalance        = errors.New("failed to get account balance")
 	ErrGetAccount        = errors.New("failed to get account")
+	ErrAmount            = errors.New("invalid amount")
 )

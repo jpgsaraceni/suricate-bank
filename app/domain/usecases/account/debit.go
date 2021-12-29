@@ -19,7 +19,7 @@ func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return fmt.Errorf("failed to debit amount: %w", err)
+		return fmt.Errorf("%w: %s", ErrAmount, err.Error())
 	}
 
 	err = uc.Repository.DebitAccount(&account, amount)
