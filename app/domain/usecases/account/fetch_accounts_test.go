@@ -126,7 +126,7 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			want: []account.Account{},
-			err:  errRepository,
+			err:  ErrFetchAccounts,
 		},
 	}
 

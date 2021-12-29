@@ -48,7 +48,7 @@ func TestGetById(t *testing.T) {
 			},
 			id:   account.AccountId(testUUID),
 			want: account.Account{},
-			err:  errRepository,
+			err:  ErrGetAccount,
 		},
 	}
 

@@ -135,7 +135,7 @@ func TestDebit(t *testing.T) {
 			},
 			amount: testMoney100,
 			want:   account.Account{},
-			err:    errRepository,
+			err:    ErrGetAccount,
 		},
 		{
 			name: "fail to debit 10 from account with 0 initial balance",
@@ -180,7 +180,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: errRepository,
+			err: ErrDebitAccount,
 		},
 	}
 

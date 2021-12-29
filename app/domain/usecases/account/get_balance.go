@@ -11,7 +11,7 @@ func (uc Usecase) GetBalance(id account.AccountId) (int, error) {
 
 	if err != nil {
 
-		return 0, fmt.Errorf("failed to get account balance: %w", err)
+		return 0, fmt.Errorf("%w: %s", ErrGetBalance, err.Error())
 	}
 
 	return balance, nil

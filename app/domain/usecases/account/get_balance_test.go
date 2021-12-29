@@ -57,7 +57,7 @@ func TestGetBalance(t *testing.T) {
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  errRepository,
+			err:  ErrGetBalance,
 		},
 	}
 

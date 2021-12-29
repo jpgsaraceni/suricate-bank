@@ -116,7 +116,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney100,
-			err:    errRepository,
+			err:    ErrGetAccount,
 		},
 		{
 			name: "repository error",
@@ -136,7 +136,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney100,
-			err:    errRepository,
+			err:    ErrCreditAccount,
 		},
 	}
 

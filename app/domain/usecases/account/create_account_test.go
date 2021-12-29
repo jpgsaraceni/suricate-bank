@@ -123,7 +123,7 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  errRepository,
+			err:  ErrCreateAccount,
 		},
 	}
 

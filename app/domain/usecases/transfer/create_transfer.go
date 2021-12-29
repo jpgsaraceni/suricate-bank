@@ -19,7 +19,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 
 	if err != nil {
 
-		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
 	}
 
 	err = uc.Crediter.Credit(destinationId, amount)
@@ -27,7 +27,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, false, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
 	}
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
@@ -35,7 +35,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("failed to create transfer: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("failed to create transfer instance: %w", err)
 	}
 
 	err = uc.Repository.Create(&newTransfer)
@@ -43,7 +43,7 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	if err != nil {
 		rollback(uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("failed to save transfer: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 
 	return newTransfer, nil

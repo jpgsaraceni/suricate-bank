@@ -26,7 +26,7 @@ func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
 
 	if err != nil {
 
-		return fmt.Errorf("failed to save debit to account: %w", err)
+		return fmt.Errorf("%w: %s", ErrDebitAccount, err.Error())
 	}
 
 	return nil

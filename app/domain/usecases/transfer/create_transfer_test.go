@@ -122,10 +122,10 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errRepository,
+			err:  ErrDebitOrigin,
 		},
 		{
-			name: "fail to credti to destination",
+			name: "fail to credit to destination",
 			repository: transfer.MockRepository{
 				OnCreate: func(transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
@@ -149,7 +149,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errRepository,
+			err:  ErrCreditDestination,
 		},
 		{
 			name: "fail to create transfer amount 0",
@@ -203,7 +203,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  errRepository,
+			err:  ErrCreateTransfer,
 		},
 	}
 
