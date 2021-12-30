@@ -1,12 +1,18 @@
 package postgres
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
@@ -51,6 +57,7 @@ func TestMain(m *testing.M) {
 	dockerPool.MaxWait = 10 * time.Second
 	if err = dockerPool.Retry(func() error {
 		dbPool, err = ConnectPool(databaseUrl)
+
 		return err
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
@@ -59,10 +66,10 @@ func TestMain(m *testing.M) {
 	defer func() {
 		dbPool.Close()
 	}()
+
 	//Run tests
 	code := m.Run()
 
-	// You can't defer this because os.Exit doesn't care for defer
 	if err := dockerPool.Purge(resource); err != nil {
 		log.Fatalf("Could not purge resource: %s", err)
 	}
@@ -70,6 +77,43 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestRealbob(t *testing.T) {
-	// all tests
+func TestCreate(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		account account.Account
+	}
+	type testCase struct {
+		name string
+		args args
+		err  error
+	}
+
+	testId := account.AccountId(uuid.New())
+	testCpf, _ := cpf.NewCpf("22061446035")
+	testHash, _ := hash.NewHash("nicesecret")
+
+	testCases := []testCase{
+		{
+			name: "successfully create account",
+			args: args{
+				account: account.Account{
+					Id:        testId,
+					Cpf:       testCpf,
+					Name:      "Nice name",
+					Secret:    testHash,
+					CreatedAt: time.Now(),
+				},
+			},
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			repo := accountspg.NewRepository(dbPool)
+			if err := repo.Create(&tt.args.account); !errors.Is(err, tt.err) {
+				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			}
+		})
+	}
 }
