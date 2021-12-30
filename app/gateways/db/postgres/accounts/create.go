@@ -2,6 +2,7 @@ package accountspg
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
@@ -31,11 +32,11 @@ func (r Repository) Create(account *account.Account) error {
 		account.Secret.Value(),
 		account.Balance.Cents(),
 		account.CreatedAt,
-	)
+	).Scan()
 
 	if err != nil {
 
-		return errQuery
+		return fmt.Errorf("%w: %s", errQuery, err.Error())
 	}
 
 	return nil
