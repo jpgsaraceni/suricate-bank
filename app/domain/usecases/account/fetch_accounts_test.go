@@ -137,14 +137,14 @@ func TestFetch(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			newAccount, err := uc.Fetch()
+			accountList, err := uc.Fetch()
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
 			}
 
-			if !reflect.DeepEqual(newAccount, tt.want) {
-				t.Errorf("got %v expected %v", newAccount, tt.want)
+			if !reflect.DeepEqual(accountList, tt.want) {
+				t.Errorf("got %v expected %v", accountList, tt.want)
 			}
 		})
 	}

@@ -85,7 +85,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			err:    money.ErrChangeByZero,
+			err:    ErrAmount,
 		},
 		{
 			name: "fail to credit 0 to account with 0 initial balance",
@@ -102,7 +102,7 @@ func TestCredit(t *testing.T) {
 				},
 			},
 			amount: testMoney0,
-			err:    money.ErrChangeByZero,
+			err:    ErrAmount,
 		},
 		{
 			name: "fail to credit inexistent account",

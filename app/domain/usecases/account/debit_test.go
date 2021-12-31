@@ -99,7 +99,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney10,
 			},
-			err: money.ErrChangeByZero,
+			err: ErrAmount,
 		},
 		{
 			name: "fail to debit 0 from account with 0 initial balance",
@@ -120,7 +120,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: money.ErrChangeByZero,
+			err: ErrAmount,
 		},
 		{
 			name: "fail to debit inexistent account",
@@ -156,7 +156,7 @@ func TestDebit(t *testing.T) {
 				Id:      account.AccountId(testUUID),
 				Balance: testMoney0,
 			},
-			err: money.ErrInsuficientFunds,
+			err: ErrAmount,
 		},
 		{
 			name: "repository error",
