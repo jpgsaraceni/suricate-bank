@@ -1,4 +1,4 @@
-package postgres
+package postgres_test
 
 import (
 	"errors"
@@ -13,12 +13,11 @@ import (
 )
 
 func TestGetById(t *testing.T) {
-	t.Parallel()
 
 	var (
-		accountId   = account.AccountId(uuid.New())
-		accountCpf  = cpf.Random()
-		testHash, _ = hash.NewHash("nicesecret")
+		accountId     = account.AccountId(uuid.New())
+		getAccountCpf = cpf.Random()
+		testHash, _   = hash.NewHash("nicesecret")
 	)
 
 	type testCase struct {
@@ -38,7 +37,7 @@ func TestGetById(t *testing.T) {
 					&account.Account{
 						Id:     accountId,
 						Name:   "Nice name",
-						Cpf:    accountCpf,
+						Cpf:    getAccountCpf,
 						Secret: testHash,
 					},
 				)
@@ -46,7 +45,7 @@ func TestGetById(t *testing.T) {
 			expectedAccount: account.Account{
 				Id:     accountId,
 				Name:   "Nice name",
-				Cpf:    accountCpf,
+				Cpf:    getAccountCpf,
 				Secret: testHash,
 			},
 		},
@@ -55,7 +54,6 @@ func TestGetById(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 

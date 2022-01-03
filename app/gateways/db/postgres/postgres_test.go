@@ -1,4 +1,4 @@
-package postgres
+package postgres_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
@@ -54,7 +55,7 @@ func TestMain(m *testing.M) {
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	dockerPool.MaxWait = 10 * time.Second
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = ConnectPool(databaseUrl)
+		dbPool, err = postgres.ConnectPool(databaseUrl)
 
 		return err
 	}); err != nil {

@@ -1,4 +1,4 @@
-package postgres
+package postgres_test
 
 import (
 	"errors"
@@ -13,7 +13,6 @@ import (
 )
 
 func TestCredit(t *testing.T) {
-	t.Parallel()
 
 	var (
 		testId       = account.AccountId(uuid.New())
@@ -53,7 +52,6 @@ func TestCredit(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 
