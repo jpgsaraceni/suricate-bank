@@ -62,7 +62,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	migration, err := os.ReadFile("./migrations/000001_accounts.up.sql")
+	migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
 
 	if err != nil {
 		log.Fatalf("Could not read migration file: %s", err)
