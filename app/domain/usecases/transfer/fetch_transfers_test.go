@@ -1,6 +1,7 @@
 package transferuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -30,7 +31,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 1 transfer",
 			repository: transfer.MockRepository{
-				OnFetch: func() ([]transfer.Transfer, error) {
+				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
 					return []transfer.Transfer{
 						{
@@ -48,7 +49,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 4 transfers",
 			repository: transfer.MockRepository{
-				OnFetch: func() ([]transfer.Transfer, error) {
+				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
 					return []transfer.Transfer{
 						{
@@ -84,7 +85,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "no existent transfers error",
 			repository: transfer.MockRepository{
-				OnFetch: func() ([]transfer.Transfer, error) {
+				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
 					return []transfer.Transfer{}, nil
 				},
@@ -95,7 +96,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "repository throws error",
 			repository: transfer.MockRepository{
-				OnFetch: func() ([]transfer.Transfer, error) {
+				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
 					return []transfer.Transfer{}, errRepository
 				},
@@ -112,7 +113,7 @@ func TestFetch(t *testing.T) {
 
 			uc := Usecase{tt.repository, MockCrediter{}, MockDebiter{}}
 
-			transfersList, err := uc.Fetch()
+			transfersList, err := uc.Fetch(context.Background())
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

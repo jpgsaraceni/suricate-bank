@@ -1,6 +1,7 @@
 package transferuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -48,19 +49,19 @@ func TestCreate(t *testing.T) {
 		{
 			name: "create transfer",
 			repository: transfer.MockRepository{
-				OnCreate: func(transfer *transfer.Transfer) error {
+				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
 					return nil
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -80,12 +81,12 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail transfer to same account",
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -100,19 +101,19 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to debit from origin",
 			repository: transfer.MockRepository{
-				OnCreate: func(transfer *transfer.Transfer) error {
+				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
 					return nil
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return errRepository
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -127,19 +128,19 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to credit to destination",
 			repository: transfer.MockRepository{
-				OnCreate: func(transfer *transfer.Transfer) error {
+				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
 					return nil
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return errRepository
 				},
 			},
@@ -154,19 +155,19 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to create transfer amount 0",
 			repository: transfer.MockRepository{
-				OnCreate: func(transfer *transfer.Transfer) error {
+				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
 					return nil
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -181,19 +182,19 @@ func TestCreate(t *testing.T) {
 		{
 			name: "repository error creating transfer",
 			repository: transfer.MockRepository{
-				OnCreate: func(transfer *transfer.Transfer) error {
+				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
 					transfer.Id = testTransferId
 					transfer.CreatedAt = testTime
 					return errRepository
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(id account.AccountId, amount money.Money) error {
+				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(id account.AccountId, amount money.Money) error {
+				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -214,7 +215,7 @@ func TestCreate(t *testing.T) {
 
 			uc := Usecase{tt.repository, tt.crediter, tt.debiter}
 
-			newTransfer, err := uc.Create(tt.args.amount, tt.args.originId, tt.args.destinationId)
+			newTransfer, err := uc.Create(context.Background(), tt.args.amount, tt.args.originId, tt.args.destinationId)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected %v", err, tt.err)
