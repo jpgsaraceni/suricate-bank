@@ -38,3 +38,7 @@ func (s Secret) Compare(inputHash string) bool {
 func (s Secret) Value() string {
 	return s.hash
 }
+
+func Parse(secret string) Secret {
+	return Secret{hash: secret}
+}
