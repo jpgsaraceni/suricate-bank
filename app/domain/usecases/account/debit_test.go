@@ -48,7 +48,7 @@ func TestDebit(t *testing.T) {
 						Balance: testMoney100,
 					}, nil
 				},
-				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -71,7 +71,7 @@ func TestDebit(t *testing.T) {
 						Balance: testMoney110,
 					}, nil
 				},
-				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -172,7 +172,7 @@ func TestDebit(t *testing.T) {
 						Balance: testMoney100,
 					}, nil
 				},
-				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return errRepository
 				},
 			},

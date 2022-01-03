@@ -46,7 +46,7 @@ func TestCredit(t *testing.T) {
 						Balance: testMoney0,
 					}, nil
 				},
-				OnCreditAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -65,7 +65,7 @@ func TestCredit(t *testing.T) {
 						Balance: testMoney10,
 					}, nil
 				},
-				OnCreditAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -132,7 +132,7 @@ func TestCredit(t *testing.T) {
 						Balance: testMoney0,
 					}, nil
 				},
-				OnCreditAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return errRepository
 				},
 			},

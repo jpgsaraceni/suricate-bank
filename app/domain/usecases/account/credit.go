@@ -23,7 +23,7 @@ func (uc Usecase) Credit(ctx context.Context, id account.AccountId, amount money
 		return fmt.Errorf("%w: %s", ErrAmount, err.Error())
 	}
 
-	err = uc.Repository.CreditAccount(ctx, &account, amount)
+	err = uc.Repository.CreditAccount(ctx, account.Id, amount)
 
 	if err != nil {
 

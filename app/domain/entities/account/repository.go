@@ -11,6 +11,6 @@ type Repository interface {
 	GetBalance(ctx context.Context, id AccountId) (int, error)
 	Fetch(ctx context.Context) ([]Account, error)
 	GetById(ctx context.Context, id AccountId) (Account, error)
-	CreditAccount(ctx context.Context, account *Account, amount money.Money) error
-	DebitAccount(ctx context.Context, account *Account, amount money.Money) error
+	CreditAccount(ctx context.Context, id AccountId, amount money.Money) error
+	DebitAccount(ctx context.Context, id AccountId, amount money.Money) error
 }

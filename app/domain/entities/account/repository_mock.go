@@ -11,8 +11,8 @@ type MockRepository struct {
 	OnGetBalance    func(ctx context.Context, id AccountId) (int, error)
 	OnFetch         func(ctx context.Context) ([]Account, error)
 	OnGetById       func(ctx context.Context, id AccountId) (Account, error)
-	OnCreditAccount func(ctx context.Context, account *Account, amount money.Money) error
-	OnDebitAccount  func(ctx context.Context, account *Account, amount money.Money) error
+	OnCreditAccount func(ctx context.Context, id AccountId, amount money.Money) error
+	OnDebitAccount  func(ctx context.Context, id AccountId, amount money.Money) error
 }
 
 var _ Repository = (*MockRepository)(nil)
@@ -33,10 +33,10 @@ func (mock MockRepository) GetById(ctx context.Context, id AccountId) (Account, 
 	return mock.OnGetById(ctx, id)
 }
 
-func (mock MockRepository) CreditAccount(ctx context.Context, account *Account, amount money.Money) error {
-	return mock.OnCreditAccount(ctx, account, amount)
+func (mock MockRepository) CreditAccount(ctx context.Context, id AccountId, amount money.Money) error {
+	return mock.OnCreditAccount(ctx, id, amount)
 }
 
-func (mock MockRepository) DebitAccount(ctx context.Context, account *Account, amount money.Money) error {
-	return mock.OnDebitAccount(ctx, account, amount)
+func (mock MockRepository) DebitAccount(ctx context.Context, id AccountId, amount money.Money) error {
+	return mock.OnDebitAccount(ctx, id, amount)
 }
