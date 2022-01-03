@@ -20,7 +20,7 @@ func (r Repository) GetBalance(ctx context.Context, id account.AccountId) (int, 
 
 	if err != nil {
 
-		return balance, ErrQuery
+		return 0, ErrQuery
 	}
 
 	return balance, nil
