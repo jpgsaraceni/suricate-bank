@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS accounts
     secret TEXT NOT NULL,
     balance INTEGER NOT NULL DEFAULT(0),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(now())
-)
+);
 
 COMMIT;
