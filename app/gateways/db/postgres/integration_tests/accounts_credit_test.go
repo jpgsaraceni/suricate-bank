@@ -16,7 +16,6 @@ func TestCredit(t *testing.T) {
 
 	var (
 		testId       = account.AccountId(uuid.New())
-		testCpf      = cpf.Random()
 		testHash, _  = hash.NewHash("nicesecret")
 		testMoney, _ = money.NewMoney(10)
 	)
@@ -44,7 +43,7 @@ func TestCredit(t *testing.T) {
 					&account.Account{
 						Id:     testId,
 						Name:   "Nice name",
-						Cpf:    testCpf,
+						Cpf:    cpf.Random(),
 						Secret: testHash,
 					},
 				)
@@ -64,7 +63,7 @@ func TestCredit(t *testing.T) {
 					&account.Account{
 						Id:      testId,
 						Name:    "Nice name",
-						Cpf:     testCpf,
+						Cpf:     cpf.Random(),
 						Secret:  testHash,
 						Balance: testMoney,
 					},

@@ -16,7 +16,6 @@ func TestDebit(t *testing.T) {
 
 	var (
 		testId         = account.AccountId(uuid.New())
-		testCpf        = cpf.Random()
 		testHash, _    = hash.NewHash("nicesecret")
 		testMoney20, _ = money.NewMoney(20)
 		testMoney10, _ = money.NewMoney(10)
@@ -45,7 +44,7 @@ func TestDebit(t *testing.T) {
 					&account.Account{
 						Id:      testId,
 						Name:    "Nice name",
-						Cpf:     testCpf,
+						Cpf:     cpf.Random(),
 						Secret:  testHash,
 						Balance: testMoney20,
 					},
@@ -66,7 +65,7 @@ func TestDebit(t *testing.T) {
 					&account.Account{
 						Id:      testId,
 						Name:    "Nice name",
-						Cpf:     testCpf,
+						Cpf:     cpf.Random(),
 						Secret:  testHash,
 						Balance: testMoney20,
 					},
