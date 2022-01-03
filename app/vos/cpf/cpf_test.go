@@ -103,3 +103,17 @@ func TestIsValid(t *testing.T) {
 		})
 	}
 }
+
+func TestRandom(t *testing.T) {
+	t.Run("generate random cpf", func(t *testing.T) {
+		t.Parallel()
+
+		generatedCpf, _ := Random()
+
+		isValid := generatedCpf.validate(generatedCpf.value)
+
+		if !isValid {
+			t.Errorf("genereated invalid cpf")
+		}
+	})
+}

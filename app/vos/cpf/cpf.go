@@ -8,8 +8,10 @@ package cpf
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 type Cpf struct {
@@ -45,6 +47,22 @@ func NewCpf(input string) (Cpf, error) {
 	}
 
 	return c, nil
+}
+
+// Random generates a random valid cpf
+func Random() (Cpf, error) {
+	var body string
+
+	rand.Seed(time.Now().Unix())
+
+	for i := 0; i < 9; i++ {
+		body += fmt.Sprint(rand.Intn(10))
+	}
+
+	body += iterateDigits(body)
+	body += iterateDigits(body)
+
+	return NewCpf(body)
 }
 
 // Value returns a cpf with only numeric digits
