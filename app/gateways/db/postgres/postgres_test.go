@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -9,13 +10,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
-	log "github.com/sirupsen/logrus"
 )
 
 var dbPool *pgxpool.Pool
@@ -33,8 +35,8 @@ func TestMain(m *testing.M) {
 		Tag:        "14-alpine",
 		Env: []string{
 			"POSTGRES_PASSWORD=secret",
-			"POSTGRES_USER=user_name",
-			"POSTGRES_DB=dbname",
+			"POSTGRES_USER=suricate",
+			"POSTGRES_DB=suricate",
 			"listen_addresses = '*'",
 		},
 	}, func(config *docker.HostConfig) {
@@ -47,7 +49,7 @@ func TestMain(m *testing.M) {
 	}
 
 	hostAndPort := resource.GetHostPort("5432/tcp")
-	databaseUrl := fmt.Sprintf("postgres://user_name:secret@%s/dbname?sslmode=disable", hostAndPort)
+	databaseUrl := fmt.Sprintf("postgres://suricate:secret@%s/suricate?sslmode=disable", hostAndPort)
 
 	log.Println("Connecting to database on url: ", databaseUrl)
 
@@ -63,12 +65,20 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	defer func() {
-		dbPool.Close()
-	}()
+	migration, err := os.ReadFile("./migrations/000001_accounts.up.sql")
+
+	if err != nil {
+		log.Fatalf("Could not read migration file: %s", err)
+	}
+
+	if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
+		log.Fatalf("Could not run migration: %s", err)
+	}
 
 	//Run tests
 	code := m.Run()
+
+	dbPool.Close()
 
 	if err := dockerPool.Purge(resource); err != nil {
 		log.Fatalf("Could not purge resource: %s", err)
@@ -79,13 +89,10 @@ func TestMain(m *testing.M) {
 
 func TestCreate(t *testing.T) {
 	t.Parallel()
-	type args struct {
-		account account.Account
-	}
 	type testCase struct {
-		name string
-		args args
-		err  error
+		name    string
+		account account.Account
+		err     error
 	}
 
 	testId := account.AccountId(uuid.New())
@@ -95,14 +102,12 @@ func TestCreate(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "successfully create account",
-			args: args{
-				account: account.Account{
-					Id:        testId,
-					Cpf:       testCpf,
-					Name:      "Nice name",
-					Secret:    testHash,
-					CreatedAt: time.Now(),
-				},
+			account: account.Account{
+				Id:        testId,
+				Cpf:       testCpf,
+				Name:      "Nice name",
+				Secret:    testHash,
+				CreatedAt: time.Now(),
 			},
 		},
 	}
@@ -111,7 +116,7 @@ func TestCreate(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			repo := accountspg.NewRepository(dbPool)
-			if err := repo.Create(&tt.args.account); !errors.Is(err, tt.err) {
+			if err := repo.Create(context.Background(), &tt.account); !errors.Is(err, tt.err) {
 				t.Fatalf("expected error: %s got error: %s", tt.err, err)
 			}
 		})
