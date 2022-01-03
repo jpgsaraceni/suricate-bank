@@ -7,7 +7,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (r Repository) Create(account *account.Account) error {
+func (r Repository) Create(ctx context.Context, account *account.Account) error {
 
 	const query = `
 		INSERT INTO 
@@ -23,8 +23,8 @@ func (r Repository) Create(account *account.Account) error {
 			($1, $2, $3, $4, $5, $6);
 	`
 
-	err := r.pool.QueryRow(
-		context.TODO(),
+	_, err := r.pool.Exec(
+		ctx,
 		query,
 		account.Id,
 		account.Name,
@@ -32,7 +32,7 @@ func (r Repository) Create(account *account.Account) error {
 		account.Secret.Value(),
 		account.Balance.Cents(),
 		account.CreatedAt,
-	).Scan()
+	)
 
 	if err != nil {
 
