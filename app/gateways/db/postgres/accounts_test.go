@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
@@ -14,27 +15,16 @@ import (
 )
 
 var (
-	repeatedId   = account.AccountId(uuid.New())
-	testHash, _  = hash.NewHash("nicesecret")
-	testHash2, _ = hash.NewHash("anothernicesecret")
+	testHash, _ = hash.NewHash("nicesecret")
 	// testMoney10, _ = money.NewMoney(10)
 	// testMoney30, _ = money.NewMoney(30)
 	testContext = context.Background()
 )
 
-func truncate() error {
-	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
-
-	if err != nil {
-
-		return err
-	}
-
-	return nil
-}
-
 func TestCreate(t *testing.T) {
 	t.Parallel()
+
+	repeatedId := account.AccountId(uuid.New())
 
 	type args struct {
 		ctx     context.Context
@@ -71,7 +61,7 @@ func TestCreate(t *testing.T) {
 						Id:     repeatedId,
 						Name:   "Another nice name",
 						Cpf:    cpf.Random(),
-						Secret: testHash2,
+						Secret: testHash,
 					},
 				)
 			},
@@ -114,6 +104,12 @@ func TestCreate(t *testing.T) {
 func TestFetch(t *testing.T) {
 	t.Parallel()
 
+	var (
+		accountId1 = account.AccountId(uuid.New())
+		accountId2 = account.AccountId(uuid.New())
+		accountId3 = account.AccountId(uuid.New())
+	)
+
 	type testCase struct {
 		name      string
 		runBefore func(repo *accountspg.Repository) error
@@ -128,7 +124,7 @@ func TestFetch(t *testing.T) {
 				err := repo.Create(
 					testContext,
 					&account.Account{
-						Id:     account.AccountId(uuid.New()),
+						Id:     accountId1,
 						Name:   "Nice name",
 						Cpf:    cpf.Random(),
 						Secret: testHash,
@@ -143,10 +139,10 @@ func TestFetch(t *testing.T) {
 				err = repo.Create(
 					testContext,
 					&account.Account{
-						Id:     account.AccountId(uuid.New()),
+						Id:     accountId2,
 						Name:   "Another nice name",
 						Cpf:    cpf.Random(),
-						Secret: testHash2,
+						Secret: testHash,
 					},
 				)
 
@@ -160,7 +156,7 @@ func TestFetch(t *testing.T) {
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:     account.AccountId(uuid.New()),
+						Id:     accountId3,
 						Name:   "Nice name",
 						Cpf:    cpf.Random(),
 						Secret: testHash,
@@ -187,11 +183,91 @@ func TestFetch(t *testing.T) {
 
 			_, err := repo.Fetch(testContext)
 
+			//TODO: compare account to expected
+
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("expected error: %s got error: %s", tt.err, err)
 			}
 		})
 	}
+}
+
+func TestGetById(t *testing.T) {
+	t.Parallel()
+
+	accountId := account.AccountId(uuid.New())
+	accountCpf := cpf.Random()
+
+	type testCase struct {
+		name            string
+		runBefore       func(repo *accountspg.Repository) error
+		expectedAccount account.Account
+		err             error
+	}
+
+	testCases := []testCase{
+		{
+			name: "successfully get an account",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncate()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:     accountId,
+						Name:   "Nice name",
+						Cpf:    accountCpf,
+						Secret: testHash,
+					},
+				)
+			},
+			expectedAccount: account.Account{
+				Id:     accountId,
+				Name:   "Nice name",
+				Cpf:    accountCpf,
+				Secret: testHash,
+			},
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			repo := accountspg.NewRepository(dbPool)
+
+			if tt.runBefore != nil {
+				err := tt.runBefore(repo)
+
+				if err != nil {
+					t.Fatalf("runBefore() failed: %s", err)
+				}
+			}
+
+			gotAccount, err := repo.GetById(testContext, accountId)
+
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			}
+
+			tt.expectedAccount.CreatedAt = gotAccount.CreatedAt
+
+			if !reflect.DeepEqual(tt.expectedAccount, gotAccount) {
+				t.Fatalf("expected %v got %v", tt.expectedAccount, gotAccount)
+			}
+		})
+	}
+}
+
+func truncate() error {
+	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }
 
 func TestAccount(t *testing.T) {
