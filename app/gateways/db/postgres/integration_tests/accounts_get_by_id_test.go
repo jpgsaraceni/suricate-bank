@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -18,11 +19,13 @@ func TestGetById(t *testing.T) {
 		accountId     = account.AccountId(uuid.New())
 		getAccountCpf = cpf.Random()
 		testHash, _   = hash.NewHash("nicesecret")
+		testTime      = time.Now().Round(time.Hour)
 	)
 
 	type testCase struct {
 		name            string
 		runBefore       func(repo *accountspg.Repository) error
+		idArg           account.AccountId
 		expectedAccount account.Account
 		err             error
 	}
@@ -35,19 +38,41 @@ func TestGetById(t *testing.T) {
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:     accountId,
-						Name:   "Nice name",
-						Cpf:    getAccountCpf,
-						Secret: testHash,
+						Id:        accountId,
+						Name:      "Nice name",
+						Cpf:       getAccountCpf,
+						Secret:    testHash,
+						CreatedAt: testTime,
 					},
 				)
 			},
+			idArg: accountId,
 			expectedAccount: account.Account{
-				Id:     accountId,
-				Name:   "Nice name",
-				Cpf:    getAccountCpf,
-				Secret: testHash,
+				Id:        accountId,
+				Name:      "Nice name",
+				Cpf:       getAccountCpf,
+				Secret:    testHash,
+				CreatedAt: testTime,
 			},
+		},
+		{
+			name: "fail to get an inexixtent account",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:        account.AccountId(uuid.New()),
+						Name:      "Nice name",
+						Cpf:       getAccountCpf,
+						Secret:    testHash,
+						CreatedAt: testTime,
+					},
+				)
+			},
+			idArg:           account.AccountId(uuid.New()),
+			expectedAccount: account.Account{},
+			err:             accountspg.ErrQuery,
 		},
 	}
 
@@ -65,16 +90,14 @@ func TestGetById(t *testing.T) {
 				}
 			}
 
-			gotAccount, err := repo.GetById(testContext, accountId)
+			gotAccount, err := repo.GetById(testContext, tt.idArg)
 
 			if !errors.Is(err, tt.err) {
-				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
-			tt.expectedAccount.CreatedAt = gotAccount.CreatedAt
-
-			if !reflect.DeepEqual(tt.expectedAccount, gotAccount) {
-				t.Fatalf("expected %v got %v", tt.expectedAccount, gotAccount)
+			if !reflect.DeepEqual(gotAccount, tt.expectedAccount) {
+				t.Fatalf("got %v expected %v", gotAccount, tt.expectedAccount)
 			}
 		})
 	}

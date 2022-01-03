@@ -9,19 +9,22 @@ import (
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestGetBalance(t *testing.T) {
 
 	var (
-		accountId   = account.AccountId(uuid.New())
-		accountCpf  = cpf.Random()
-		testHash, _ = hash.NewHash("nicesecret")
+		accountId1   = account.AccountId(uuid.New())
+		accountId2   = account.AccountId(uuid.New())
+		testHash, _  = hash.NewHash("nicesecret")
+		testMoney, _ = money.NewMoney(10)
 	)
 
 	type testCase struct {
 		name            string
 		runBefore       func(repo *accountspg.Repository) error
+		accountId       account.AccountId
 		expectedBalance int
 		err             error
 	}
@@ -34,14 +37,52 @@ func TestGetBalance(t *testing.T) {
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:     accountId,
+						Id:     accountId1,
 						Name:   "Nice name",
-						Cpf:    accountCpf,
+						Cpf:    cpf.Random(),
 						Secret: testHash,
 					},
 				)
 			},
+			accountId:       accountId1,
 			expectedBalance: 0,
+		},
+		{
+			name: "successfully get 10 balance",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:      accountId2,
+						Name:    "Nice name",
+						Cpf:     cpf.Random(),
+						Secret:  testHash,
+						Balance: testMoney,
+					},
+				)
+			},
+			accountId:       accountId2,
+			expectedBalance: 10,
+		},
+		{
+			name: "fail to get balance from inexistent account",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:      account.AccountId(uuid.New()),
+						Name:    "Nice name",
+						Cpf:     cpf.Random(),
+						Secret:  testHash,
+						Balance: testMoney,
+					},
+				)
+			},
+			accountId:       account.AccountId(uuid.New()),
+			expectedBalance: 0,
+			err:             accountspg.ErrQuery,
 		},
 	}
 
@@ -59,14 +100,14 @@ func TestGetBalance(t *testing.T) {
 				}
 			}
 
-			gotBalance, err := repo.GetBalance(testContext, accountId)
+			gotBalance, err := repo.GetBalance(testContext, tt.accountId)
 
 			if !errors.Is(err, tt.err) {
-				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
 			if gotBalance != tt.expectedBalance {
-				t.Fatalf("expected %d got %d", tt.expectedBalance, gotBalance)
+				t.Fatalf("got %d expected %d", tt.expectedBalance, gotBalance)
 			}
 		})
 	}

@@ -13,7 +13,6 @@ import (
 )
 
 func TestDebit(t *testing.T) {
-	t.Parallel()
 
 	var (
 		testId         = account.AccountId(uuid.New())
@@ -23,10 +22,15 @@ func TestDebit(t *testing.T) {
 		testMoney10, _ = money.NewMoney(10)
 	)
 
+	type args struct {
+		accountId account.AccountId
+		amount    money.Money
+	}
+
 	type testCase struct {
 		name            string
 		runBefore       func(repo *accountspg.Repository) error
-		amount          money.Money
+		args            args
 		expectedBalance int
 		err             error
 	}
@@ -36,31 +40,49 @@ func TestDebit(t *testing.T) {
 			name: "successfully debit 10 from account with 20 balance",
 			runBefore: func(repo *accountspg.Repository) error {
 				truncateAccounts()
-				repo.Create(
+				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:     testId,
-						Name:   "Nice name",
-						Cpf:    testCpf,
-						Secret: testHash,
+						Id:      testId,
+						Name:    "Nice name",
+						Cpf:     testCpf,
+						Secret:  testHash,
+						Balance: testMoney20,
 					},
 				)
-				repo.CreditAccount(
-					testContext,
-					testId,
-					testMoney20,
-				)
-				return nil
 			},
-			amount:          testMoney10,
+			args: args{
+				accountId: testId,
+				amount:    testMoney10,
+			},
 			expectedBalance: 10,
+		},
+		{
+			name: "successfully debit 20 from account with 20 balance",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:      testId,
+						Name:    "Nice name",
+						Cpf:     testCpf,
+						Secret:  testHash,
+						Balance: testMoney20,
+					},
+				)
+			},
+			args: args{
+				accountId: testId,
+				amount:    testMoney20,
+			},
+			expectedBalance: 0,
 		},
 	}
 
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 
@@ -72,12 +94,12 @@ func TestDebit(t *testing.T) {
 				}
 			}
 
-			if err := repo.DebitAccount(testContext, testId, tt.amount); !errors.Is(err, tt.err) {
-				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			if err := repo.DebitAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
+				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
-			if gotBalance, _ := repo.GetBalance(testContext, testId); gotBalance != tt.expectedBalance {
-				t.Fatalf("expected %d got %d", tt.expectedBalance, gotBalance)
+			if gotBalance, _ := repo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
+				t.Fatalf("got %d expected %d", gotBalance, tt.expectedBalance)
 			}
 		})
 	}

@@ -20,10 +20,8 @@ func TestFetch(t *testing.T) {
 	var (
 		accountId1  = account.AccountId(uuid.New())
 		accountId2  = account.AccountId(uuid.New())
-		accountId3  = account.AccountId(uuid.New())
 		cpf1        = cpf.Random()
 		cpf2        = cpf.Random()
-		cpf3        = cpf.Random()
 		testTime    = time.Now().Round(time.Hour)
 		testHash, _ = hash.NewHash("nicesecret")
 	)
@@ -93,9 +91,9 @@ func TestFetch(t *testing.T) {
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:        accountId3,
+						Id:        accountId1,
 						Name:      "Nice name",
-						Cpf:       cpf3,
+						Cpf:       cpf1,
 						Secret:    testHash,
 						CreatedAt: testTime,
 					},
@@ -103,9 +101,9 @@ func TestFetch(t *testing.T) {
 			},
 			expectedAccounts: []account.Account{
 				{
-					Id:        accountId3,
+					Id:        accountId1,
 					Name:      "Nice name",
-					Cpf:       cpf3,
+					Cpf:       cpf1,
 					Secret:    testHash,
 					CreatedAt: testTime,
 				},
@@ -130,11 +128,11 @@ func TestFetch(t *testing.T) {
 			gotAccounts, err := repo.Fetch(testContext)
 
 			if !errors.Is(err, tt.err) {
-				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
-			if !reflect.DeepEqual(tt.expectedAccounts, gotAccounts) {
-				t.Fatalf("expected %v got %v", tt.expectedAccounts, gotAccounts)
+			if !reflect.DeepEqual(gotAccounts, tt.expectedAccounts) {
+				t.Fatalf("got %v expected %v", gotAccounts, tt.expectedAccounts)
 			}
 		})
 	}

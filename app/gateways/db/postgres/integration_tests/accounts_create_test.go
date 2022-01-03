@@ -17,6 +17,7 @@ func TestCreate(t *testing.T) {
 
 	var (
 		repeatedId  = account.AccountId(uuid.New())
+		repeatedCpf = cpf.Random()
 		testHash, _ = hash.NewHash("nicesecret")
 	)
 
@@ -46,7 +47,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		{
-			name: "fail to create account with repeated id",
+			name: "fail to create 2 accounts with same id",
 			runBefore: func(repo *accountspg.Repository) error {
 				truncateAccounts()
 				return repo.Create(
@@ -70,6 +71,55 @@ func TestCreate(t *testing.T) {
 			},
 			err: accountspg.ErrQuery,
 		},
+		{
+			name: "fail to create 2 accounts with same cpf",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:     account.AccountId(uuid.New()),
+						Name:   "Another nice name",
+						Cpf:    repeatedCpf,
+						Secret: testHash,
+					},
+				)
+			},
+			args: args{
+				ctx: testContext,
+				account: &account.Account{
+					Id:     account.AccountId(uuid.New()),
+					Name:   "Nice name",
+					Cpf:    repeatedCpf,
+					Secret: testHash,
+				},
+			},
+			err: accountspg.ErrQuery,
+		},
+		{
+			name: "successfully create 2 different accounts in sequence",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return repo.Create(
+					testContext,
+					&account.Account{
+						Id:     account.AccountId(uuid.New()),
+						Name:   "Nice name",
+						Cpf:    cpf.Random(),
+						Secret: testHash,
+					},
+				)
+			},
+			args: args{
+				ctx: testContext,
+				account: &account.Account{
+					Id:     account.AccountId(uuid.New()),
+					Name:   "Another nice name",
+					Cpf:    cpf.Random(),
+					Secret: testHash,
+				},
+			},
+		},
 	}
 
 	for _, tt := range testCases {
@@ -89,7 +139,7 @@ func TestCreate(t *testing.T) {
 
 			if err := repo.Create(testContext, tt.args.account); !errors.Is(err, tt.err) {
 
-				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 		})
 	}
