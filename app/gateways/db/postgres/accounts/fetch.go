@@ -23,7 +23,7 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 
 	if err != nil {
 
-		return nil, fmt.Errorf("%w: %s", errQuery, err.Error())
+		return nil, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
 	defer rows.Close()

@@ -10,7 +10,7 @@ import (
 func (r Repository) Create(ctx context.Context, account *account.Account) error {
 
 	const query = `
-		INSERT INTO 
+		INSERT INTO
 			accounts (
 				id,
 				name,
@@ -36,7 +36,7 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 
 	if err != nil {
 
-		return fmt.Errorf("%w: %s", errQuery, err.Error())
+		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
 	return nil

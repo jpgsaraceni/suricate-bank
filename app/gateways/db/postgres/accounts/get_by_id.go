@@ -35,7 +35,7 @@ func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.
 
 	if err != nil {
 
-		return account.Account{}, fmt.Errorf("%w: %s", errQuery, err.Error())
+		return account.Account{}, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
 	parsedAccount, err := accountReturned.parse()

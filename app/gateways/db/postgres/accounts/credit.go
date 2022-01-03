@@ -19,7 +19,7 @@ func (r Repository) CreditAccount(ctx context.Context, id account.AccountId, amo
 
 	if err != nil {
 
-		return fmt.Errorf("%w: %s", errQuery, err.Error())
+		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
 	return nil
