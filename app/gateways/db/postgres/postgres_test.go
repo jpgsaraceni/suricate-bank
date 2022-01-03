@@ -119,6 +119,25 @@ func TestCreate(t *testing.T) {
 			if err := repo.Create(context.Background(), &tt.account); !errors.Is(err, tt.err) {
 				t.Fatalf("expected error: %s got error: %s", tt.err, err)
 			}
+			accounts, err := repo.Fetch(context.Background())
+
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			}
+
+			account, err := repo.GetById(context.Background(), accounts[0].Id)
+
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			}
+
+			balance, err := repo.GetBalance(context.Background(), account.Id)
+
+			if !errors.Is(err, tt.err) {
+				t.Fatalf("expected error: %s got error: %s", tt.err, err)
+			}
+
+			fmt.Println(balance)
 		})
 	}
 }
