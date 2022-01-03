@@ -50,7 +50,7 @@ func NewCpf(input string) (Cpf, error) {
 }
 
 // Random generates a random valid cpf
-func Random() (Cpf, error) {
+func Random() Cpf {
 	var body string
 
 	rand.Seed(time.Now().Unix())
@@ -62,7 +62,26 @@ func Random() (Cpf, error) {
 	body += iterateDigits(body)
 	body += iterateDigits(body)
 
-	return NewCpf(body)
+	_, isKnownInvalid := knownInvalids[body]
+
+	for isKnownInvalid {
+		var body string
+
+		rand.Seed(time.Now().Unix())
+
+		for i := 0; i < 9; i++ {
+			body += fmt.Sprint(rand.Intn(10))
+		}
+
+		body += iterateDigits(body)
+		body += iterateDigits(body)
+
+		_, isKnownInvalid = knownInvalids[body]
+	}
+
+	generatedCpf, _ := NewCpf(body)
+
+	return generatedCpf
 }
 
 // Value returns a cpf with only numeric digits

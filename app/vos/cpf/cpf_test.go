@@ -108,7 +108,7 @@ func TestRandom(t *testing.T) {
 	t.Run("generate random cpf", func(t *testing.T) {
 		t.Parallel()
 
-		generatedCpf, _ := Random()
+		generatedCpf := Random()
 
 		isValid := generatedCpf.validate(generatedCpf.value)
 
