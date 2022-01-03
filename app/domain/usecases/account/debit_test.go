@@ -1,6 +1,7 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -41,13 +42,13 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney100,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney100,
 					}, nil
 				},
-				OnDebitAccount: func(account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
 					return nil
 				},
 			},
@@ -64,13 +65,13 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney110,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney110,
 					}, nil
 				},
-				OnDebitAccount: func(account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
 					return nil
 				},
 			},
@@ -87,7 +88,7 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney10,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney10,
@@ -108,7 +109,7 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney0,
@@ -129,7 +130,7 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{}, errRepository
 				},
 			},
@@ -144,7 +145,7 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney0,
@@ -165,13 +166,13 @@ func TestDebit(t *testing.T) {
 				Balance: testMoney100,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id:      account.AccountId(testUUID),
 						Balance: testMoney100,
 					}, nil
 				},
-				OnDebitAccount: func(account *account.Account, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, account *account.Account, amount money.Money) error {
 					return errRepository
 				},
 			},
@@ -191,7 +192,7 @@ func TestDebit(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			err := uc.Debit(tt.testAccount.Id, tt.amount)
+			err := uc.Debit(context.Background(), tt.testAccount.Id, tt.amount)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)

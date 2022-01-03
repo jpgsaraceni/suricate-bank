@@ -1,14 +1,15 @@
 package accountuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
-	account, err := uc.GetById(id)
+func (uc Usecase) Debit(ctx context.Context, id account.AccountId, amount money.Money) error {
+	account, err := uc.GetById(ctx, id)
 
 	if err != nil {
 
@@ -22,7 +23,7 @@ func (uc Usecase) Debit(id account.AccountId, amount money.Money) error {
 		return fmt.Errorf("%w: %s", ErrAmount, err.Error())
 	}
 
-	err = uc.Repository.DebitAccount(&account, amount)
+	err = uc.Repository.DebitAccount(ctx, &account, amount)
 
 	if err != nil {
 

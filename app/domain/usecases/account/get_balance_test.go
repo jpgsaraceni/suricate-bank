@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"golang.org/x/net/context"
 )
 
 func TestGetBalance(t *testing.T) {
@@ -28,7 +29,7 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "get 0 balance",
 			repository: account.MockRepository{
-				OnGetBalance: func(id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
 
 					return 0, nil
 				},
@@ -39,7 +40,7 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "get 100 balance",
 			repository: account.MockRepository{
-				OnGetBalance: func(id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
 
 					return 100, nil
 				},
@@ -50,7 +51,7 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "repository throws error",
 			repository: account.MockRepository{
-				OnGetBalance: func(id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
 
 					return 0, errRepository
 				},
@@ -68,7 +69,7 @@ func TestGetBalance(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			newAccount, err := uc.GetBalance(tt.id)
+			newAccount, err := uc.GetBalance(context.Background(), tt.id)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

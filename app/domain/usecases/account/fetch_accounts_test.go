@@ -1,6 +1,7 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -35,7 +36,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 1 account",
 			repository: account.MockRepository{
-				OnFetch: func() ([]account.Account, error) {
+				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{
 						{
@@ -57,7 +58,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 4 accounts",
 			repository: account.MockRepository{
-				OnFetch: func() ([]account.Account, error) {
+				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{
 						{
@@ -109,7 +110,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "no existent accounts error",
 			repository: account.MockRepository{
-				OnFetch: func() ([]account.Account, error) {
+				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{}, nil
 				},
@@ -120,7 +121,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "repository throws error",
 			repository: account.MockRepository{
-				OnFetch: func() ([]account.Account, error) {
+				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{}, errRepository
 				},
@@ -137,7 +138,7 @@ func TestFetch(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			accountList, err := uc.Fetch()
+			accountList, err := uc.Fetch(context.Background())
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

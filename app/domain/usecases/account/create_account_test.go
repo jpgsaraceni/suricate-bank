@@ -1,6 +1,7 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -38,7 +39,7 @@ func TestCreate(t *testing.T) {
 		return newHash
 	}
 
-	var mockCreateSuccess = func(account *account.Account) error {
+	var mockCreateSuccess = func(ctx context.Context, account *account.Account) error {
 		account.Id = testAccountId
 		account.CreatedAt = testTime
 		account.Secret = wantHash("hashedpassphrase")
@@ -113,7 +114,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
-				OnCreate: func(account *account.Account) error {
+				OnCreate: func(ctx context.Context, account *account.Account) error {
 					return errRepository
 				},
 			},
@@ -134,7 +135,7 @@ func TestCreate(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			newAccount, err := uc.Create(tt.args.name, tt.args.cpf, tt.args.secret)
+			newAccount, err := uc.Create(context.Background(), tt.args.name, tt.args.cpf, tt.args.secret)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

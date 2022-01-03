@@ -1,13 +1,14 @@
 package accountuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (uc Usecase) GetById(id account.AccountId) (account.Account, error) {
-	account, err := uc.Repository.GetById(id)
+func (uc Usecase) GetById(ctx context.Context, id account.AccountId) (account.Account, error) {
+	account, err := uc.Repository.GetById(ctx, id)
 
 	if err != nil {
 

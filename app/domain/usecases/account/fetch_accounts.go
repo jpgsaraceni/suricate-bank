@@ -1,13 +1,14 @@
 package accountuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (uc Usecase) Fetch() ([]account.Account, error) {
-	accountList, err := uc.Repository.Fetch()
+func (uc Usecase) Fetch(ctx context.Context) ([]account.Account, error) {
+	accountList, err := uc.Repository.Fetch(ctx)
 
 	if err != nil {
 
