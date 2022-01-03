@@ -12,7 +12,7 @@ import (
 )
 
 type queryReturn struct {
-	id        string
+	id        uuid.UUID
 	name      string
 	cpf       string
 	secret    string
@@ -23,14 +23,7 @@ type queryReturn struct {
 func (q *queryReturn) parse() (account.Account, error) {
 	var parsedAccount account.Account
 
-	// id, err := uuid.Parse(q.id)
-
-	// if err != nil {
-
-	// 	return account.Account{}, fmt.Errorf("%w: %s", errIdParse, err.Error())
-	// }
-
-	parsedAccount.Id = account.AccountId(uuid.MustParse(q.id))
+	parsedAccount.Id = account.AccountId(q.id)
 	parsedAccount.Name = q.name
 	parsedAccount.Cpf, _ = cpf.NewCpf(q.cpf)
 	parsedAccount.Balance, _ = money.NewMoney(q.balance)
