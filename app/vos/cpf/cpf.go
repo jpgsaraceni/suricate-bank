@@ -53,7 +53,7 @@ func NewCpf(input string) (Cpf, error) {
 func Random() Cpf {
 	var body string
 
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixMicro())
 
 	for i := 0; i < 9; i++ {
 		body += fmt.Sprint(rand.Intn(10))
@@ -67,7 +67,7 @@ func Random() Cpf {
 	for isKnownInvalid {
 		var body string
 
-		rand.Seed(time.Now().Unix())
+		rand.Seed(time.Now().UnixMicro())
 
 		for i := 0; i < 9; i++ {
 			body += fmt.Sprint(rand.Intn(10))
