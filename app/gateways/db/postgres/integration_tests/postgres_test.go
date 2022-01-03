@@ -19,6 +19,8 @@ var (
 	testContext = context.Background()
 )
 
+// TestMain creates runs a docker container of PostgreSQL to run
+// integration tests.
 func TestMain(m *testing.M) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	dockerPool, err := dockertest.NewPool("")
@@ -50,12 +52,13 @@ func TestMain(m *testing.M) {
 
 	log.Println("Connecting to database on url: ", databaseUrl)
 
-	resource.Expire(120) // Tell docker to hard kill the container in 120 seconds
+	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
 
-	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
 	dockerPool.MaxWait = 10 * time.Second
+	// connects to db in container, with exponential backoff-retry,
+	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = postgres.ConnectPool(databaseUrl)
+		dbPool, err = postgres.ConnectPool(testContext, databaseUrl)
 
 		return err
 	}); err != nil {
@@ -68,6 +71,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not read migration file: %s", err)
 	}
 
+	// creates accounts table in db
 	if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
 		log.Fatalf("Could not run migration: %s", err)
 	}
@@ -84,6 +88,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+// truncateAccounts clears the accounts table so tests are independent
 func truncateAccounts() error {
 	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
 

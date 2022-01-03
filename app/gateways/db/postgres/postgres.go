@@ -13,7 +13,9 @@ var (
 	errConnectDb   = errors.New("failed to connect to db")
 )
 
-func ConnectPool(url string) (*pgxpool.Pool, error) {
+// ConnectPool builds a config using the url passed as argument,
+// then creates a new pool and connects using that config.
+func ConnectPool(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(url)
 
 	if err != nil {
@@ -21,7 +23,7 @@ func ConnectPool(url string) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("%w: %s", errConfigureDb, err.Error())
 	}
 
-	pool, err := pgxpool.ConnectConfig(context.TODO(), config)
+	pool, err := pgxpool.ConnectConfig(ctx, config)
 
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", errConnectDb, err.Error())
