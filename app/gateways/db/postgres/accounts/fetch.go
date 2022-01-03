@@ -2,44 +2,94 @@ package accountspg
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (r Repository) Fetch() ([]account.Account, error) {
+type queryReturn struct {
+	id        string
+	name      string
+	cpf       string
+	secret    string
+	balance   int
+	createdAt time.Time
+}
+
+func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 	const query = `
-		SELECT *
+		SELECT 
+			id,
+			name,
+			cpf,
+			secret,
+			balance,
+			created_at
 		FROM accounts;
 	`
 
-	rows, err := r.pool.Query(context.TODO(), query, nil)
+	rows, err := r.pool.Query(ctx, query)
 
 	if err != nil {
 
-		return nil, errQuery
+		return nil, fmt.Errorf("%w: %s", errQuery, err.Error())
 	}
 
 	defer rows.Close()
 	var accountList []account.Account
 
 	for rows.Next() {
-		var account account.Account
-		err := rows.Scan( // TODO verify if types should be parsed
-			&account.Id,
-			&account.Name,
-			&account.Cpf,
-			&account.Secret,
-			&account.Balance,
-			&account.CreatedAt,
+		var account queryReturn
+		err := rows.Scan(
+			&account.id,
+			&account.name,
+			&account.cpf,
+			&account.secret,
+			&account.balance,
+			&account.createdAt,
 		)
 
 		if err != nil {
 
-			return nil, errScanningRows
+			return nil, fmt.Errorf("%w: %s", errScanningRows, err.Error())
 		}
 
-		accountList = append(accountList, account)
+		parsedAccount, err := account.parse()
+
+		if err != nil {
+
+			return nil, fmt.Errorf("%w: %s", errParse, err.Error())
+		}
+
+		fmt.Println(parsedAccount)
+
+		accountList = append(accountList, parsedAccount)
 	}
 
 	return accountList, nil
+}
+
+func (q *queryReturn) parse() (account.Account, error) {
+	var parsedAccount account.Account
+
+	// id, err := uuid.Parse(q.id)
+
+	// if err != nil {
+
+	// 	return account.Account{}, fmt.Errorf("%w: %s", errIdParse, err.Error())
+	// }
+
+	parsedAccount.Id = account.AccountId(uuid.MustParse(q.id))
+	parsedAccount.Name = q.name
+	parsedAccount.Cpf, _ = cpf.NewCpf(q.cpf)
+	parsedAccount.Balance, _ = money.NewMoney(q.balance)
+	parsedAccount.Secret = hash.Parse(q.secret)
+	parsedAccount.CreatedAt = q.createdAt
+
+	return parsedAccount, nil
 }
