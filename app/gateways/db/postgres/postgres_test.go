@@ -13,7 +13,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var dbPool *pgxpool.Pool
+var (
+	dbPool      *pgxpool.Pool
+	testContext = context.Background()
+)
 
 func TestMain(m *testing.M) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
@@ -78,4 +81,15 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(code)
+}
+
+func truncateAccounts() error {
+	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }
