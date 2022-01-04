@@ -1,10 +1,10 @@
 package accountuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"golang.org/x/net/context"
 )
 
 const (

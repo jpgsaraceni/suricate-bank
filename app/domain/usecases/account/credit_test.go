@@ -1,13 +1,13 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
-	"golang.org/x/net/context"
 )
 
 func TestCredit(t *testing.T) {

@@ -1,13 +1,13 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"golang.org/x/net/context"
 )
 
 func TestGetById(t *testing.T) {

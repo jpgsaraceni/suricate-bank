@@ -1,7 +1,6 @@
 package postgres_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -22,7 +21,6 @@ func TestCreate(t *testing.T) {
 	)
 
 	type args struct {
-		ctx     context.Context
 		account *account.Account
 	}
 
@@ -37,7 +35,6 @@ func TestCreate(t *testing.T) {
 		{
 			name: "successfully create account",
 			args: args{
-				ctx: testContext,
 				account: &account.Account{
 					Id:     account.AccountId(uuid.New()),
 					Name:   "Nice name",
@@ -60,7 +57,6 @@ func TestCreate(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx: testContext,
 				account: &account.Account{
 					Id:     repeatedId,
 					Name:   "Nice name",
@@ -84,7 +80,6 @@ func TestCreate(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx: testContext,
 				account: &account.Account{
 					Id:     account.AccountId(uuid.New()),
 					Name:   "Nice name",
@@ -108,7 +103,6 @@ func TestCreate(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx: testContext,
 				account: &account.Account{
 					Id:     account.AccountId(uuid.New()),
 					Name:   "Another nice name",
