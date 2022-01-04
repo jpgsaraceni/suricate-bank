@@ -20,6 +20,7 @@ type queryReturn struct {
 	createdAt time.Time
 }
 
+// parse parses values returned from queries into types expected by account entity
 func (q *queryReturn) parse() (account.Account, error) {
 	var parsedAccount account.Account
 
