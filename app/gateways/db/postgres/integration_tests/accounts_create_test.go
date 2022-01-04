@@ -49,7 +49,6 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to create 2 accounts with same id",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -74,7 +73,6 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to create 2 accounts with same cpf",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -99,7 +97,6 @@ func TestCreate(t *testing.T) {
 		{
 			name: "successfully create 2 different accounts in sequence",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{

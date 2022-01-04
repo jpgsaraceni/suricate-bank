@@ -13,6 +13,7 @@ import (
 )
 
 func TestGetBalance(t *testing.T) {
+	t.Parallel()
 
 	var (
 		accountId1   = account.AccountId(uuid.New())
@@ -33,7 +34,6 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "successfully get 0 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -50,7 +50,6 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "successfully get 10 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -68,7 +67,6 @@ func TestGetBalance(t *testing.T) {
 		{
 			name: "fail to get balance from inexistent account",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -89,6 +87,7 @@ func TestGetBalance(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 

@@ -13,9 +13,11 @@ import (
 )
 
 func TestCredit(t *testing.T) {
+	t.Parallel()
 
 	var (
-		testId       = account.AccountId(uuid.New())
+		accountId1   = account.AccountId(uuid.New())
+		accountId2   = account.AccountId(uuid.New())
 		testHash, _  = hash.NewHash("nicesecret")
 		testMoney, _ = money.NewMoney(10)
 	)
@@ -37,11 +39,10 @@ func TestCredit(t *testing.T) {
 		{
 			name: "successfully credit 10 to account with 0 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:     testId,
+						Id:     accountId1,
 						Name:   "Nice name",
 						Cpf:    cpf.Random(),
 						Secret: testHash,
@@ -49,7 +50,7 @@ func TestCredit(t *testing.T) {
 				)
 			},
 			args: args{
-				accountId: testId,
+				accountId: accountId1,
 				amount:    testMoney,
 			},
 			expectedBalance: 10,
@@ -57,11 +58,10 @@ func TestCredit(t *testing.T) {
 		{
 			name: "successfully credit 10 to account with 10 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:      testId,
+						Id:      accountId2,
 						Name:    "Nice name",
 						Cpf:     cpf.Random(),
 						Secret:  testHash,
@@ -70,7 +70,7 @@ func TestCredit(t *testing.T) {
 				)
 			},
 			args: args{
-				accountId: testId,
+				accountId: accountId2,
 				amount:    testMoney,
 			},
 			expectedBalance: 20,
@@ -80,6 +80,7 @@ func TestCredit(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 

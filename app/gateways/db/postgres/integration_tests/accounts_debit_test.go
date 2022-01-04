@@ -13,9 +13,11 @@ import (
 )
 
 func TestDebit(t *testing.T) {
+	t.Parallel()
 
 	var (
-		testId         = account.AccountId(uuid.New())
+		accountId1     = account.AccountId(uuid.New())
+		accountId2     = account.AccountId(uuid.New())
 		testHash, _    = hash.NewHash("nicesecret")
 		testMoney20, _ = money.NewMoney(20)
 		testMoney10, _ = money.NewMoney(10)
@@ -38,11 +40,10 @@ func TestDebit(t *testing.T) {
 		{
 			name: "successfully debit 10 from account with 20 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:      testId,
+						Id:      accountId1,
 						Name:    "Nice name",
 						Cpf:     cpf.Random(),
 						Secret:  testHash,
@@ -51,7 +52,7 @@ func TestDebit(t *testing.T) {
 				)
 			},
 			args: args{
-				accountId: testId,
+				accountId: accountId1,
 				amount:    testMoney10,
 			},
 			expectedBalance: 10,
@@ -59,11 +60,10 @@ func TestDebit(t *testing.T) {
 		{
 			name: "successfully debit 20 from account with 20 balance",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
-						Id:      testId,
+						Id:      accountId2,
 						Name:    "Nice name",
 						Cpf:     cpf.Random(),
 						Secret:  testHash,
@@ -72,7 +72,7 @@ func TestDebit(t *testing.T) {
 				)
 			},
 			args: args{
-				accountId: testId,
+				accountId: accountId2,
 				amount:    testMoney20,
 			},
 			expectedBalance: 0,
@@ -82,6 +82,7 @@ func TestDebit(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 

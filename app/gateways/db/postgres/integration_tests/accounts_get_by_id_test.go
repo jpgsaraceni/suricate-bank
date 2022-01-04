@@ -14,12 +14,14 @@ import (
 )
 
 func TestGetById(t *testing.T) {
+	t.Parallel()
 
 	var (
-		accountId     = account.AccountId(uuid.New())
-		getAccountCpf = cpf.Random()
-		testHash, _   = hash.NewHash("nicesecret")
-		testTime      = time.Now().Round(time.Hour)
+		accountId   = account.AccountId(uuid.New())
+		cpf1        = cpf.Random()
+		cpf2        = cpf.Random()
+		testHash, _ = hash.NewHash("nicesecret")
+		testTime    = time.Now().Round(time.Hour)
 	)
 
 	type testCase struct {
@@ -34,13 +36,12 @@ func TestGetById(t *testing.T) {
 		{
 			name: "successfully get an account",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
 						Id:        accountId,
 						Name:      "Nice name",
-						Cpf:       getAccountCpf,
+						Cpf:       cpf1,
 						Secret:    testHash,
 						CreatedAt: testTime,
 					},
@@ -50,7 +51,7 @@ func TestGetById(t *testing.T) {
 			expectedAccount: account.Account{
 				Id:        accountId,
 				Name:      "Nice name",
-				Cpf:       getAccountCpf,
+				Cpf:       cpf1,
 				Secret:    testHash,
 				CreatedAt: testTime,
 			},
@@ -58,13 +59,12 @@ func TestGetById(t *testing.T) {
 		{
 			name: "fail to get an inexixtent account",
 			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
 				return repo.Create(
 					testContext,
 					&account.Account{
 						Id:        account.AccountId(uuid.New()),
 						Name:      "Nice name",
-						Cpf:       getAccountCpf,
+						Cpf:       cpf2,
 						Secret:    testHash,
 						CreatedAt: testTime,
 					},
@@ -79,6 +79,7 @@ func TestGetById(t *testing.T) {
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
 			repo := accountspg.NewRepository(dbPool)
 
