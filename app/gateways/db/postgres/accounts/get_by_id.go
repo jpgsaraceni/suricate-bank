@@ -42,7 +42,7 @@ func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.
 
 	if err != nil {
 
-		return account.Account{}, fmt.Errorf("%w: %s", errParse, err.Error())
+		return account.Account{}, fmt.Errorf("%w: %s", ErrParse, err.Error())
 	}
 
 	return parsedAccount, nil

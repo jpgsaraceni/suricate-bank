@@ -42,14 +42,14 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 
 		if err != nil {
 
-			return nil, fmt.Errorf("%w: %s", errScanningRows, err.Error())
+			return nil, fmt.Errorf("%w: %s", ErrScanningRows, err.Error())
 		}
 
 		parsedAccount, err := accountReturned.parse()
 
 		if err != nil {
 
-			return nil, fmt.Errorf("%w: %s", errParse, err.Error())
+			return nil, fmt.Errorf("%w: %s", ErrParse, err.Error())
 		}
 
 		accountList = append(accountList, parsedAccount)
