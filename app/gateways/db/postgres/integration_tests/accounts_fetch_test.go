@@ -13,7 +13,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
-func TestFetch(t *testing.T) {
+func TestFetchAccounts(t *testing.T) {
 	// can't run this test in parallel because Fetch would possibly return accounts
 	// created in parallel tests after the truncate function call
 

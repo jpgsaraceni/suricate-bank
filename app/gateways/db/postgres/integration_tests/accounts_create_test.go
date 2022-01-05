@@ -11,7 +11,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateAccount(t *testing.T) {
 	t.Parallel()
 
 	var (
