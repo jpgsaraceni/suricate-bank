@@ -15,7 +15,7 @@ type ErrorPayload struct {
 	Message string
 }
 
-func BadRequest(w http.ResponseWriter, err error, errorPayload ErrorPayload) Response {
+func BadRequest(err error, errorPayload ErrorPayload) Response {
 	return Response{
 		Status:  http.StatusBadRequest,
 		Error:   err,

@@ -13,10 +13,12 @@ type CreateRequest struct {
 	Secret string `json:"secret" validate:"required"`
 }
 
-func (h Handler) Create(w http.ResponseWriter, r *http.Request) {
+func (h Handler) Create(r *http.Request) responses.Response {
 	var createRequest CreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		responses.BadRequest(w, err, ErrMissingFields)
+		return responses.BadRequest(err, ErrMissingFields)
 	}
+
+	return responses.Response{}
 }
