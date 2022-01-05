@@ -65,15 +65,21 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
+	accountsMigration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
+	transfersMigration, err := os.ReadFile("../migrations/000002_transfers.up.sql")
 
 	if err != nil {
 		log.Fatalf("Could not read migration file: %s", err)
 	}
 
 	// creates accounts table in db
-	if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
-		log.Fatalf("Could not run migration: %s", err)
+	if _, err := dbPool.Exec(context.Background(), string(accountsMigration)); err != nil {
+		log.Fatalf("Could not run accounts migration: %s", err)
+	}
+
+	// creates transfers table in db
+	if _, err := dbPool.Exec(context.Background(), string(transfersMigration)); err != nil {
+		log.Fatalf("Could not run transfers migration: %s", err)
 	}
 
 	//Run tests
@@ -91,6 +97,18 @@ func TestMain(m *testing.M) {
 // truncateAccounts clears the accounts table so tests are independent
 func truncateAccounts() error {
 	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// truncateTransfers clears the accounts table so tests are independent
+func truncateTransfers() error {
+	_, err := dbPool.Exec(testContext, "TRUNCATE transfers")
 
 	if err != nil {
 
