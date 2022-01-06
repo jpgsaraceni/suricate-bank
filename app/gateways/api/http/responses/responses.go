@@ -2,7 +2,10 @@ package responses
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
 type Response struct {
@@ -23,11 +26,11 @@ func BadRequest(err error, errorPayload ErrorPayload) Response {
 	}
 }
 
-func InternalServerError(err error, errorPayload ErrorPayload) Response {
+func InternalServerError(err error) Response {
 	return Response{
 		Status:  http.StatusInternalServerError,
 		Error:   err,
-		Payload: errorPayload,
+		Payload: ErrInternalServerError,
 	}
 }
 
@@ -38,8 +41,17 @@ func Created(payload string) Response {
 	}
 }
 
-func SendJSON(w http.ResponseWriter, response Response) {
+func SendJSON(w http.ResponseWriter, response Response) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.Status)
-	json.NewEncoder(w).Encode(response.Payload)
+	return json.NewEncoder(w).Encode(response.Payload)
+}
+
+func ErrorResponse(err error) Response {
+	switch {
+	case errors.Is(err, account.ErrInvalidCpf):
+		return BadRequest(err, ErrInvalidCpf)
+	default:
+		return InternalServerError(err)
+	}
 }
