@@ -7,11 +7,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 )
 
 var (
@@ -65,16 +69,23 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
+	// migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
+	migration, err := migrate.New(
+		"../migrations",
+		databaseUrl)
 
 	if err != nil {
-		log.Fatalf("Could not read migration file: %s", err)
+		log.Fatalf("Could not read migration files: %s", err)
+	}
+
+	if err := migration.Up(); err != nil {
+		log.Fatal(err)
 	}
 
 	// creates accounts table in db
-	if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
-		log.Fatalf("Could not run migration: %s", err)
-	}
+	// if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
+	// 	log.Fatalf("Could not run migration: %s", err)
+	// }
 
 	//Run tests
 	code := m.Run()
