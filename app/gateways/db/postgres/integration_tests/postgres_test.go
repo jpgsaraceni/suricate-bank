@@ -71,7 +71,7 @@ func TestMain(m *testing.M) {
 
 	// migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
 	migration, err := migrate.New(
-		"../migrations",
+		"file://../migrations",
 		databaseUrl)
 
 	if err != nil {
