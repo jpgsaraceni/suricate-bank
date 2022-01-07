@@ -12,6 +12,8 @@ var (
 	ErrNegative         = errors.New("negative values not allowed")
 	ErrChangeByZero     = errors.New("cannot add or subtract 0")
 	ErrInsuficientFunds = errors.New("subtract amount greater than available amount")
+	errScan             = errors.New("scan failed")
+	errScanEmpty        = errors.New("scan returned empty")
 )
 
 func NewMoney(amount int) (Money, error) {
@@ -25,6 +27,31 @@ func NewMoney(amount int) (Money, error) {
 
 func (m Money) Cents() int {
 	return m.cents
+}
+
+// Scan implements database/sql/driver Scanner interface.
+// Scan parses a string value to Cpf (if valid) or returns error.
+func (m *Money) Scan(value interface{}) error {
+	if value == nil {
+		*m = Money{}
+
+		return errScanEmpty
+	}
+
+	if value, ok := value.(int); ok {
+		money, err := NewMoney(value)
+
+		if err != nil {
+
+			return err
+		}
+
+		*m = money
+
+		return nil
+	}
+
+	return errScan
 }
 
 func (m *Money) Add(amount int) error {
