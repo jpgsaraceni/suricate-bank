@@ -2,6 +2,7 @@ package hash
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"golang.org/x/crypto/bcrypt"
@@ -123,6 +124,54 @@ func TestCompare(t *testing.T) {
 
 			if success != tt.expectsSuccess {
 				t.Errorf("got %t expected %t", success, tt.expectsSuccess)
+			}
+		})
+	}
+}
+
+func TestScan(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name  string
+		value interface{}
+		err   error
+	}
+
+	var testHash, _ = bcrypt.GenerateFromPassword([]byte("abc"), 10)
+
+	testCases := []testCase{
+		{
+			name:  "successfully scan",
+			value: string(testHash),
+		},
+		{
+			name:  "fail to scan empty value",
+			value: nil,
+			err:   errScanEmpty,
+		},
+		{
+			name:  "fail to scan invalid hash",
+			value: "this is not a hash",
+			err:   errScan,
+		},
+		{
+			name:  "fail to scan invalid type",
+			value: 22061446035,
+			err:   errScan,
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var testSecret = Secret{}
+
+			if err := testSecret.Scan(tt.value); err != tt.err {
+				fmt.Println(tt.value)
+				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})
 	}
