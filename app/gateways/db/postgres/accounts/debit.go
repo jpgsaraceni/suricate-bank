@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gofrs/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -11,11 +12,17 @@ import (
 func (r Repository) DebitAccount(ctx context.Context, id account.AccountId, amount money.Money) error {
 	const query = `
 		UPDATE accounts
-		SET balance = balance - $1
-		WHERE id = $2;
+		SET balance = 
+			CASE WHEN balance >= $1 THEN balance - $1
+				ELSE balance
+			END
+		WHERE id = $2
+		RETURNING id;
 	`
 
-	_, err := r.pool.Exec(ctx, query, amount.Cents(), id)
+	var updateId uuid.UUID
+
+	err := r.pool.QueryRow(ctx, query, amount.Cents(), id).Scan(&updateId)
 
 	if err != nil {
 

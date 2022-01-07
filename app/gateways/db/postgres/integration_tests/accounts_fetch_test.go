@@ -109,6 +109,15 @@ func TestFetch(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "fail to fetch 0 accounts",
+			runBefore: func(repo *accountspg.Repository) error {
+				truncateAccounts()
+				return nil
+			},
+			expectedAccounts: nil,
+			err:              accountspg.ErrEmptyFetch,
+		},
 	}
 
 	for _, tt := range testCases {

@@ -77,6 +77,14 @@ func TestDebit(t *testing.T) {
 			},
 			expectedBalance: 0,
 		},
+		{
+			name: "fail to debit inexistent account",
+			args: args{
+				accountId: account.AccountId(uuid.New()),
+				amount:    testMoney10,
+			},
+			err: accountspg.ErrQuery,
+		},
 	}
 
 	for _, tt := range testCases {

@@ -48,5 +48,10 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 		accountList = append(accountList, accountReturned)
 	}
 
+	if len(accountList) == 0 {
+
+		return nil, ErrEmptyFetch
+	}
+
 	return accountList, nil
 }

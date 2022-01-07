@@ -75,6 +75,14 @@ func TestCredit(t *testing.T) {
 			},
 			expectedBalance: 20,
 		},
+		{
+			name: "fail to credit inexistent account",
+			args: args{
+				accountId: account.AccountId(uuid.New()),
+				amount:    testMoney,
+			},
+			err: accountspg.ErrQuery,
+		},
 	}
 
 	for _, tt := range testCases {
