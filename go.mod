@@ -3,14 +3,13 @@ module github.com/jpgsaraceni/suricate-bank
 go 1.17
 
 require (
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.14.1
 	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
 )
 
 require (
-	github.com/google/go-github/v35 v35.2.0 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
