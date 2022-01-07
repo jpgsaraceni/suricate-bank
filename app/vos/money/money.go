@@ -2,7 +2,10 @@
 // Money types. Values are expressed in cents (integers) and must always be positive.
 package money
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Money struct {
 	cents int
@@ -38,16 +41,16 @@ func (m *Money) Scan(value interface{}) error {
 		return errScanEmpty
 	}
 
-	if value, ok := value.(int); ok {
-		money, err := NewMoney(value)
+	if value, ok := value.(int64); ok {
+		money, err := NewMoney(int(value))
 
 		if err != nil {
+			fmt.Printf("money err: %d\n", value)
 
 			return err
 		}
 
 		*m = money
-
 		return nil
 	}
 
