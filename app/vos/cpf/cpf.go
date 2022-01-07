@@ -33,9 +33,11 @@ var knownInvalids = map[string]struct{}{
 	"99999999999": {},
 }
 
-var errInvalid = errors.New("invalid cpf")
-var errScan = errors.New("scan failed")
-var errScanEmpty = errors.New("scan returned empty")
+var (
+	errInvalid   = errors.New("invalid cpf")
+	errScan      = errors.New("scan failed")
+	errScanEmpty = errors.New("scan returned empty")
+)
 
 // NewCpf creates a Cpf struct with value and masked, or empty and returns error if invalid
 func NewCpf(input string) (Cpf, error) {
