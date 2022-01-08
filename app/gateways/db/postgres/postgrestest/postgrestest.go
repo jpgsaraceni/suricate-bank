@@ -1,31 +1,26 @@
-package postgres_test
+package postgrestest
 
 import (
 	"context"
 	"fmt"
-	"os"
-	"testing"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 )
 
-var (
-	dbPool      *pgxpool.Pool
-	testContext = context.Background()
-)
+var dbPool *pgxpool.Pool
+var testContext = context.Background()
 
 // TestMain creates runs a docker container of PostgreSQL to run
 // integration tests.
-func TestMain(m *testing.M) {
+func GetTestPool() *pgxpool.Pool {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
@@ -88,20 +83,22 @@ func TestMain(m *testing.M) {
 	// }
 
 	//Run tests
-	code := m.Run()
+	// code := m.Run()
 
-	dbPool.Close()
+	// dbPool.Close()
 
-	if err := dockerPool.Purge(resource); err != nil {
-		log.Fatalf("Could not purge resource: %s", err)
-	}
+	return dbPool
 
-	os.Exit(code)
+	// if err := dockerPool.Purge(resource); err != nil {
+	// 	log.Fatalf("Could not purge resource: %s", err)
+	// }
+
+	// os.Exit(code)
 }
 
 // truncateAccounts clears the accounts table so tests are independent
-func truncateAccounts() error {
-	_, err := dbPool.Exec(testContext, "TRUNCATE accounts")
+func Truncate(pool *pgxpool.Pool, table string) error {
+	_, err := pool.Exec(testContext, fmt.Sprintf("TRUNCATE %s", table))
 
 	if err != nil {
 

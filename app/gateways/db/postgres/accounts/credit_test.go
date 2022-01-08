@@ -1,4 +1,4 @@
-package postgres_test
+package accountspg
 
 import (
 	"errors"
@@ -6,13 +6,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func TestGetBalance(t *testing.T) {
+func TestCredit(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -22,18 +21,23 @@ func TestGetBalance(t *testing.T) {
 		testMoney, _ = money.NewMoney(10)
 	)
 
+	type args struct {
+		accountId account.AccountId
+		amount    money.Money
+	}
+
 	type testCase struct {
 		name            string
-		runBefore       func(repo *accountspg.Repository) error
-		accountId       account.AccountId
+		runBefore       func(repo *Repository) error
+		args            args
 		expectedBalance int
 		err             error
 	}
 
 	testCases := []testCase{
 		{
-			name: "successfully get 0 balance",
-			runBefore: func(repo *accountspg.Repository) error {
+			name: "successfully credit 10 to account with 0 balance",
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -44,12 +48,15 @@ func TestGetBalance(t *testing.T) {
 					},
 				)
 			},
-			accountId:       accountId1,
-			expectedBalance: 0,
+			args: args{
+				accountId: accountId1,
+				amount:    testMoney,
+			},
+			expectedBalance: 10,
 		},
 		{
-			name: "successfully get 10 balance",
-			runBefore: func(repo *accountspg.Repository) error {
+			name: "successfully credit 10 to account with 10 balance",
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -61,26 +68,19 @@ func TestGetBalance(t *testing.T) {
 					},
 				)
 			},
-			accountId:       accountId2,
-			expectedBalance: 10,
+			args: args{
+				accountId: accountId2,
+				amount:    testMoney,
+			},
+			expectedBalance: 20,
 		},
 		{
-			name: "fail to get balance from inexistent account",
-			runBefore: func(repo *accountspg.Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:      account.AccountId(uuid.New()),
-						Name:    "Nice name",
-						Cpf:     cpf.Random(),
-						Secret:  testHash,
-						Balance: testMoney,
-					},
-				)
+			name: "fail to credit inexistent account",
+			args: args{
+				accountId: account.AccountId(uuid.New()),
+				amount:    testMoney,
 			},
-			accountId:       account.AccountId(uuid.New()),
-			expectedBalance: 0,
-			err:             accountspg.ErrQuery,
+			err: ErrQuery,
 		},
 	}
 
@@ -89,7 +89,7 @@ func TestGetBalance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := accountspg.NewRepository(dbPool)
+			repo := NewRepository(dbPool)
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(repo)
@@ -99,14 +99,12 @@ func TestGetBalance(t *testing.T) {
 				}
 			}
 
-			gotBalance, err := repo.GetBalance(testContext, tt.accountId)
-
-			if !errors.Is(err, tt.err) {
-				t.Fatalf("got error: %s expected error: %s", err, tt.err)
+			if err := repo.CreditAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
+				t.Fatalf(" got error: %s expected error: %s", err, tt.err)
 			}
 
-			if gotBalance != tt.expectedBalance {
-				t.Fatalf("got %d expected %d", tt.expectedBalance, gotBalance)
+			if gotBalance, _ := repo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
+				t.Fatalf("got %d expected %d ", gotBalance, tt.expectedBalance)
 			}
 		})
 	}

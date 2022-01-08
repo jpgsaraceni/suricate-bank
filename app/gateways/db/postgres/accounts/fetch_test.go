@@ -1,4 +1,4 @@
-package postgres_test
+package accountspg
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
@@ -29,15 +29,15 @@ func TestFetch(t *testing.T) {
 	type testCase struct {
 		name             string
 		expectedAccounts []account.Account
-		runBefore        func(repo *accountspg.Repository) error
+		runBefore        func(repo *Repository) error
 		err              error
 	}
 
 	testCases := []testCase{
 		{
 			name: "successfully fetch 2 accounts",
-			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
+			runBefore: func(repo *Repository) error {
+				postgrestest.Truncate(dbPool, "accounts")
 				err := repo.Create(
 					testContext,
 					&account.Account{
@@ -86,8 +86,8 @@ func TestFetch(t *testing.T) {
 		},
 		{
 			name: "successfully fetch 1 account",
-			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
+			runBefore: func(repo *Repository) error {
+				postgrestest.Truncate(dbPool, "accounts")
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -111,12 +111,12 @@ func TestFetch(t *testing.T) {
 		},
 		{
 			name: "fail to fetch 0 accounts",
-			runBefore: func(repo *accountspg.Repository) error {
-				truncateAccounts()
+			runBefore: func(repo *Repository) error {
+				postgrestest.Truncate(dbPool, "accounts")
 				return nil
 			},
 			expectedAccounts: nil,
-			err:              accountspg.ErrEmptyFetch,
+			err:              ErrEmptyFetch,
 		},
 	}
 
@@ -124,7 +124,7 @@ func TestFetch(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			repo := accountspg.NewRepository(dbPool)
+			repo := NewRepository(dbPool)
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(repo)

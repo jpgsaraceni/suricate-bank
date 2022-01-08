@@ -1,4 +1,4 @@
-package postgres_test
+package accountspg
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
@@ -26,7 +25,7 @@ func TestCreate(t *testing.T) {
 
 	type testCase struct {
 		name      string
-		runBefore func(repo *accountspg.Repository) error
+		runBefore func(repo *Repository) error
 		args      args
 		err       error
 	}
@@ -45,7 +44,7 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "fail to create 2 accounts with same id",
-			runBefore: func(repo *accountspg.Repository) error {
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -64,11 +63,11 @@ func TestCreate(t *testing.T) {
 					Secret: testHash,
 				},
 			},
-			err: accountspg.ErrQuery,
+			err: ErrQuery,
 		},
 		{
 			name: "fail to create 2 accounts with same cpf",
-			runBefore: func(repo *accountspg.Repository) error {
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -87,11 +86,11 @@ func TestCreate(t *testing.T) {
 					Secret: testHash,
 				},
 			},
-			err: accountspg.ErrQuery,
+			err: ErrQuery,
 		},
 		{
 			name: "successfully create 2 different accounts in sequence",
-			runBefore: func(repo *accountspg.Repository) error {
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -118,7 +117,7 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := accountspg.NewRepository(dbPool)
+			repo := NewRepository(dbPool)
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(repo)

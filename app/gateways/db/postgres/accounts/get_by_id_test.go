@@ -1,4 +1,4 @@
-package postgres_test
+package accountspg
 
 import (
 	"errors"
@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
@@ -26,7 +25,7 @@ func TestGetById(t *testing.T) {
 
 	type testCase struct {
 		name            string
-		runBefore       func(repo *accountspg.Repository) error
+		runBefore       func(repo *Repository) error
 		idArg           account.AccountId
 		expectedAccount account.Account
 		err             error
@@ -35,7 +34,7 @@ func TestGetById(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "successfully get an account",
-			runBefore: func(repo *accountspg.Repository) error {
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -58,7 +57,7 @@ func TestGetById(t *testing.T) {
 		},
 		{
 			name: "fail to get an inexixtent account",
-			runBefore: func(repo *accountspg.Repository) error {
+			runBefore: func(repo *Repository) error {
 				return repo.Create(
 					testContext,
 					&account.Account{
@@ -72,7 +71,7 @@ func TestGetById(t *testing.T) {
 			},
 			idArg:           account.AccountId(uuid.New()),
 			expectedAccount: account.Account{},
-			err:             accountspg.ErrQuery,
+			err:             ErrQuery,
 		},
 	}
 
@@ -81,7 +80,7 @@ func TestGetById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := accountspg.NewRepository(dbPool)
+			repo := NewRepository(dbPool)
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(repo)
