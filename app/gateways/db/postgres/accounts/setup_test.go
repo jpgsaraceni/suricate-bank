@@ -12,7 +12,9 @@ var testContext = context.Background()
 var dbPool *pgxpool.Pool
 
 func TestMain(m *testing.M) {
-	dbPool = postgrestest.GetTestPool()
+	gotPool, tearDown := postgrestest.GetTestPool()
+	dbPool = gotPool
 
 	m.Run()
+	tearDown()
 }

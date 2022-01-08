@@ -18,9 +18,9 @@ import (
 var dbPool *pgxpool.Pool
 var testContext = context.Background()
 
-// TestMain creates runs a docker container of PostgreSQL to run
+// GetTestPool creates runs a docker container of PostgreSQL to run
 // integration tests.
-func GetTestPool() *pgxpool.Pool {
+func GetTestPool() (*pgxpool.Pool, func()) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
@@ -77,23 +77,13 @@ func GetTestPool() *pgxpool.Pool {
 		log.Fatal(err)
 	}
 
-	// creates accounts table in db
-	// if _, err := dbPool.Exec(context.Background(), string(migration)); err != nil {
-	// 	log.Fatalf("Could not run migration: %s", err)
-	// }
+	// tearDown destroys container at the end of the test
+	tearDown := func() {
+		dbPool.Close()
+		dockerPool.Purge(resource)
+	}
 
-	//Run tests
-	// code := m.Run()
-
-	// dbPool.Close()
-
-	return dbPool
-
-	// if err := dockerPool.Purge(resource); err != nil {
-	// 	log.Fatalf("Could not purge resource: %s", err)
-	// }
-
-	// os.Exit(code)
+	return dbPool, tearDown
 }
 
 // truncateAccounts clears the accounts table so tests are independent
