@@ -210,21 +210,16 @@ func TestScan(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:  "successfully scan",
-			value: 10,
+			value: int64(10),
 		},
 		{
 			name:  "fail to scan empty value",
 			value: nil,
 			err:   errScanEmpty,
 		},
-		// {
-		// 	name:  "fail to scan invalid cpf",
-		// 	value: "220.614.460-34",
-		// 	err:   errInvalid,
-		// },
 		{
 			name:  "fail to scan invalid type",
-			value: "22061446035",
+			value: "a string",
 			err:   errScan,
 		},
 	}

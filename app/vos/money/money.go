@@ -5,6 +5,7 @@ package money
 import (
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 type Money struct {
@@ -41,8 +42,11 @@ func (m *Money) Scan(value interface{}) error {
 		return errScanEmpty
 	}
 
-	if value, ok := value.(int64); ok {
-		money, err := NewMoney(int(value))
+	valueString := fmt.Sprint(value)
+	valueInt, err := strconv.Atoi(valueString)
+
+	if err == nil {
+		money, err := NewMoney(int(valueInt))
 
 		if err != nil {
 			fmt.Printf("money err: %d\n", value)
