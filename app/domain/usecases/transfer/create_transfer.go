@@ -1,6 +1,7 @@
 package transferuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -8,24 +9,24 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Create(amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
+func (uc Usecase) Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
 
 	if originId == destinationId {
 
 		return transfer.Transfer{}, ErrSameAccounts
 	}
 
-	err := uc.Debiter.Debit(originId, amount)
+	err := uc.Debiter.Debit(ctx, originId, amount)
 
 	if err != nil {
 
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
 	}
 
-	err = uc.Crediter.Credit(destinationId, amount)
+	err = uc.Crediter.Credit(ctx, destinationId, amount)
 
 	if err != nil {
-		rollback(uc, false, true, originId, destinationId, amount)
+		rollback(ctx, uc, false, true, originId, destinationId, amount)
 
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
 	}
@@ -33,15 +34,15 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
 
 	if err != nil {
-		rollback(uc, true, true, originId, destinationId, amount)
+		rollback(ctx, uc, true, true, originId, destinationId, amount)
 
 		return transfer.Transfer{}, fmt.Errorf("failed to create transfer instance: %w", err)
 	}
 
-	err = uc.Repository.Create(&newTransfer)
+	err = uc.Repository.Create(ctx, &newTransfer)
 
 	if err != nil {
-		rollback(uc, true, true, originId, destinationId, amount)
+		rollback(ctx, uc, true, true, originId, destinationId, amount)
 
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
@@ -49,13 +50,13 @@ func (uc Usecase) Create(amount money.Money, originId, destinationId account.Acc
 	return newTransfer, nil
 }
 
-func rollback(uc Usecase, hasCredited, hasDebited bool, originId, destinationId account.AccountId, amount money.Money) {
+func rollback(ctx context.Context, uc Usecase, hasCredited, hasDebited bool, originId, destinationId account.AccountId, amount money.Money) {
 	if hasCredited {
-		uc.Debiter.Debit(destinationId, amount)
+		uc.Debiter.Debit(ctx, destinationId, amount)
 	}
 
 	if hasDebited {
-		uc.Crediter.Credit(originId, amount)
+		uc.Crediter.Credit(ctx, originId, amount)
 	}
 }
 

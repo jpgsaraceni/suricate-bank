@@ -1,6 +1,7 @@
 package accountuc
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -28,7 +29,7 @@ func TestGetById(t *testing.T) {
 		{
 			name: "get account",
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{
 						Id: id,
 					}, nil
@@ -42,7 +43,7 @@ func TestGetById(t *testing.T) {
 		{
 			name: "fail to get account",
 			repository: account.MockRepository{
-				OnGetById: func(id account.AccountId) (account.Account, error) {
+				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
 					return account.Account{}, errRepository
 				},
 			},
@@ -59,7 +60,7 @@ func TestGetById(t *testing.T) {
 
 			uc := Usecase{tt.repository}
 
-			newAccount, err := uc.GetById(tt.id)
+			newAccount, err := uc.GetById(context.Background(), tt.id)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

@@ -1,6 +1,8 @@
 package transferuc
 
 import (
+	"context"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
@@ -13,9 +15,9 @@ type Usecase struct {
 }
 
 type Debiter interface {
-	Debit(id account.AccountId, amount money.Money) error
+	Debit(ctx context.Context, id account.AccountId, amount money.Money) error
 }
 
 type Crediter interface {
-	Credit(id account.AccountId, amount money.Money) error
+	Credit(ctx context.Context, id account.AccountId, amount money.Money) error
 }

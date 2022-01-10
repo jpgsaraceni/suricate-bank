@@ -1,13 +1,14 @@
 package transferuc
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 )
 
-func (uc Usecase) Fetch() ([]transfer.Transfer, error) {
-	transferList, err := uc.Repository.Fetch()
+func (uc Usecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
+	transferList, err := uc.Repository.Fetch(ctx)
 
 	if err != nil {
 

@@ -103,3 +103,62 @@ func TestIsValid(t *testing.T) {
 		})
 	}
 }
+
+func TestRandom(t *testing.T) {
+	t.Parallel()
+	t.Run("generate random cpf", func(t *testing.T) {
+
+		generatedCpf := Random()
+
+		isValid := generatedCpf.validate(generatedCpf.value)
+
+		if !isValid {
+			t.Errorf("genereated invalid cpf")
+		}
+	})
+}
+
+func TestScan(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name  string
+		value interface{}
+		err   error
+	}
+
+	testCases := []testCase{
+		{
+			name:  "successfully scan",
+			value: "220.614.460-35",
+		},
+		{
+			name:  "fail to scan empty value",
+			value: nil,
+			err:   errScanEmpty,
+		},
+		{
+			name:  "fail to scan invalid cpf",
+			value: "220.614.460-34",
+			err:   errInvalid,
+		},
+		{
+			name:  "fail to scan invalid type",
+			value: 22061446035,
+			err:   errScan,
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var testCpf = Cpf{}
+
+			if err := testCpf.Scan(tt.value); err != tt.err {
+				t.Errorf("got error: %s expected error: %s", err, tt.err)
+			}
+		})
+	}
+}
