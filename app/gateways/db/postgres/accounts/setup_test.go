@@ -2,7 +2,6 @@ package accountspg
 
 import (
 	"context"
-	"testing"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -13,17 +12,12 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-var testContext = context.Background()
-
-func TestMain(m *testing.M) {
-
-	m.Run()
-}
-
 var (
+	testContext    = context.Background()
 	testHash, _    = hash.NewHash("nicesecret")
 	testTime       = time.Now().Round(time.Hour)
 	testMoney10, _ = money.NewMoney(10)
+	testMoney20, _ = money.NewMoney(20)
 	testMoney30, _ = money.NewMoney(30)
 )
 
