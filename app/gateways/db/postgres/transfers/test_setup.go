@@ -16,12 +16,13 @@ var (
 	testContext    = context.Background()
 	testTime       = time.Now().Round(time.Hour)
 	testMoney10, _ = money.NewMoney(10)
+	testMoney15, _ = money.NewMoney(15)
 )
 
 func createTestTransferBatch(pool *pgxpool.Pool, ids []transfer.TransferId, originIds, destinationIds []account.AccountId, amount []int) error {
 	const query = `
 	INSERT INTO 
-	accounts (
+	transfers (
 		id,
 		account_origin_id,
 		account_destination_id,
