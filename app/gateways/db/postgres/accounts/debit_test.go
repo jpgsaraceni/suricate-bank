@@ -6,21 +6,18 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestDebit(t *testing.T) {
 	t.Parallel()
 
-	var (
-		accountId1     = account.AccountId(uuid.New())
-		accountId2     = account.AccountId(uuid.New())
-		testHash, _    = hash.NewHash("nicesecret")
-		testMoney20, _ = money.NewMoney(20)
-		testMoney10, _ = money.NewMoney(10)
-	)
+	testPool, tearDown := postgrestest.GetTestPool()
+	testRepo := NewRepository(testPool)
+
+	t.Cleanup(tearDown)
 
 	type args struct {
 		accountId account.AccountId
@@ -29,50 +26,47 @@ func TestDebit(t *testing.T) {
 
 	type testCase struct {
 		name            string
-		runBefore       func(repo *Repository) error
+		runBefore       func() error
 		args            args
 		expectedBalance int
 		err             error
 	}
 
+	var (
+		testIdDebit10initial20 = account.AccountId(uuid.New())
+		testIddebit30initial30 = account.AccountId(uuid.New())
+	)
+
 	testCases := []testCase{
 		{
 			name: "successfully debit 10 from account with 20 balance",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:      accountId1,
-						Name:    "Nice name",
-						Cpf:     cpf.Random(),
-						Secret:  testHash,
-						Balance: testMoney20,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIdDebit10initial20,
+					cpf.Random().Value(),
+					20,
 				)
 			},
 			args: args{
-				accountId: accountId1,
+				accountId: testIdDebit10initial20,
 				amount:    testMoney10,
 			},
 			expectedBalance: 10,
 		},
 		{
-			name: "successfully debit 20 from account with 20 balance",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:      accountId2,
-						Name:    "Nice name",
-						Cpf:     cpf.Random(),
-						Secret:  testHash,
-						Balance: testMoney20,
-					},
+			name: "successfully debit 30 from account with 30 balance",
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIddebit30initial30,
+					cpf.Random().Value(),
+					30,
 				)
 			},
 			args: args{
-				accountId: accountId2,
-				amount:    testMoney20,
+				accountId: testIddebit30initial30,
+				amount:    testMoney30,
 			},
 			expectedBalance: 0,
 		},
@@ -91,21 +85,19 @@ func TestDebit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := NewRepository(dbPool)
-
 			if tt.runBefore != nil {
-				err := tt.runBefore(repo)
+				err := tt.runBefore()
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			if err := repo.DebitAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
+			if err := testRepo.DebitAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
-			if gotBalance, _ := repo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
+			if gotBalance, _ := testRepo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
 				t.Fatalf("got %d expected %d", gotBalance, tt.expectedBalance)
 			}
 		})

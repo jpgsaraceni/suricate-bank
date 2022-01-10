@@ -6,77 +6,60 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestGetBalance(t *testing.T) {
 	t.Parallel()
 
-	var (
-		accountId1   = account.AccountId(uuid.New())
-		accountId2   = account.AccountId(uuid.New())
-		testHash, _  = hash.NewHash("nicesecret")
-		testMoney, _ = money.NewMoney(10)
-	)
+	testPool, tearDown := postgrestest.GetTestPool()
+	testRepo := NewRepository(testPool)
+
+	t.Cleanup(tearDown)
 
 	type testCase struct {
 		name            string
-		runBefore       func(repo *Repository) error
+		runBefore       func() error
 		accountId       account.AccountId
 		expectedBalance int
 		err             error
 	}
 
+	var (
+		testIdInitial0  = account.AccountId(uuid.New())
+		testIdInitial10 = account.AccountId(uuid.New())
+	)
+
 	testCases := []testCase{
 		{
 			name: "successfully get 0 balance",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:     accountId1,
-						Name:   "Nice name",
-						Cpf:    cpf.Random(),
-						Secret: testHash,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIdInitial0,
+					cpf.Random().Value(),
+					0,
 				)
 			},
-			accountId:       accountId1,
+			accountId:       testIdInitial0,
 			expectedBalance: 0,
 		},
 		{
 			name: "successfully get 10 balance",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:      accountId2,
-						Name:    "Nice name",
-						Cpf:     cpf.Random(),
-						Secret:  testHash,
-						Balance: testMoney,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIdInitial10,
+					cpf.Random().Value(),
+					10,
 				)
 			},
-			accountId:       accountId2,
+			accountId:       testIdInitial10,
 			expectedBalance: 10,
 		},
 		{
-			name: "fail to get balance from inexistent account",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:      account.AccountId(uuid.New()),
-						Name:    "Nice name",
-						Cpf:     cpf.Random(),
-						Secret:  testHash,
-						Balance: testMoney,
-					},
-				)
-			},
+			name:            "fail to get balance from inexistent account",
 			accountId:       account.AccountId(uuid.New()),
 			expectedBalance: 0,
 			err:             ErrQuery,
@@ -88,24 +71,22 @@ func TestGetBalance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := NewRepository(dbPool)
-
 			if tt.runBefore != nil {
-				err := tt.runBefore(repo)
+				err := tt.runBefore()
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			gotBalance, err := repo.GetBalance(testContext, tt.accountId)
+			gotBalance, err := testRepo.GetBalance(testContext, tt.accountId)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
 			if gotBalance != tt.expectedBalance {
-				t.Fatalf("got %d expected %d", tt.expectedBalance, gotBalance)
+				t.Fatalf("got %d expected %d", gotBalance, tt.expectedBalance)
 			}
 		})
 	}

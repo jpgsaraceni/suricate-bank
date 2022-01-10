@@ -5,93 +5,92 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestCreate(t *testing.T) {
 	t.Parallel()
 
-	var (
-		repeatedId  = account.AccountId(uuid.New())
-		repeatedCpf = cpf.Random()
-		testHash, _ = hash.NewHash("nicesecret")
-	)
+	testPool, tearDown := postgrestest.GetTestPool()
+	testRepo := NewRepository(testPool)
 
-	type args struct {
-		account *account.Account
-	}
+	t.Cleanup(tearDown)
 
 	type testCase struct {
 		name      string
-		runBefore func(repo *Repository) error
-		args      args
+		runBefore func() error
+		account   *account.Account
 		err       error
 	}
+
+	var (
+		repeatedId  = account.AccountId(uuid.New())
+		repeatedCpf = cpf.Random()
+	)
 
 	testCases := []testCase{
 		{
 			name: "successfully create account",
-			args: args{
-				account: &account.Account{
-					Id:     account.AccountId(uuid.New()),
-					Name:   "Nice name",
-					Cpf:    cpf.Random(),
-					Secret: testHash,
-				},
+			account: &account.Account{
+				Id:     account.AccountId(uuid.New()),
+				Name:   "Nice name",
+				Cpf:    cpf.Random(),
+				Secret: testHash,
+			},
+		},
+		{
+			name: "successfully create account with initial balance",
+			account: &account.Account{
+				Id:      account.AccountId(uuid.New()),
+				Name:    "Nice name",
+				Cpf:     cpf.Random(),
+				Secret:  testHash,
+				Balance: testMoney10,
 			},
 		},
 		{
 			name: "fail to create 2 accounts with same id",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:     repeatedId,
-						Name:   "Another nice name",
-						Cpf:    cpf.Random(),
-						Secret: testHash,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					repeatedId,
+					cpf.Random().Value(),
+					0,
 				)
 			},
-			args: args{
-				account: &account.Account{
-					Id:     repeatedId,
-					Name:   "Nice name",
-					Cpf:    cpf.Random(),
-					Secret: testHash,
-				},
+			account: &account.Account{
+				Id:     repeatedId,
+				Name:   "Nice name",
+				Cpf:    cpf.Random(),
+				Secret: testHash,
 			},
 			err: ErrQuery,
 		},
 		{
 			name: "fail to create 2 accounts with same cpf",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:     account.AccountId(uuid.New()),
-						Name:   "Another nice name",
-						Cpf:    repeatedCpf,
-						Secret: testHash,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					account.AccountId(uuid.New()),
+					repeatedCpf.Value(),
+					0,
 				)
 			},
-			args: args{
-				account: &account.Account{
-					Id:     account.AccountId(uuid.New()),
-					Name:   "Nice name",
-					Cpf:    repeatedCpf,
-					Secret: testHash,
-				},
+			account: &account.Account{
+				Id:     account.AccountId(uuid.New()),
+				Name:   "Nice name",
+				Cpf:    repeatedCpf,
+				Secret: testHash,
 			},
 			err: ErrQuery,
 		},
 		{
 			name: "successfully create 2 different accounts in sequence",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
+			runBefore: func() error {
+				return testRepo.Create(
 					testContext,
 					&account.Account{
 						Id:     account.AccountId(uuid.New()),
@@ -101,13 +100,11 @@ func TestCreate(t *testing.T) {
 					},
 				)
 			},
-			args: args{
-				account: &account.Account{
-					Id:     account.AccountId(uuid.New()),
-					Name:   "Another nice name",
-					Cpf:    cpf.Random(),
-					Secret: testHash,
-				},
+			account: &account.Account{
+				Id:     account.AccountId(uuid.New()),
+				Name:   "Another nice name",
+				Cpf:    cpf.Random(),
+				Secret: testHash,
 			},
 		},
 	}
@@ -117,17 +114,15 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := NewRepository(dbPool)
-
 			if tt.runBefore != nil {
-				err := tt.runBefore(repo)
+				err := tt.runBefore()
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			if err := repo.Create(testContext, tt.args.account); !errors.Is(err, tt.err) {
+			if err := testRepo.Create(testContext, tt.account); !errors.Is(err, tt.err) {
 
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}

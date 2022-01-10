@@ -9,31 +9,28 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 )
 
-var dbPool *pgxpool.Pool
-var testContext = context.Background()
-
-// GetTestPool creates runs a docker container of PostgreSQL to run
-// integration tests.
 func GetTestPool() (*pgxpool.Pool, func()) {
+	var dbPool *pgxpool.Pool
+
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	// pulls an image, creates a container based on it and runs it
 	resource, err := dockerPool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "postgres",
 		Tag:        "14-alpine",
 		Env: []string{
 			"POSTGRES_PASSWORD=secret",
-			"POSTGRES_USER=suricate",
+			"POSTGRES_USER=postgres",
 			"POSTGRES_DB=suricate",
 			"listen_addresses = '*'",
 		},
@@ -47,7 +44,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	}
 
 	hostAndPort := resource.GetHostPort("5432/tcp")
-	databaseUrl := fmt.Sprintf("postgres://suricate:secret@%s/suricate?sslmode=disable", hostAndPort)
+	databaseUrl := fmt.Sprintf("postgres://postgres:secret@%s/suricate?sslmode=disable", hostAndPort)
 
 	log.Println("Connecting to database on url: ", databaseUrl)
 
@@ -57,14 +54,13 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = postgres.ConnectPool(testContext, databaseUrl)
+		dbPool, err = postgres.ConnectPool(context.Background(), databaseUrl)
 
 		return err
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	// migration, err := os.ReadFile("../migrations/000001_accounts.up.sql")
 	migration, err := migrate.New(
 		"file://../migrations",
 		databaseUrl)
@@ -77,23 +73,11 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 		log.Fatal(err)
 	}
 
-	// tearDown destroys container at the end of the test
+	// tearDown should be called to destroy container at the end of the test
 	tearDown := func() {
 		dbPool.Close()
 		dockerPool.Purge(resource)
 	}
 
 	return dbPool, tearDown
-}
-
-// truncateAccounts clears the accounts table so tests are independent
-func Truncate(pool *pgxpool.Pool, table string) error {
-	_, err := pool.Exec(testContext, fmt.Sprintf("TRUNCATE %s", table))
-
-	if err != nil {
-
-		return err
-	}
-
-	return nil
 }

@@ -4,71 +4,56 @@ import (
 	"errors"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestGetById(t *testing.T) {
 	t.Parallel()
 
-	var (
-		accountId   = account.AccountId(uuid.New())
-		cpf1        = cpf.Random()
-		cpf2        = cpf.Random()
-		testHash, _ = hash.NewHash("nicesecret")
-		testTime    = time.Now().Round(time.Hour)
-	)
+	testPool, tearDown := postgrestest.GetTestPool()
+	testRepo := NewRepository(testPool)
+
+	t.Cleanup(tearDown)
 
 	type testCase struct {
 		name            string
-		runBefore       func(repo *Repository) error
+		runBefore       func() error
 		idArg           account.AccountId
 		expectedAccount account.Account
 		err             error
 	}
 
+	var (
+		testIdCredit10initial0 = account.AccountId(uuid.New())
+		testCpf                = cpf.Random()
+	)
+
 	testCases := []testCase{
 		{
 			name: "successfully get an account",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:        accountId,
-						Name:      "Nice name",
-						Cpf:       cpf1,
-						Secret:    testHash,
-						CreatedAt: testTime,
-					},
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIdCredit10initial0,
+					testCpf.Value(),
+					0,
 				)
 			},
-			idArg: accountId,
+			idArg: testIdCredit10initial0,
 			expectedAccount: account.Account{
-				Id:        accountId,
-				Name:      "Nice name",
-				Cpf:       cpf1,
+				Id:        testIdCredit10initial0,
+				Name:      "nice name",
+				Cpf:       testCpf,
 				Secret:    testHash,
 				CreatedAt: testTime,
 			},
 		},
 		{
-			name: "fail to get an inexixtent account",
-			runBefore: func(repo *Repository) error {
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:        account.AccountId(uuid.New()),
-						Name:      "Nice name",
-						Cpf:       cpf2,
-						Secret:    testHash,
-						CreatedAt: testTime,
-					},
-				)
-			},
+			name:            "fail to get an inexixtent account",
 			idArg:           account.AccountId(uuid.New()),
 			expectedAccount: account.Account{},
 			err:             ErrQuery,
@@ -80,17 +65,15 @@ func TestGetById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repo := NewRepository(dbPool)
-
 			if tt.runBefore != nil {
-				err := tt.runBefore(repo)
+				err := tt.runBefore()
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			gotAccount, err := repo.GetById(testContext, tt.idArg)
+			gotAccount, err := testRepo.GetById(testContext, tt.idArg)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)

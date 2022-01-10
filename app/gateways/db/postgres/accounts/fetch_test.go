@@ -4,119 +4,73 @@ import (
 	"errors"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestFetch(t *testing.T) {
-	// can't run this test in parallel because Fetch would possibly return accounts
-	// created in parallel tests after the truncate function call
+	t.Parallel()
 
-	var (
-		accountId1  = account.AccountId(uuid.New())
-		accountId2  = account.AccountId(uuid.New())
-		cpf1        = cpf.Random()
-		cpf2        = cpf.Random()
-		testTime    = time.Now().Round(time.Hour)
-		testHash, _ = hash.NewHash("nicesecret")
-	)
+	testPool, tearDown := postgrestest.GetTestPool()
+	testRepo := NewRepository(testPool)
+
+	t.Cleanup(tearDown)
 
 	type testCase struct {
 		name             string
+		runBefore        func() error
 		expectedAccounts []account.Account
-		runBefore        func(repo *Repository) error
 		err              error
 	}
+
+	var (
+		testIdInitial0   = account.AccountId(uuid.New())
+		testIdInitial10  = account.AccountId(uuid.New())
+		testCpfInitial0  = cpf.Random()
+		testCpfInitial10 = cpf.Random()
+	)
 
 	testCases := []testCase{
 		{
 			name: "successfully fetch 2 accounts",
-			runBefore: func(repo *Repository) error {
-				postgrestest.Truncate(dbPool, "accounts")
-				err := repo.Create(
-					testContext,
-					&account.Account{
-						Id:        accountId1,
-						Name:      "Nice name",
-						Cpf:       cpf1,
-						Secret:    testHash,
-						CreatedAt: testTime,
+			runBefore: func() error {
+				return createTestAccountBatch(
+					testPool,
+					[]account.AccountId{
+						testIdInitial0,
+						testIdInitial10,
 					},
-				)
-
-				if err != nil {
-
-					return err
-				}
-
-				err = repo.Create(
-					testContext,
-					&account.Account{
-						Id:        accountId2,
-						Name:      "Another nice name",
-						Cpf:       cpf2,
-						Secret:    testHash,
-						CreatedAt: testTime,
+					[]string{
+						testCpfInitial0.Value(),
+						testCpfInitial10.Value(),
 					},
-				)
-
-				return err
-			},
-			expectedAccounts: []account.Account{
-				{
-					Id:        accountId1,
-					Name:      "Nice name",
-					Cpf:       cpf1,
-					Secret:    testHash,
-					CreatedAt: testTime,
-				},
-				{
-					Id:        accountId2,
-					Name:      "Another nice name",
-					Cpf:       cpf2,
-					Secret:    testHash,
-					CreatedAt: testTime,
-				},
-			},
-		},
-		{
-			name: "successfully fetch 1 account",
-			runBefore: func(repo *Repository) error {
-				postgrestest.Truncate(dbPool, "accounts")
-				return repo.Create(
-					testContext,
-					&account.Account{
-						Id:        accountId1,
-						Name:      "Nice name",
-						Cpf:       cpf1,
-						Secret:    testHash,
-						CreatedAt: testTime,
+					[]int{
+						0,
+						10,
 					},
 				)
 			},
 			expectedAccounts: []account.Account{
 				{
-					Id:        accountId1,
-					Name:      "Nice name",
-					Cpf:       cpf1,
+					Id:        testIdInitial0,
+					Name:      "nice name",
+					Cpf:       testCpfInitial0,
 					Secret:    testHash,
 					CreatedAt: testTime,
 				},
+				{
+					Id:        testIdInitial10,
+					Name:      "nice name",
+					Cpf:       testCpfInitial10,
+					Secret:    testHash,
+					Balance:   testMoney10,
+					CreatedAt: testTime,
+				},
 			},
-		},
-		{
-			name: "fail to fetch 0 accounts",
-			runBefore: func(repo *Repository) error {
-				postgrestest.Truncate(dbPool, "accounts")
-				return nil
-			},
-			expectedAccounts: nil,
-			err:              ErrEmptyFetch,
 		},
 	}
 
@@ -124,24 +78,22 @@ func TestFetch(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			repo := NewRepository(dbPool)
-
 			if tt.runBefore != nil {
-				err := tt.runBefore(repo)
+				err := tt.runBefore()
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			gotAccounts, err := repo.Fetch(testContext)
+			gotAccounts, err := testRepo.Fetch(testContext)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
 			if !reflect.DeepEqual(gotAccounts, tt.expectedAccounts) {
-				t.Fatalf("got %v expected %v", gotAccounts, tt.expectedAccounts)
+				t.Fatalf("got\n %v \nexpected\n %v", gotAccounts, tt.expectedAccounts)
 			}
 		})
 	}
