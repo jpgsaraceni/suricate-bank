@@ -30,14 +30,14 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 	var accountList []account.Account
 
 	for rows.Next() {
-		var accountReturned queryReturn
+		var accountReturned account.Account
 		err := rows.Scan(
-			&accountReturned.id,
-			&accountReturned.name,
-			&accountReturned.cpf,
-			&accountReturned.secret,
-			&accountReturned.balance,
-			&accountReturned.createdAt,
+			&accountReturned.Id,
+			&accountReturned.Name,
+			&accountReturned.Cpf,
+			&accountReturned.Secret,
+			&accountReturned.Balance,
+			&accountReturned.CreatedAt,
 		)
 
 		if err != nil {
@@ -45,14 +45,12 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 			return nil, fmt.Errorf("%w: %s", ErrScanningRows, err.Error())
 		}
 
-		parsedAccount, err := accountReturned.parse()
+		accountList = append(accountList, accountReturned)
+	}
 
-		if err != nil {
+	if len(accountList) == 0 {
 
-			return nil, fmt.Errorf("%w: %s", ErrParse, err.Error())
-		}
-
-		accountList = append(accountList, parsedAccount)
+		return nil, ErrEmptyFetch
 	}
 
 	return accountList, nil

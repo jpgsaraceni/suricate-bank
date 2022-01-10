@@ -33,7 +33,11 @@ var knownInvalids = map[string]struct{}{
 	"99999999999": {},
 }
 
-var errInvalid = errors.New("invalid cpf")
+var (
+	errInvalid   = errors.New("invalid cpf")
+	errScan      = errors.New("scan failed")
+	errScanEmpty = errors.New("scan returned empty")
+)
 
 // NewCpf creates a Cpf struct with value and masked, or empty and returns error if invalid
 func NewCpf(input string) (Cpf, error) {
@@ -87,6 +91,31 @@ func Random() Cpf {
 // Value returns a cpf with only numeric digits
 func (c Cpf) Value() string {
 	return c.value
+}
+
+// Scan implements database/sql/driver Scanner interface.
+// Scan parses a string value to Cpf (if valid) or returns error.
+func (c *Cpf) Scan(value interface{}) error {
+	if value == nil {
+		*c = Cpf{}
+
+		return errScanEmpty
+	}
+
+	if value, ok := value.(string); ok {
+		cpf, err := NewCpf(value)
+
+		if err != nil {
+
+			return err
+		}
+
+		*c = cpf
+
+		return nil
+	}
+
+	return errScan
 }
 
 // Masked returns a cpf in XXX.XXX.XXX-XX format
