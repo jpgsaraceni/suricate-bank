@@ -27,8 +27,6 @@ func TestCreate(t *testing.T) {
 	var (
 		testAccountIdInitial0  = account.AccountId(uuid.New())
 		testAccountIdInitial10 = account.AccountId(uuid.New())
-		testCpfInitial0        = cpf.Random()
-		testCpfInitial10       = cpf.Random()
 	)
 
 	testCases := []testCase{
@@ -42,8 +40,8 @@ func TestCreate(t *testing.T) {
 						testAccountIdInitial10,
 					},
 					[]string{
-						testCpfInitial0.Value(),
-						testCpfInitial10.Value(),
+						cpf.Random().Value(),
+						cpf.Random().Value(),
 					},
 					[]int{
 						0,
@@ -69,8 +67,8 @@ func TestCreate(t *testing.T) {
 						testAccountIdInitial10,
 					},
 					[]string{
-						testCpfInitial0.Value(),
-						testCpfInitial10.Value(),
+						cpf.Random().Value(),
+						cpf.Random().Value(),
 					},
 					[]int{
 						0,
@@ -97,8 +95,8 @@ func TestCreate(t *testing.T) {
 						testAccountIdInitial10,
 					},
 					[]string{
-						testCpfInitial0.Value(),
-						testCpfInitial10.Value(),
+						cpf.Random().Value(),
+						cpf.Random().Value(),
 					},
 					[]int{
 						0,
@@ -125,8 +123,8 @@ func TestCreate(t *testing.T) {
 						testAccountIdInitial10,
 					},
 					[]string{
-						testCpfInitial0.Value(),
-						testCpfInitial10.Value(),
+						cpf.Random().Value(),
+						cpf.Random().Value(),
 					},
 					[]int{
 						0,
