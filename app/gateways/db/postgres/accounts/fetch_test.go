@@ -61,6 +61,7 @@ func TestFetch(t *testing.T) {
 			name: "successfully fetch 2 accounts",
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return CreateTestAccountBatch(
+
 					testPool,
 					[]account.AccountId{
 						testIdInitial0,
