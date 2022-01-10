@@ -197,3 +197,43 @@ func TestSubtract(t *testing.T) {
 		})
 	}
 }
+
+func TestScan(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name  string
+		value interface{}
+		err   error
+	}
+
+	testCases := []testCase{
+		{
+			name:  "successfully scan",
+			value: int64(10),
+		},
+		{
+			name:  "fail to scan empty value",
+			value: nil,
+			err:   errScanEmpty,
+		},
+		{
+			name:  "fail to scan invalid type",
+			value: "a string",
+			err:   errScan,
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var testMoney = Money{}
+
+			if err := testMoney.Scan(tt.value); err != tt.err {
+				t.Errorf("got error: %s expected error: %s", err, tt.err)
+			}
+		})
+	}
+}

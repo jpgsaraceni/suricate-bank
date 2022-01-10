@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS accounts
     name TEXT NOT NULL,
     cpf TEXT NOT NULL UNIQUE,
     secret TEXT NOT NULL,
-    balance INTEGER NOT NULL DEFAULT(0),
+    balance INTEGER NOT NULL DEFAULT(0) CHECK (balance >= 0),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT(now())
 );
 

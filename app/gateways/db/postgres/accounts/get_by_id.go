@@ -20,17 +20,17 @@ func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.
 		WHERE id = $1;
 	`
 
-	var accountReturned queryReturn
+	var accountReturned account.Account
 
 	row := r.pool.QueryRow(ctx, query, id)
 
 	err := row.Scan(
-		&accountReturned.id,
-		&accountReturned.name,
-		&accountReturned.cpf,
-		&accountReturned.secret,
-		&accountReturned.balance,
-		&accountReturned.createdAt,
+		&accountReturned.Id,
+		&accountReturned.Name,
+		&accountReturned.Cpf,
+		&accountReturned.Secret,
+		&accountReturned.Balance,
+		&accountReturned.CreatedAt,
 	)
 
 	if err != nil {
@@ -38,12 +38,5 @@ func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.
 		return account.Account{}, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
-	parsedAccount, err := accountReturned.parse()
-
-	if err != nil {
-
-		return account.Account{}, fmt.Errorf("%w: %s", ErrParse, err.Error())
-	}
-
-	return parsedAccount, nil
+	return accountReturned, nil
 }
