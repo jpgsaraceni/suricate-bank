@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4/pgxpool"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
@@ -15,14 +16,9 @@ import (
 func TestFetch(t *testing.T) {
 	t.Parallel()
 
-	testPool, tearDown := postgrestest.GetTestPool()
-	testRepo := NewRepository(testPool)
-
-	t.Cleanup(tearDown)
-
 	type testCase struct {
 		name             string
-		runBefore        func() error
+		runBefore        func(*pgxpool.Pool) error
 		expectedAccounts []account.Account
 		err              error
 	}
@@ -36,8 +32,34 @@ func TestFetch(t *testing.T) {
 
 	testCases := []testCase{
 		{
+			name: "successfully fetch 1 account",
+			runBefore: func(testPool *pgxpool.Pool) error {
+				return createTestAccountBatch(
+					testPool,
+					[]account.AccountId{
+						testIdInitial0,
+					},
+					[]string{
+						testCpfInitial0.Value(),
+					},
+					[]int{
+						0,
+					},
+				)
+			},
+			expectedAccounts: []account.Account{
+				{
+					Id:        testIdInitial0,
+					Name:      "nice name",
+					Cpf:       testCpfInitial0,
+					Secret:    testHash,
+					CreatedAt: testTime,
+				},
+			},
+		},
+		{
 			name: "successfully fetch 2 accounts",
-			runBefore: func() error {
+			runBefore: func(testPool *pgxpool.Pool) error {
 				return createTestAccountBatch(
 					testPool,
 					[]account.AccountId{
@@ -72,14 +94,44 @@ func TestFetch(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:             "fail to fetch 0 accounts",
+			expectedAccounts: nil,
+			err:              ErrEmptyFetch,
+		},
+		{
+			name: "fail to scan accounts with invalid data",
+			runBefore: func(testPool *pgxpool.Pool) error {
+				return createTestAccountBatch(
+					testPool,
+					[]account.AccountId{
+						testIdInitial0,
+					},
+					[]string{
+						"12345",
+					},
+					[]int{
+						0,
+					},
+				)
+			},
+			expectedAccounts: nil,
+			err:              ErrScanningRows,
+		},
 	}
 
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			testPool, tearDown := postgrestest.GetTestPool()
+			testRepo := NewRepository(testPool)
+
+			t.Cleanup(tearDown)
 
 			if tt.runBefore != nil {
-				err := tt.runBefore()
+				err := tt.runBefore(testPool)
 
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
