@@ -34,7 +34,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 1 account",
 			runBefore: func(testPool *pgxpool.Pool) error {
-				return createTestAccountBatch(
+				return CreateTestAccountBatch(
 					testPool,
 					[]account.AccountId{
 						testIdInitial0,
@@ -60,7 +60,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "successfully fetch 2 accounts",
 			runBefore: func(testPool *pgxpool.Pool) error {
-				return createTestAccountBatch(
+				return CreateTestAccountBatch(
 					testPool,
 					[]account.AccountId{
 						testIdInitial0,
@@ -102,7 +102,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "fail to scan accounts with invalid data",
 			runBefore: func(testPool *pgxpool.Pool) error {
-				return createTestAccountBatch(
+				return CreateTestAccountBatch(
 					testPool,
 					[]account.AccountId{
 						testIdInitial0,
