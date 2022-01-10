@@ -34,7 +34,8 @@ func TestDebit(t *testing.T) {
 
 	var (
 		testIdDebit10initial20 = account.AccountId(uuid.New())
-		testIddebit30initial30 = account.AccountId(uuid.New())
+		testIdDebit30initial30 = account.AccountId(uuid.New())
+		testIdDebit20initial10 = account.AccountId(uuid.New())
 	)
 
 	testCases := []testCase{
@@ -59,16 +60,33 @@ func TestDebit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIddebit30initial30,
+					testIdDebit30initial30,
 					cpf.Random().Value(),
 					30,
 				)
 			},
 			args: args{
-				accountId: testIddebit30initial30,
+				accountId: testIdDebit30initial30,
 				amount:    testMoney30,
 			},
 			expectedBalance: 0,
+		},
+		{
+			name: "fail to debit 20 from account with 10 balance",
+			runBefore: func() error {
+				return createTestAccount(
+					testPool,
+					testIdDebit20initial10,
+					cpf.Random().Value(),
+					10,
+				)
+			},
+			args: args{
+				accountId: testIdDebit20initial10,
+				amount:    testMoney20,
+			},
+			expectedBalance: 10,
+			err:             ErrQuery,
 		},
 		{
 			name: "fail to debit inexistent account",

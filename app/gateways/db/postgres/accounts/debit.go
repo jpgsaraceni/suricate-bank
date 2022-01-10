@@ -12,10 +12,7 @@ import (
 func (r Repository) DebitAccount(ctx context.Context, id account.AccountId, amount money.Money) error {
 	const query = `
 		UPDATE accounts
-		SET balance = 
-			CASE WHEN balance >= $1 THEN balance - $1
-				ELSE balance
-			END
+		SET balance = balance - $1
 		WHERE id = $2
 		RETURNING id;
 	`
