@@ -2,7 +2,6 @@ package accountsroute
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -14,37 +13,44 @@ type CreateRequest struct {
 	Secret string `json:"secret" validate:"required"`
 }
 
-func (h Handler) Create(r *http.Request) responses.Response {
+func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var createRequest CreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		return responses.ErrorResponse(err)
+		ErrorResponse(w, err)
+
+		return
 	}
 
 	cpf := createRequest.Cpf
 
 	if len(cpf) != 11 && len(cpf) != 14 {
+		ErrorResponse(w, ErrLengthCpf)
 
-		return responses.BadRequest(fmt.Errorf("invalid cpf length"), responses.ErrLengthCpf)
+		return
 	}
 
 	name := createRequest.Name
 
 	if len(name) < 3 {
+		ErrorResponse(w, ErrShortName)
 
-		return responses.BadRequest(fmt.Errorf("name too short"), responses.ErrShortName)
+		return
 	}
 
 	secret := createRequest.Secret
 
 	if len(secret) < 6 {
+		ErrorResponse(w, ErrShortSecret)
 
-		return responses.BadRequest(fmt.Errorf("secret too short"), responses.ErrShortSecret)
+		return
 	}
 
-	if _, err := h.Usecase.Create(r.Context(), name, cpf, secret); err != nil {
-		return responses.ErrorResponse(err)
+	if _, err := h.usecase.Create(r.Context(), name, cpf, secret); err != nil {
+		ErrorResponse(w, err)
+
+		return
 	}
 
-	return responses.Created("successfully created")
+	responses.SendJSON(w, responses.Created("successfully created"))
 }

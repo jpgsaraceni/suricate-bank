@@ -1,8 +1,20 @@
 package accountsroute
 
-import accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
+import (
+	"net/http"
+
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
+)
 
 // Handler will be used to bind all handlers for the /accounts route and access usecase.
-type Handler struct {
-	Usecase accountuc.Usecase
+type handler struct {
+	usecase accountuc.Usecase
+}
+
+type Handler interface {
+	Create(w http.ResponseWriter, r *http.Request)
+}
+
+func NewHandler(uc accountuc.Usecase) Handler {
+	return &handler{usecase: uc}
 }
