@@ -17,7 +17,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var createRequest CreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		ErrorResponse(w, err)
+		ErrorResponse(w, ErrMissingFields)
 
 		return
 	}
