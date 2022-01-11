@@ -136,7 +136,7 @@ func TestFetch(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.repository}
+			uc := usecase{tt.repository}
 
 			accountList, err := uc.Fetch(context.Background())
 

@@ -8,7 +8,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Credit(ctx context.Context, id account.AccountId, amount money.Money) error {
+func (uc usecase) Credit(ctx context.Context, id account.AccountId, amount money.Money) error {
 	account, err := uc.GetById(ctx, id)
 
 	if err != nil {
@@ -23,7 +23,7 @@ func (uc Usecase) Credit(ctx context.Context, id account.AccountId, amount money
 		return fmt.Errorf("%w: %s", ErrAmount, err.Error())
 	}
 
-	err = uc.Repository.CreditAccount(ctx, account.Id, amount)
+	err = uc.repository.CreditAccount(ctx, account.Id, amount)
 
 	if err != nil {
 

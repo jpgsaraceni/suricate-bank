@@ -67,7 +67,7 @@ func TestGetBalance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.repository}
+			uc := usecase{tt.repository}
 
 			newAccount, err := uc.GetBalance(context.Background(), tt.id)
 

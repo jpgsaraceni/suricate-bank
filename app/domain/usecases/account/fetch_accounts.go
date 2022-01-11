@@ -7,8 +7,8 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (uc Usecase) Fetch(ctx context.Context) ([]account.Account, error) {
-	accountList, err := uc.Repository.Fetch(ctx)
+func (uc usecase) Fetch(ctx context.Context) ([]account.Account, error) {
+	accountList, err := uc.repository.Fetch(ctx)
 
 	if err != nil {
 

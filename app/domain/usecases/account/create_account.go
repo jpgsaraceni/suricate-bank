@@ -14,7 +14,7 @@ const (
 	minPasswordLength = 6
 )
 
-func (uc Usecase) Create(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+func (uc usecase) Create(ctx context.Context, name, cpf, secret string) (account.Account, error) {
 	if len(name) < minNameLength || len(name) > maxNameLength {
 
 		return account.Account{}, ErrNameLength
@@ -32,7 +32,7 @@ func (uc Usecase) Create(ctx context.Context, name, cpf, secret string) (account
 		return account.Account{}, fmt.Errorf("failed to create account instance: %w", err)
 	}
 
-	err = uc.Repository.Create(ctx, &newAccount)
+	err = uc.repository.Create(ctx, &newAccount)
 
 	if err != nil {
 

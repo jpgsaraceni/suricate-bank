@@ -190,7 +190,7 @@ func TestDebit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.repository}
+			uc := usecase{tt.repository}
 
 			err := uc.Debit(context.Background(), tt.testAccount.Id, tt.amount)
 
