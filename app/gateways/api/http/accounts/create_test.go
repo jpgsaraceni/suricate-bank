@@ -3,16 +3,19 @@ package accountsroute
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
 
-func TestCreate(t *testing.T) { // TODO: assert payloads
+func TestCreate(t *testing.T) {
 	t.Parallel()
 
 	type httpIO struct {
@@ -21,10 +24,11 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 	}
 
 	type testCase struct {
-		name           string
-		usecase        accountuc.Usecase
-		httpIO         httpIO
-		expectedStatus int
+		name            string
+		usecase         accountuc.Usecase
+		httpIO          httpIO
+		expectedStatus  int
+		expectedPayload responses.Payload
 	}
 
 	var (
@@ -50,10 +54,25 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 					}, nil
 				},
 			},
-			expectedStatus: 201,
+			expectedStatus:  201,
+			expectedPayload: responses.AccountCreated,
 		},
 		{
-			name: "fail to create account missing name",
+			name: "respond 400 to invalid request payload",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						"/accounts",
+						bytes.NewReader([]byte(`Not what the server expects`)))
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			expectedStatus:  400,
+			expectedPayload: responses.ErrInvalidRequestPayload,
+		},
+		{
+			name: "respond 400 to request missing name",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -63,17 +82,11 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: testId,
-					}, nil
-				},
-			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrMissingFields,
 		},
 		{
-			name: "fail to create account with short name",
+			name: "respond 400 to request with short name",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -83,17 +96,11 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: testId,
-					}, nil
-				},
-			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrShortName,
 		},
 		{
-			name: "fail to create account missing cpf",
+			name: "respond 400 to request with missing cpf",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -103,17 +110,25 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: testId,
-					}, nil
-				},
-			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrMissingFields,
 		},
 		{
-			name: "fail to create account with invalid cpf",
+			name: "respond 400 to request with invalid cpf length",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						"/accounts",
+						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"123456789000", "Secret": "123456"}`)))
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			expectedStatus:  400,
+			expectedPayload: responses.ErrLengthCpf,
+		},
+		{
+			name: "respond 400 when cpf validation fails",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -128,30 +143,25 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 					return account.Account{}, account.ErrInvalidCpf
 				},
 			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrInvalidCpf,
 		},
 		{
-			name: "fail to create account missing secret",
+			name: "respond 400 to request missing secret",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
 						"/accounts",
-						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35"`)))
+						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35"}`)))
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: testId,
-					}, nil
-				},
-			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrMissingFields,
 		},
 		{
-			name: "fail to create account short secret",
+			name: "respond 400 to request with short secret",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -161,17 +171,11 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: testId,
-					}, nil
-				},
-			},
-			expectedStatus: 400,
+			expectedStatus:  400,
+			expectedPayload: responses.ErrShortSecret,
 		},
 		{
-			name: "fail to create account due to usecase error",
+			name: "respond 500 due to usecase error",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -186,7 +190,8 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 					return account.Account{}, accountuc.ErrCreateAccount
 				},
 			},
-			expectedStatus: 500,
+			expectedStatus:  500,
+			expectedPayload: responses.ErrInternalServerError,
 		},
 	}
 
@@ -206,6 +211,17 @@ func TestCreate(t *testing.T) { // TODO: assert payloads
 
 			if statusCode := recorder.Code; statusCode != tt.expectedStatus {
 				t.Errorf("got status code %d expected %d", statusCode, tt.expectedStatus)
+			}
+
+			var got responses.Payload
+			err := json.NewDecoder(recorder.Body).Decode(&got)
+
+			if err != nil {
+				t.Fatalf("failed to decode response body: %s", err)
+			}
+
+			if got != tt.expectedPayload {
+				t.Fatalf("got response body: %s, expected %s", got, tt.expectedPayload)
 			}
 		})
 	}
