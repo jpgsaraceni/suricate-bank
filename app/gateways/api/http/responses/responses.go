@@ -24,6 +24,14 @@ func BadRequest(err error, errorPayload Payload) Response {
 	}
 }
 
+func NotFound(err error, errorPayload Payload) Response {
+	return Response{
+		Status:  http.StatusNotFound,
+		Error:   err,
+		Payload: errorPayload,
+	}
+}
+
 func InternalServerError(err error) Response {
 	return Response{
 		Status:  http.StatusInternalServerError,

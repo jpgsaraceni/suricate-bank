@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
@@ -14,14 +15,16 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(p[1])
 
 	if err != nil {
-		// bad request
+		ErrorResponse(w, ErrInvalidPathParameter)
+
 		return
 	}
 
 	balance, err := h.usecase.GetBalance(r.Context(), account.AccountId(id))
 
 	if err != nil {
-		// id doesn't exist or internal server error
+		ErrorResponse(w, err)
+
 		return
 	}
 
