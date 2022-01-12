@@ -13,6 +13,7 @@ var (
 	ErrDebitAccount      = errors.New("failed to save debit to account")
 	ErrFetchAccounts     = errors.New("failed to fetch accounts")
 	ErrGetBalance        = errors.New("failed to get account balance")
+	ErrIdNotFound        = errors.New("account id not found")
 	ErrGetAccount        = errors.New("failed to get account")
 	ErrAmount            = errors.New("invalid amount")
 )

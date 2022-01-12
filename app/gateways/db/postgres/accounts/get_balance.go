@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 )
 
 func (r Repository) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
@@ -26,7 +27,7 @@ func (r Repository) GetBalance(ctx context.Context, id account.AccountId) (int, 
 
 	if errors.Is(err, pgx.ErrNoRows) {
 
-		return 0, ErrIdNotFound
+		return 0, accountuc.ErrIdNotFound
 	}
 
 	if err != nil {
