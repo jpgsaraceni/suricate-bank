@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgconn"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
@@ -33,6 +35,16 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 		account.Balance.Cents(),
 		account.CreatedAt,
 	)
+
+	const uniqueKeyViolationCode = "23505"
+	const cpfUniqueKey = "accounts_cpf_key"
+
+	if pgErr, ok := err.(*pgconn.PgError); ok {
+		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfUniqueKey {
+
+			return ErrCpfAlreadyExists
+		}
+	}
 
 	if err != nil {
 

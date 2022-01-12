@@ -9,4 +9,5 @@ var (
 	ErrIdNotFound       = errors.New("id not found")
 	ErrEmptyFetch       = errors.New("fetch returned empty")
 	ErrBalanceUnchanged = errors.New("debit failed because amount to debit is greater than balance")
+	ErrCpfAlreadyExists = errors.New("cpf already exists in db")
 )
