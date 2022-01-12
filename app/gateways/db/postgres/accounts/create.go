@@ -37,10 +37,10 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 	)
 
 	const uniqueKeyViolationCode = "23505"
-	const cpfUniqueKey = "accounts_cpf_key"
+	const cpfConstraint = "accounts_cpf_key"
 
 	if pgErr, ok := err.(*pgconn.PgError); ok {
-		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfUniqueKey {
+		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
 
 			return ErrCpfAlreadyExists
 		}
