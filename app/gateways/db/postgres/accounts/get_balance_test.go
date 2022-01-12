@@ -62,7 +62,7 @@ func TestGetBalance(t *testing.T) {
 			name:            "fail to get balance from inexistent account",
 			accountId:       account.AccountId(uuid.New()),
 			expectedBalance: 0,
-			err:             ErrQuery,
+			err:             ErrIdNotFound,
 		},
 	}
 
