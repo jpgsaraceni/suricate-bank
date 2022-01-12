@@ -1,32 +1,32 @@
 package accountsroute
 
-import (
-	"net/http"
-	"strings"
+// import (
+// 	"net/http"
+// 	"strings"
 
-	"github.com/google/uuid"
+// 	"github.com/google/uuid"
 
-	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
-)
+// 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+// 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+// )
 
-func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
-	p := strings.Split(r.URL.Path, "/")
-	id, err := uuid.Parse(p[1])
+// func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
+// 	p := strings.Split(r.URL.Path, "/")
+// 	id, err := uuid.Parse(p[1])
 
-	if err != nil {
-		ErrorResponse(w, ErrInvalidPathParameter)
+// 	if err != nil {
+// 		RequestError(w, responses.ErrInvalidPathParameter)
 
-		return
-	}
+// 		return
+// 	}
 
-	balance, err := h.usecase.GetBalance(r.Context(), account.AccountId(id))
+// 	balance, err := h.usecase.GetBalance(r.Context(), account.AccountId(id))
 
-	if err != nil {
-		ErrorResponse(w, err)
+// 	if err != nil {
+// 		RequestError(w, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	responses.SendJSON(w, responses.GotBalance(balance))
-}
+// 	responses.SendJSON(w, responses.GotBalance(balance))
+// }

@@ -2,8 +2,10 @@ package accountsroute
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
 
@@ -15,15 +17,20 @@ type CreateRequest struct {
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var createRequest CreateRequest
+	var response responses.Response
+
+	defer func(r *responses.Response) {
+		responses.SendJSON(w, *r)
+	}(&response)
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		ErrorResponse(w, ErrInvalidRequestPayload)
+		response = responses.BadRequest(responses.ErrInvalidRequestPayload)
 
 		return
 	}
 
 	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
-		ErrorResponse(w, ErrMissingFields)
+		response = responses.BadRequest(responses.ErrMissingFields)
 
 		return
 	}
@@ -31,7 +38,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	cpf := createRequest.Cpf
 
 	if len(cpf) != 11 && len(cpf) != 14 {
-		ErrorResponse(w, ErrLengthCpf)
+		response = responses.BadRequest(responses.ErrLengthCpf)
 
 		return
 	}
@@ -39,7 +46,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	name := createRequest.Name
 
 	if len(name) < 3 {
-		ErrorResponse(w, ErrShortName)
+		response = responses.BadRequest(responses.ErrShortName)
 
 		return
 	}
@@ -47,16 +54,24 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	secret := createRequest.Secret
 
 	if len(secret) < 6 {
-		ErrorResponse(w, ErrShortSecret)
+		response = responses.BadRequest(responses.ErrShortSecret)
 
 		return
 	}
 
-	if _, err := h.usecase.Create(r.Context(), name, cpf, secret); err != nil {
-		ErrorResponse(w, err)
+	_, err := h.usecase.Create(r.Context(), name, cpf, secret)
+
+	if errors.Is(err, account.ErrInvalidCpf) {
+		response = responses.BadRequest(responses.ErrInvalidCpf)
 
 		return
 	}
 
-	responses.SendJSON(w, responses.Created(responses.AccountCreated))
+	if err != nil {
+		response = responses.InternalServerError(err)
+
+		return
+	}
+
+	response = responses.Created(responses.AccountCreated)
 }

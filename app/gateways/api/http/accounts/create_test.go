@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -69,7 +68,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrInvalidRequestPayload,
+			expectedPayload: responses.ErrInvalidRequestPayload.Payload,
 		},
 		{
 			name: "respond 400 to request missing name",
@@ -83,7 +82,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields,
+			expectedPayload: responses.ErrMissingFields.Payload,
 		},
 		{
 			name: "respond 400 to request with short name",
@@ -97,7 +96,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrShortName,
+			expectedPayload: responses.ErrShortName.Payload,
 		},
 		{
 			name: "respond 400 to request with missing cpf",
@@ -111,7 +110,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields,
+			expectedPayload: responses.ErrMissingFields.Payload,
 		},
 		{
 			name: "respond 400 to request with invalid cpf length",
@@ -125,7 +124,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrLengthCpf,
+			expectedPayload: responses.ErrLengthCpf.Payload,
 		},
 		{
 			name: "respond 400 when cpf validation fails",
@@ -144,7 +143,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrInvalidCpf,
+			expectedPayload: responses.ErrInvalidCpf.Payload,
 		},
 		{
 			name: "respond 400 to request missing secret",
@@ -158,7 +157,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields,
+			expectedPayload: responses.ErrMissingFields.Payload,
 		},
 		{
 			name: "respond 400 to request with short secret",
@@ -172,7 +171,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrShortSecret,
+			expectedPayload: responses.ErrShortSecret.Payload,
 		},
 		{
 			name: "respond 500 due to usecase error",

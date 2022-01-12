@@ -16,19 +16,19 @@ type Response struct {
 	Payload Payload
 }
 
-func BadRequest(err error, errorPayload Payload) Response {
+func BadRequest(err Error) Response {
 	return Response{
 		Status:  http.StatusBadRequest,
-		Error:   err,
-		Payload: errorPayload,
+		Error:   err.Err,
+		Payload: err.Payload,
 	}
 }
 
-func NotFound(err error, errorPayload Payload) Response {
+func NotFound(err Error) Response {
 	return Response{
 		Status:  http.StatusNotFound,
-		Error:   err,
-		Payload: errorPayload,
+		Error:   err.Err,
+		Payload: err.Payload,
 	}
 }
 
