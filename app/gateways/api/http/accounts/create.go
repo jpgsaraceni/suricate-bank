@@ -17,6 +17,12 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var createRequest CreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
+		ErrorResponse(w, ErrInvalidRequestPayload)
+
+		return
+	}
+
+	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
 		ErrorResponse(w, ErrMissingFields)
 
 		return
@@ -52,5 +58,5 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.SendJSON(w, responses.Created("successfully created"))
+	responses.SendJSON(w, responses.Created(responses.AccountCreated))
 }

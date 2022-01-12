@@ -14,6 +14,8 @@ func ErrorResponse(w http.ResponseWriter, err error) error {
 		return responses.SendJSON(w, responses.BadRequest(err, responses.ErrInvalidCpf))
 	case errors.Is(err, ErrMissingFields):
 		return responses.SendJSON(w, responses.BadRequest(err, responses.ErrMissingFields))
+	case errors.Is(err, ErrInvalidRequestPayload):
+		return responses.SendJSON(w, responses.BadRequest(err, responses.ErrInvalidRequestPayload))
 	case errors.Is(err, ErrLengthCpf):
 		return responses.SendJSON(w, responses.BadRequest(err, responses.ErrLengthCpf))
 	case errors.Is(err, ErrShortName):
