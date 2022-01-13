@@ -51,7 +51,7 @@ func TestGetBalance(t *testing.T) {
 				},
 			},
 			expectedStatus:  200,
-			expectedPayload: responses.GotBalance(10),
+			expectedPayload: responses.GotBalancePayload(10),
 		},
 		{
 			name: "fail to get balance for invalid id",
