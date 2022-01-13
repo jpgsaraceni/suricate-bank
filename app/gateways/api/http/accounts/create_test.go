@@ -37,7 +37,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35", "Secret": "123456"}`)))
 				}(),
@@ -58,7 +58,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`Not what the server expects`)))
 				}(),
@@ -72,7 +72,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Cpf":"220.614.460-35", "Secret": "123456"}`)))
 				}(),
@@ -86,7 +86,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"N", "Cpf":"220.614.460-35", "Secret": "123456"}`)))
 				}(),
@@ -100,7 +100,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Secret": "123456"}`)))
 				}(),
@@ -114,7 +114,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"123456789000", "Secret": "123456"}`)))
 				}(),
@@ -128,7 +128,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-34", "Secret": "123456"}`)))
 				}(),
@@ -147,7 +147,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35"}`)))
 				}(),
@@ -161,7 +161,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35", "Secret": "12345"}`)))
 				}(),
@@ -175,7 +175,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35", "Secret": "123456"}`)))
 				}(),
@@ -194,7 +194,7 @@ func TestCreate(t *testing.T) {
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
-						http.MethodGet,
+						http.MethodPost,
 						"/accounts",
 						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35", "Secret": "123456"}`)))
 				}(),
