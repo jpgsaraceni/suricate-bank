@@ -51,7 +51,7 @@ func TestGetBalance(t *testing.T) {
 				},
 			},
 			expectedStatus:  200,
-			expectedPayload: responses.Payload{Message: "10"},
+			expectedPayload: responses.GotBalance(10),
 		},
 		{
 			name: "fail to get balance for invalid id",
@@ -65,13 +65,48 @@ func TestGetBalance(t *testing.T) {
 				}(),
 				w: httptest.NewRecorder(),
 			},
-			// usecase: accountuc.MockUsecase{
-			// 	OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
-			// 		return 0, nil
-			// 	},
-			// },
 			expectedStatus:  400,
 			expectedPayload: responses.ErrInvalidPathParameter.Payload,
+		},
+		{
+			name: "fail to get balance inexistent account id",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						fmt.Sprintf("/accounts/%s/balance", testId),
+						nil,
+					)
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			usecase: accountuc.MockUsecase{
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+					return 0, accountuc.ErrIdNotFound
+				},
+			},
+			expectedStatus:  400,
+			expectedPayload: responses.ErrAccountNotFound.Payload,
+		},
+		{
+			name: "fail due to usecase error",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						fmt.Sprintf("/accounts/%s/balance", testId),
+						nil,
+					)
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			usecase: accountuc.MockUsecase{
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+					return 0, accountuc.ErrGetBalance
+				},
+			},
+			expectedStatus:  500,
+			expectedPayload: responses.ErrInternalServerError,
 		},
 	}
 
