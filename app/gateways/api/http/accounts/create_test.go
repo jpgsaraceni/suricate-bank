@@ -12,6 +12,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 )
 
 func TestCreate(t *testing.T) {
@@ -30,10 +31,6 @@ func TestCreate(t *testing.T) {
 		expectedPayload responses.Payload
 	}
 
-	var (
-		testId = account.AccountId(uuid.New())
-	)
-
 	testCases := []testCase{
 		{
 			name: "successfully create account",
@@ -49,7 +46,7 @@ func TestCreate(t *testing.T) {
 			usecase: accountuc.MockUsecase{
 				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
 					return account.Account{
-						Id: testId,
+						Id: account.AccountId(uuid.New()),
 					}, nil
 				},
 			},
@@ -172,6 +169,25 @@ func TestCreate(t *testing.T) {
 			},
 			expectedStatus:  400,
 			expectedPayload: responses.ErrShortSecret.Payload,
+		},
+		{
+			name: "respond 400 to request containing cpf that already exists",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						"/accounts",
+						bytes.NewReader([]byte(`{"Name":"Nice Name", "Cpf":"220.614.460-35", "Secret": "123456"}`)))
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			usecase: accountuc.MockUsecase{
+				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+					return account.Account{}, accountspg.ErrCpfAlreadyExists
+				},
+			},
+			expectedStatus:  400,
+			expectedPayload: responses.ErrCpfAlreadyExists.Payload,
 		},
 		{
 			name: "respond 500 due to usecase error",

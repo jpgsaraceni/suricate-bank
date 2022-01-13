@@ -7,6 +7,7 @@ import (
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 )
 
 type CreateRequest struct {
@@ -63,6 +64,12 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	if errors.Is(err, account.ErrInvalidCpf) {
 		response = responses.BadRequest(responses.ErrInvalidCpf)
+
+		return
+	}
+
+	if errors.Is(err, accountspg.ErrCpfAlreadyExists) {
+		response = responses.BadRequest(responses.ErrCpfAlreadyExists)
 
 		return
 	}
