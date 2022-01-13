@@ -13,7 +13,7 @@ type handler struct {
 
 type Handler interface {
 	Create(w http.ResponseWriter, r *http.Request)
-	// GetBalance(w http.ResponseWriter, r *http.Request)
+	GetBalance(w http.ResponseWriter, r *http.Request)
 }
 
 func NewHandler(uc accountuc.Usecase) Handler {
