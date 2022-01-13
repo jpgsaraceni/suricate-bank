@@ -14,7 +14,7 @@ import (
 
 func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")
-	id, err := uuid.Parse(p[1])
+	id, err := uuid.Parse(p[2])
 
 	var response responses.Response
 
