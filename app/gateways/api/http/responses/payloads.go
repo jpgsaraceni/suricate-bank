@@ -13,12 +13,17 @@ type Error struct {
 	Payload Payload
 }
 
-func GotBalance(balance int) Payload {
+func GotBalancePayload(balance int) Payload {
 	return Payload{Message: strconv.Itoa(balance)}
+}
+
+func FetchedAccountsPayload(accountList []byte) Payload {
+	return Payload{Message: string(accountList)}
 }
 
 var (
 	AccountCreated         = Payload{Message: "Account successfully created"}
+	NoAccounts             = Payload{Message: "There are no accounts registered yet"}
 	ErrInternalServerError = Payload{Message: "Internal server error"}
 )
 
