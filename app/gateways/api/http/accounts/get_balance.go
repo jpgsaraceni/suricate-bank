@@ -42,5 +42,5 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response = responses.GotBalance(balance)
+	response = responses.Ok(responses.GotBalance(balance))
 }

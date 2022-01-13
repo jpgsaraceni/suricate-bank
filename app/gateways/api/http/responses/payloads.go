@@ -2,6 +2,7 @@ package responses
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
@@ -10,6 +11,10 @@ import (
 type Error struct {
 	Err     error
 	Payload Payload
+}
+
+func GotBalance(balance int) Payload {
+	return Payload{Message: strconv.Itoa(balance)}
 }
 
 var (

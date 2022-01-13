@@ -3,7 +3,6 @@ package responses
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 )
 
 type Payload struct {
@@ -47,10 +46,10 @@ func Created(payload Payload) Response {
 	}
 }
 
-func GotBalance(balance int) Response {
+func Ok(payload Payload) Response {
 	return Response{
 		Status:  http.StatusOK,
-		Payload: Payload{Message: strconv.Itoa(balance)},
+		Payload: payload,
 	}
 }
 
