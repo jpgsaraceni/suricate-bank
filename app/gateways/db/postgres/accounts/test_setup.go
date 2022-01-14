@@ -54,7 +54,7 @@ func createTestAccount(pool *pgxpool.Pool, id account.AccountId, cpf string, amo
 	return nil
 }
 
-func createTestAccountBatch(pool *pgxpool.Pool, ids []account.AccountId, cpfs []string, amount []int) error {
+func CreateTestAccountBatch(pool *pgxpool.Pool, ids []account.AccountId, cpfs []string, amount []int) error {
 	const query = `
 	INSERT INTO 
 		accounts (
