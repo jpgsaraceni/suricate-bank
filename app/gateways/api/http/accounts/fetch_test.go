@@ -191,6 +191,7 @@ func TestFetch(t *testing.T) {
 
 func FetchPayloadTest(accountList []account.Account) responses.Payload {
 	j, _ := json.Marshal(accountList)
+	var response responses.Response
 
-	return responses.Ok(responses.FetchedAccountsPayload(j)).Payload
+	return response.Ok(responses.FetchedAccountsPayload(j)).Payload
 }
