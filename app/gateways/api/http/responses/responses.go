@@ -13,8 +13,15 @@ type Payload struct {
 type Response struct {
 	Status  int
 	Error   error
-	Payload Payload
+	Payload interface{}
+	Headers map[string]string // TODO: implement
 	Writer  http.ResponseWriter
+}
+
+type ErrorPayload struct {
+	Type    string      `json:"type" example:"srn:error:some_error"`
+	Title   string      `json:"title,omitempty" example:"Message for some error"`
+	Details interface{} `json:"details,omitempty" swaggertype:"object"`
 }
 
 func (r Response) BadRequest(err Error) Response {
