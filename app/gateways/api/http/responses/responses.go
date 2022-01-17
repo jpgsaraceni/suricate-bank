@@ -2,6 +2,7 @@ package responses
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -42,10 +43,12 @@ func (r Response) Created(payload Payload) Response {
 	return r
 }
 
-func (r Response) SendJSON() error {
+func (r Response) SendJSON() {
 	r.Writer.Header().Set("Content-Type", "application/json")
 	r.Writer.WriteHeader(r.Status)
-	return json.NewEncoder(r.Writer).Encode(r.Payload)
+	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
+		log.Println(err) // TODO: fix after implementing log
+	}
 }
 
 func BadRequest(err Error) Response {
