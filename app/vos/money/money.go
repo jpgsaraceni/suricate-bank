@@ -95,3 +95,27 @@ func (m *Money) Subtract(amount int) error {
 
 	return nil
 }
+
+func (m Money) BRL() string {
+	if m.cents == 0 {
+		return "R$0,00"
+	}
+
+	valueString := strconv.Itoa(m.cents)
+
+	if digitLimit := 10; m.cents < digitLimit {
+		return "R$0,0" + valueString
+	}
+
+	wholePrefix := ""
+	if m.cents < 100 {
+		wholePrefix = "0"
+	}
+
+	wholePart := valueString[:len(valueString)-2]
+	decimalPart := valueString[len(valueString)-2:]
+
+	valueString = fmt.Sprintf("R$%s%s,%s", wholePrefix, wholePart, decimalPart)
+
+	return valueString
+}
