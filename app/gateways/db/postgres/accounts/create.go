@@ -2,6 +2,7 @@ package accountspg
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgconn"
@@ -39,11 +40,13 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 	const uniqueKeyViolationCode = "23505"
 	const cpfConstraint = "accounts_cpf_key"
 
-	pgErr, ok := err.(*pgconn.PgError)
+	var pgErr *pgconn.PgError
 
-	if ok && pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
+	if errors.As(err, &pgErr) {
+		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
 
-		return ErrCpfAlreadyExists
+			return ErrCpfAlreadyExists
+		}
 	}
 
 	if err != nil {
