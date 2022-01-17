@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -30,7 +31,7 @@ func TestFetch(t *testing.T) {
 		usecase         accountuc.Usecase
 		httpIO          httpIO
 		expectedStatus  int
-		expectedPayload responses.Payload
+		expectedPayload interface{}
 	}
 
 	var (
@@ -189,7 +190,7 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func FetchPayloadTest(accountList []account.Account) responses.Payload {
+func FetchPayloadTest(accountList []account.Account) interface{} {
 	j, _ := json.Marshal(accountList)
 	var response responses.Response
 
