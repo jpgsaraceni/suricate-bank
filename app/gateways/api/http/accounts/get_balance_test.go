@@ -85,7 +85,7 @@ func TestGetBalance(t *testing.T) {
 					return 0, accountuc.ErrIdNotFound
 				},
 			},
-			expectedStatus:  400,
+			expectedStatus:  404,
 			expectedPayload: responses.ErrAccountNotFound.Payload,
 		},
 		{

@@ -24,6 +24,13 @@ func (r Response) BadRequest(err Error) Response {
 	return r
 }
 
+func (r Response) NotFound(err Error) Response {
+	r.Status = http.StatusNotFound
+	r.Error = err.Err
+	r.Payload = err.Payload
+	return r
+}
+
 func (r Response) InternalServerError(err error) Response {
 	r.Status = http.StatusInternalServerError
 	r.Error = err
@@ -49,48 +56,4 @@ func (r Response) SendJSON() {
 	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
 		log.Println(err) // TODO: fix after implementing log
 	}
-}
-
-func BadRequest(err Error) Response {
-	return Response{
-		Status:  http.StatusBadRequest,
-		Error:   err.Err,
-		Payload: err.Payload,
-	}
-}
-
-func NotFound(err Error) Response {
-	return Response{
-		Status:  http.StatusNotFound,
-		Error:   err.Err,
-		Payload: err.Payload,
-	}
-}
-
-func InternalServerError(err error) Response {
-	return Response{
-		Status:  http.StatusInternalServerError,
-		Error:   err,
-		Payload: ErrInternalServerError,
-	}
-}
-
-func Created(payload Payload) Response {
-	return Response{
-		Status:  http.StatusCreated,
-		Payload: payload,
-	}
-}
-
-func Ok(payload Payload) Response {
-	return Response{
-		Status:  http.StatusOK,
-		Payload: payload,
-	}
-}
-
-func SendJSON(w http.ResponseWriter, response Response) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.Status)
-	return json.NewEncoder(w).Encode(response.Payload)
 }
