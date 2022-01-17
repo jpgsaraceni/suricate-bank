@@ -12,29 +12,50 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
 
-func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) error {
-	p := strings.Split(r.URL.Path, "/")
-	id, err := uuid.Parse(p[2])
-
+func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	var response responses.Response
 	response.Writer = w
 
-	if err != nil {
+	accountId, err := getAccountIdFromPath(r)
 
-		return response.BadRequest(responses.ErrInvalidPathParameter).SendJSON()
+	if err != nil {
+		response.BadRequest(responses.ErrInvalidPathParameter).SendJSON()
+
+		return
 	}
 
-	balance, err := h.usecase.GetBalance(r.Context(), account.AccountId(id))
+	balance, err := h.usecase.GetBalance(r.Context(), accountId)
 
 	if errors.Is(err, accountuc.ErrIdNotFound) {
+		response.BadRequest(responses.ErrAccountNotFound).SendJSON()
 
-		return response.BadRequest(responses.ErrAccountNotFound).SendJSON()
+		return
 	}
 
 	if err != nil {
+		response.InternalServerError(err).SendJSON()
 
-		return response.InternalServerError(err).SendJSON()
+		return
 	}
 
-	return response.Ok(responses.GotBalancePayload(balance)).SendJSON()
+	response.Ok(responses.GotBalancePayload(balance)).SendJSON()
+}
+
+func getAccountIdFromPath(r *http.Request) (account.AccountId, error) {
+	// const pathParamPattern = "/accounts/{account_id}/balance"
+	// idParam := getPathParam(r.URL.Path, pathParamPattern)
+	idParam := getPathParam(r.URL.Path, 2)
+	parsedToUuid, err := uuid.Parse(idParam)
+
+	if err != nil {
+
+		return account.AccountId{}, err
+	}
+
+	return account.AccountId(parsedToUuid), nil
+}
+
+func getPathParam(url string, position int) string { // TODO: define position using regexp
+	parts := strings.Split(url, "/")
+	return parts[position]
 }
