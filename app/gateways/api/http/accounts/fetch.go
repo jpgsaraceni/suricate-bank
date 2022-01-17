@@ -9,34 +9,28 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
 
-func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
+func (h handler) Fetch(w http.ResponseWriter, r *http.Request) error {
 	var response responses.Response
-
-	defer func(r *responses.Response) {
-		responses.SendJSON(w, *r)
-	}(&response)
+	response.Writer = w
 
 	accountList, err := h.usecase.Fetch(r.Context())
 
 	if errors.Is(err, accountuc.ErrNoAccountsToFetch) { // TODO: reavaliar se deve ser um erro mesmo
-		response = responses.Ok(responses.NoAccounts)
 
-		return
+		return response.Ok(responses.NoAccounts).SendJSON()
 	}
 
 	if err != nil {
-		response = responses.InternalServerError(err)
 
-		return
+		return response.InternalServerError(err).SendJSON()
 	}
 
 	j, err := json.Marshal(accountList)
 
 	if err != nil {
-		response = responses.InternalServerError(err)
 
-		return
+		return response.InternalServerError(err).SendJSON()
 	}
 
-	response = responses.Ok(responses.FetchedAccountsPayload(j))
+	return response.Ok(responses.FetchedAccountsPayload(j)).SendJSON()
 }

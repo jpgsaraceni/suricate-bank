@@ -13,6 +13,39 @@ type Response struct {
 	Status  int
 	Error   error
 	Payload Payload
+	Writer  http.ResponseWriter
+}
+
+func (r Response) BadRequest(err Error) Response {
+	r.Status = http.StatusBadRequest
+	r.Error = err.Err
+	r.Payload = err.Payload
+	return r
+}
+
+func (r Response) InternalServerError(err error) Response {
+	r.Status = http.StatusInternalServerError
+	r.Error = err
+	r.Payload = ErrInternalServerError
+	return r
+}
+
+func (r Response) Ok(payload Payload) Response {
+	r.Status = http.StatusOK
+	r.Payload = payload
+	return r
+}
+
+func (r Response) Created(payload Payload) Response {
+	r.Status = http.StatusCreated
+	r.Payload = payload
+	return r
+}
+
+func (r Response) SendJSON() error {
+	r.Writer.Header().Set("Content-Type", "application/json")
+	r.Writer.WriteHeader(r.Status)
+	return json.NewEncoder(r.Writer).Encode(r.Payload)
 }
 
 func BadRequest(err Error) Response {

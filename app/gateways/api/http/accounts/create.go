@@ -16,69 +16,59 @@ type CreateRequest struct {
 	Secret string `json:"secret" validate:"required"`
 }
 
-func (h handler) Create(w http.ResponseWriter, r *http.Request) {
+func (h handler) Create(w http.ResponseWriter, r *http.Request) error {
 	var createRequest CreateRequest
 	var response responses.Response
 
-	defer func(r *responses.Response) {
-		responses.SendJSON(w, *r)
-	}(&response)
+	response.Writer = w
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		response = responses.BadRequest(responses.ErrInvalidRequestPayload)
 
-		return
+		return response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
 	}
 
 	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
-		response = responses.BadRequest(responses.ErrMissingFields)
 
-		return
+		return response.BadRequest(responses.ErrMissingFields).SendJSON()
 	}
 
 	cpf := createRequest.Cpf
 
 	if len(cpf) != 11 && len(cpf) != 14 {
-		response = responses.BadRequest(responses.ErrLengthCpf)
 
-		return
+		return response.BadRequest(responses.ErrLengthCpf).SendJSON()
 	}
 
 	name := createRequest.Name
 
 	if len(name) < 3 {
-		response = responses.BadRequest(responses.ErrShortName)
 
-		return
+		return response.BadRequest(responses.ErrShortName).SendJSON()
 	}
 
 	secret := createRequest.Secret
 
 	if len(secret) < 6 {
-		response = responses.BadRequest(responses.ErrShortSecret)
 
-		return
+		return response.BadRequest(responses.ErrShortSecret).SendJSON()
 	}
 
 	_, err := h.usecase.Create(r.Context(), name, cpf, secret)
 
 	if errors.Is(err, account.ErrInvalidCpf) {
-		response = responses.BadRequest(responses.ErrInvalidCpf)
 
-		return
+		return response.BadRequest(responses.ErrInvalidCpf).SendJSON()
 	}
 
 	if errors.Is(err, accountspg.ErrCpfAlreadyExists) {
-		response = responses.BadRequest(responses.ErrCpfAlreadyExists)
 
-		return
+		return response.BadRequest(responses.ErrCpfAlreadyExists).SendJSON()
 	}
 
 	if err != nil {
-		response = responses.InternalServerError(err)
 
-		return
+		return response.InternalServerError(err).SendJSON()
 	}
 
-	response = responses.Created(responses.AccountCreated)
+	return response.Created(responses.AccountCreated).SendJSON()
 }

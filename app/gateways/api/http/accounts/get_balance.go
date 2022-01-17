@@ -12,35 +12,29 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 )
 
-func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) error {
 	p := strings.Split(r.URL.Path, "/")
 	id, err := uuid.Parse(p[2])
 
 	var response responses.Response
-
-	defer func(r *responses.Response) {
-		responses.SendJSON(w, *r)
-	}(&response)
+	response.Writer = w
 
 	if err != nil {
-		response = responses.BadRequest(responses.ErrInvalidPathParameter)
 
-		return
+		return response.BadRequest(responses.ErrInvalidPathParameter).SendJSON()
 	}
 
 	balance, err := h.usecase.GetBalance(r.Context(), account.AccountId(id))
 
 	if errors.Is(err, accountuc.ErrIdNotFound) {
-		response = responses.BadRequest(responses.ErrAccountNotFound)
 
-		return
+		return response.BadRequest(responses.ErrAccountNotFound).SendJSON()
 	}
 
 	if err != nil {
-		response = responses.InternalServerError(err)
 
-		return
+		return response.InternalServerError(err).SendJSON()
 	}
 
-	response = responses.Ok(responses.GotBalancePayload(balance))
+	return response.Ok(responses.GotBalancePayload(balance)).SendJSON()
 }
