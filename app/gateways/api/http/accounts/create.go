@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -11,9 +12,18 @@ import (
 )
 
 type CreateRequest struct {
-	Name   string `json:"name" validate:"required"`
-	Cpf    string `json:"cpf" validate:"required"`
-	Secret string `json:"secret" validate:"required"`
+	Name   string `json:"name"`
+	Cpf    string `json:"cpf"`
+	Secret string `json:"secret"`
+}
+
+type CreateResponse struct {
+	AccountId account.AccountId `json:"account_id"`
+	Name      string            `json:"name"`
+	Cpf       string            `json:"cpf"`
+	Balance   string            `json:"balance"`
+	CreatedAt time.Time         `josn:"created_at"`
+	Success   bool              `json:"success"`
 }
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +68,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.usecase.Create(r.Context(), name, cpf, secret)
+	createdAccount, err := h.usecase.Create(r.Context(), name, cpf, secret)
 
 	if errors.Is(err, account.ErrInvalidCpf) {
 		response.BadRequest(responses.ErrInvalidCpf).SendJSON()
@@ -77,5 +87,15 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	response.Payload = CreateResponse{
+		AccountId: createdAccount.Id,
+		Name:      createdAccount.Name,
+		Cpf:       createdAccount.Cpf.Masked(),
+		Balance:   createdAccount.Balance.BRL(),
+		CreatedAt: createdAccount.CreatedAt,
+		Success:   true,
+	}
+
 	response.Created(responses.AccountCreated).SendJSON()
 }
