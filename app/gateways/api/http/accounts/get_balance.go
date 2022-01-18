@@ -40,7 +40,7 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	balanceJSON, err := schemas.BalanceToResponse(accountId, balance).Marshal()
+	balanceResponse := schemas.BalanceToResponse(accountId, balance)
 
 	if err != nil {
 		response.InternalServerError(err).SendJSON()
@@ -48,7 +48,7 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = balanceJSON
+	response.Payload = balanceResponse
 
 	response.Ok().SendJSON()
 }

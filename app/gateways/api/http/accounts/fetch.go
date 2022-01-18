@@ -19,7 +19,7 @@ func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountListJSON, err := schemas.AccountsToResponse(accountList).Marshal()
+	accountListResponse := schemas.AccountsToResponse(accountList)
 
 	if err != nil {
 		response.InternalServerError(err).SendJSON()
@@ -27,7 +27,7 @@ func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = accountListJSON
+	response.Payload = accountListResponse
 
 	response.Ok().SendJSON()
 }

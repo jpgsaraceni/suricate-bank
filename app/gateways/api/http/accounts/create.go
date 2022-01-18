@@ -73,7 +73,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdAccountJSON, err := schemas.CreatedAccountToResponse(createdAccount).Marshal()
+	createdAccountPayload := schemas.CreatedAccountToResponse(createdAccount)
 
 	if err != nil {
 		response.InternalServerError(err).SendJSON()
@@ -81,7 +81,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = createdAccountJSON
+	response.Payload = createdAccountPayload
 
 	response.Created().SendJSON()
 }

@@ -1,7 +1,6 @@
 package schemas
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -14,23 +13,19 @@ type CreateRequest struct {
 }
 
 type CreateResponse struct {
-	AccountId account.AccountId `json:"account_id"`
-	Name      string            `json:"name"`
-	Cpf       string            `json:"cpf"`
-	Balance   string            `json:"balance"`
-	CreatedAt time.Time         `josn:"created_at"`
+	AccountId string    `json:"account_id"`
+	Name      string    `json:"name"`
+	Cpf       string    `json:"cpf"`
+	Balance   string    `json:"balance"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func CreatedAccountToResponse(createdAccount account.Account) CreateResponse {
 	return CreateResponse{
-		AccountId: createdAccount.Id,
+		AccountId: createdAccount.Id.String(),
 		Name:      createdAccount.Name,
 		Cpf:       createdAccount.Cpf.Masked(),
 		Balance:   createdAccount.Balance.BRL(),
-		CreatedAt: createdAccount.CreatedAt.Local(),
+		CreatedAt: createdAccount.CreatedAt,
 	}
-}
-
-func (r CreateResponse) Marshal() ([]byte, error) {
-	return json.Marshal(r)
 }

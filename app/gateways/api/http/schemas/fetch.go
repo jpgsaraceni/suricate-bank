@@ -1,7 +1,6 @@
 package schemas
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -31,8 +30,4 @@ func AccountsToResponse(accountList []account.Account) FetchResponse {
 		})
 	}
 	return FetchResponse{Accounts: accountResponse}
-}
-
-func (r FetchResponse) Marshal() ([]byte, error) {
-	return json.Marshal(r)
 }
