@@ -6,13 +6,17 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestCreate(t *testing.T) {
@@ -28,7 +32,15 @@ func TestCreate(t *testing.T) {
 		usecase         accountuc.Usecase
 		httpIO          httpIO
 		expectedStatus  int
-		expectedPayload responses.Payload
+		expectedPayload interface{}
+	}
+
+	testAccount := account.Account{
+		Id:        account.AccountId(uuid.New()),
+		Name:      "nice name",
+		Cpf:       cpf.Random(),
+		Balance:   money.Money{},
+		CreatedAt: time.Now(),
 	}
 
 	testCases := []testCase{
@@ -45,13 +57,17 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{
-						Id: account.AccountId(uuid.New()),
-					}, nil
+					return testAccount, nil
 				},
 			},
-			expectedStatus:  201,
-			expectedPayload: responses.AccountCreated,
+			expectedStatus: 201,
+			expectedPayload: map[string]interface{}{
+				"account_id": testAccount.Id.String(),
+				"name":       testAccount.Name,
+				"cpf":        testAccount.Cpf.Masked(),
+				"balance":    testAccount.Balance.BRL(),
+				"created_at": testAccount.CreatedAt.Format(time.RFC3339Nano),
+			},
 		},
 		{
 			name: "respond 400 to invalid request payload",
@@ -65,7 +81,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrInvalidRequestPayload.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidRequestPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request missing name",
@@ -79,7 +95,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short name",
@@ -93,7 +109,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrShortName.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrShortName.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with missing cpf",
@@ -107,7 +123,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with invalid cpf length",
@@ -121,7 +137,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrLengthCpf.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrLengthCpf.Payload.Message},
 		},
 		{
 			name: "respond 400 when cpf validation fails",
@@ -140,7 +156,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrInvalidCpf.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidCpf.Payload.Message},
 		},
 		{
 			name: "respond 400 to request missing secret",
@@ -154,7 +170,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrMissingFields.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short secret",
@@ -168,7 +184,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrShortSecret.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrShortSecret.Payload.Message},
 		},
 		{
 			name: "respond 400 to request containing cpf that already exists",
@@ -187,7 +203,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrCpfAlreadyExists.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrCpfAlreadyExists.Payload.Message},
 		},
 		{
 			name: "respond 500 due to usecase error",
@@ -206,7 +222,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: responses.ErrInternalServerError,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
 		},
 	}
 
@@ -228,14 +244,14 @@ func TestCreate(t *testing.T) {
 				t.Errorf("got status code %d expected %d", statusCode, tt.expectedStatus)
 			}
 
-			var got responses.Payload
+			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
 
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}
 
-			if got != tt.expectedPayload {
+			if !reflect.DeepEqual(got, tt.expectedPayload) {
 				t.Fatalf("got response body: %s, expected %s", got, tt.expectedPayload)
 			}
 		})
