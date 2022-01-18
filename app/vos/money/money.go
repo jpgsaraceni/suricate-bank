@@ -119,3 +119,8 @@ func (m Money) BRL() string {
 
 	return valueString
 }
+
+func MustParseBRL(cents int) string {
+	money, _ := NewMoney(cents)
+	return money.BRL()
+}
