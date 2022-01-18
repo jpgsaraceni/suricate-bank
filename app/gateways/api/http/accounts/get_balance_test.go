@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
@@ -27,10 +28,12 @@ func TestGetBalance(t *testing.T) {
 		usecase         accountuc.Usecase
 		httpIO          httpIO
 		expectedStatus  int
-		expectedPayload responses.Payload
+		expectedPayload interface{}
 	}
 
-	var testId = uuid.NewString()
+	var (
+		testId = account.AccountId(uuid.New())
+	)
 
 	testCases := []testCase{
 		{
@@ -50,11 +53,37 @@ func TestGetBalance(t *testing.T) {
 					return 10, nil
 				},
 			},
-			expectedStatus:  200,
-			expectedPayload: responses.GotBalancePayload(10),
+			expectedStatus: 200,
+			expectedPayload: map[string]interface{}{
+				"account_id": testId.String(),
+				"balance":    "R$0,10",
+			},
 		},
 		{
-			name: "fail to get balance for invalid id",
+			name: "successfully get 0 balance",
+			httpIO: httpIO{
+				r: func() *http.Request {
+					return httptest.NewRequest(
+						http.MethodGet,
+						fmt.Sprintf("/accounts/%s/balance", testId),
+						nil,
+					)
+				}(),
+				w: httptest.NewRecorder(),
+			},
+			usecase: accountuc.MockUsecase{
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+					return 0, nil
+				},
+			},
+			expectedStatus: 200,
+			expectedPayload: map[string]interface{}{
+				"account_id": testId.String(),
+				"balance":    "R$0,00",
+			},
+		},
+		{
+			name: "fail to get balance for invalid id param",
 			httpIO: httpIO{
 				r: func() *http.Request {
 					return httptest.NewRequest(
@@ -66,7 +95,7 @@ func TestGetBalance(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: responses.ErrInvalidPathParameter.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidPathParameter.Payload.Message},
 		},
 		{
 			name: "fail to get balance inexistent account id",
@@ -86,7 +115,7 @@ func TestGetBalance(t *testing.T) {
 				},
 			},
 			expectedStatus:  404,
-			expectedPayload: responses.ErrAccountNotFound.Payload,
+			expectedPayload: map[string]interface{}{"title": responses.ErrAccountNotFound.Payload.Message},
 		},
 		{
 			name: "fail due to usecase error",
@@ -106,7 +135,7 @@ func TestGetBalance(t *testing.T) {
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: responses.ErrInternalServerError,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
 		},
 	}
 
@@ -128,14 +157,14 @@ func TestGetBalance(t *testing.T) {
 				t.Errorf("got status code %d expected %d", statusCode, tt.expectedStatus)
 			}
 
-			var got responses.Payload
+			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
 
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}
 
-			if got != tt.expectedPayload {
+			if !reflect.DeepEqual(got, tt.expectedPayload) {
 				t.Fatalf("got response body: %s, expected %s", got, tt.expectedPayload)
 			}
 		})
