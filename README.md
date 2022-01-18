@@ -14,7 +14,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 
 ## Testing the app
 
-I've implemented only the internal layers (entities and usecases), so you can't actually run the app. However, you can test all the packages that have been created so far. To do so, clone the project:
+I've implemented only the internal layers (entities and usecases) and repositories, so you can't actually run the app. However, you can test all the packages that have been created so far. To do so, clone the project:
 
 ```shell
 git clone https://github.com/jpgsaraceni/suricate-bank.git
