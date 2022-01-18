@@ -11,6 +11,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
 
 func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,17 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Ok(responses.GotBalancePayload(balance)).SendJSON()
+	balanceJSON, err := schemas.BalanceToResponse(accountId, balance).Marshal()
+
+	if err != nil {
+		response.InternalServerError(err).SendJSON()
+
+		return
+	}
+
+	response.Payload = balanceJSON
+
+	response.Ok().SendJSON()
 }
 
 func getAccountIdFromRequest(r *http.Request) (account.AccountId, error) {

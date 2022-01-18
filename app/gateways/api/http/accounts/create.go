@@ -4,33 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 )
-
-type CreateRequest struct {
-	Name   string `json:"name"`
-	Cpf    string `json:"cpf"`
-	Secret string `json:"secret"`
-}
-
-type CreateResponse struct {
-	AccountId account.AccountId `json:"account_id"`
-	Name      string            `json:"name"`
-	Cpf       string            `json:"cpf"`
-	Balance   string            `json:"balance"`
-	CreatedAt time.Time         `josn:"created_at"`
-	Success   bool              `json:"success"`
-}
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var response responses.Response
 	response.Writer = w
 
-	var createRequest CreateRequest
+	var createRequest schemas.CreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
 		response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
@@ -88,14 +73,15 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = CreateResponse{
-		AccountId: createdAccount.Id,
-		Name:      createdAccount.Name,
-		Cpf:       createdAccount.Cpf.Masked(),
-		Balance:   createdAccount.Balance.BRL(),
-		CreatedAt: createdAccount.CreatedAt,
-		Success:   true,
+	createdAccountJSON, err := schemas.CreatedAccountToResponse(createdAccount).Marshal()
+
+	if err != nil {
+		response.InternalServerError(err).SendJSON()
+
+		return
 	}
 
-	response.Created(responses.AccountCreated).SendJSON()
+	response.Payload = createdAccountJSON
+
+	response.Created().SendJSON()
 }

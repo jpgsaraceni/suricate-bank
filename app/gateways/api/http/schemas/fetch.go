@@ -33,6 +33,6 @@ func AccountsToResponse(accountList []account.Account) FetchResponse {
 	return FetchResponse{Accounts: accountResponse}
 }
 
-func (f FetchResponse) Marshal() ([]byte, error) {
-	return json.Marshal(f)
+func (r FetchResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
 }
