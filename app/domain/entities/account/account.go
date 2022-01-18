@@ -72,3 +72,8 @@ func newAccountId() AccountId {
 
 	return AccountId(uuid.New())
 }
+
+func (id AccountId) String() string {
+	parsedToUUID := uuid.UUID(id)
+	return parsedToUUID.String()
+}
