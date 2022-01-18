@@ -108,7 +108,7 @@ func TestFetch(t *testing.T) {
 			},
 		},
 		{
-			name: "no existent accounts error",
+			name: "successfully fetch 0 accounts",
 			repository: account.MockRepository{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
@@ -116,7 +116,6 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			want: []account.Account{},
-			err:  ErrNoAccountsToFetch,
 		},
 		{
 			name: "repository throws error",

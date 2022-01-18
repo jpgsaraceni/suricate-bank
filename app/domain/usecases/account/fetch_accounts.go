@@ -15,10 +15,5 @@ func (uc usecase) Fetch(ctx context.Context) ([]account.Account, error) {
 		return []account.Account{}, fmt.Errorf("%w: %s", ErrFetchAccounts, err.Error())
 	}
 
-	if len(accountList) == 0 {
-
-		return accountList, ErrNoAccountsToFetch
-	}
-
 	return accountList, nil
 }
