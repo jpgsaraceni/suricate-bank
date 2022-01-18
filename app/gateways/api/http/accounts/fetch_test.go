@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -34,18 +35,30 @@ func TestFetch(t *testing.T) {
 		expectedPayload interface{}
 	}
 
-	var (
-		testId1        = uuid.New()
-		testId2        = uuid.New()
-		testId3        = uuid.New()
-		testCpf1       = cpf.Random()
-		testCpf2       = cpf.Random()
-		testCpf3       = cpf.Random()
-		testSecret, _  = hash.NewHash("123")
-		testMoney10, _ = money.NewMoney(10)
-		testMoney0, _  = money.NewMoney(0)
-		testTime       = time.Now()
-	)
+	testAccount1 := account.Account{
+		Id:        account.AccountId(uuid.New()),
+		Name:      "nice name",
+		Cpf:       cpf.Random(),
+		Secret:    hash.Parse("123456"),
+		Balance:   money.Money{},
+		CreatedAt: time.Now(),
+	}
+	testAccount2 := account.Account{
+		Id:        account.AccountId(uuid.New()),
+		Name:      "nice name",
+		Cpf:       cpf.Random(),
+		Secret:    hash.Parse("123456"),
+		Balance:   money.Money{},
+		CreatedAt: time.Now(),
+	}
+	testAccount3 := account.Account{
+		Id:        account.AccountId(uuid.New()),
+		Name:      "nice name",
+		Cpf:       cpf.Random(),
+		Secret:    hash.Parse("123456"),
+		Balance:   money.Money{},
+		CreatedAt: time.Now(),
+	}
 
 	testCases := []testCase{
 		{
@@ -64,57 +77,58 @@ func TestFetch(t *testing.T) {
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 					return []account.Account{
 						{
-							Id:        account.AccountId(testId1),
-							Name:      "acceptable name",
-							Cpf:       testCpf1,
-							Secret:    testSecret,
-							Balance:   testMoney10,
-							CreatedAt: testTime,
+							Id:        testAccount1.Id,
+							Name:      testAccount1.Name,
+							Cpf:       testAccount1.Cpf,
+							Secret:    testAccount1.Secret,
+							Balance:   testAccount1.Balance,
+							CreatedAt: testAccount1.CreatedAt,
 						},
 						{
-							Id:        account.AccountId(testId2),
-							Name:      "acceptable name",
-							Cpf:       testCpf2,
-							Secret:    testSecret,
-							CreatedAt: testTime,
+							Id:        testAccount2.Id,
+							Name:      testAccount2.Name,
+							Cpf:       testAccount2.Cpf,
+							Secret:    testAccount2.Secret,
+							Balance:   testAccount2.Balance,
+							CreatedAt: testAccount2.CreatedAt,
 						},
 						{
-							Id:        account.AccountId(testId3),
-							Name:      "acceptable name",
-							Cpf:       testCpf3,
-							Secret:    testSecret,
-							Balance:   testMoney0,
-							CreatedAt: testTime,
+							Id:        testAccount3.Id,
+							Name:      testAccount3.Name,
+							Cpf:       testAccount3.Cpf,
+							Secret:    testAccount3.Secret,
+							Balance:   testAccount3.Balance,
+							CreatedAt: testAccount3.CreatedAt,
 						},
 					}, nil
 				},
 			},
 			expectedStatus: 200,
-			expectedPayload: FetchPayloadTest([]account.Account{
-				{
-					Id:        account.AccountId(testId1),
-					Name:      "acceptable name",
-					Cpf:       testCpf1,
-					Secret:    testSecret,
-					Balance:   testMoney10,
-					CreatedAt: testTime,
+			expectedPayload: map[string]interface{}{
+				"accounts": []interface{}{
+					map[string]interface{}{
+						"account_id": testAccount1.Id.String(),
+						"name":       testAccount1.Name,
+						"cpf":        testAccount1.Cpf.Masked(),
+						"balance":    testAccount1.Balance.BRL(),
+						"created_at": testAccount1.CreatedAt.Format(time.RFC3339Nano),
+					},
+					map[string]interface{}{
+						"account_id": testAccount2.Id.String(),
+						"name":       testAccount2.Name,
+						"cpf":        testAccount2.Cpf.Masked(),
+						"balance":    testAccount2.Balance.BRL(),
+						"created_at": testAccount2.CreatedAt.Format(time.RFC3339Nano),
+					},
+					map[string]interface{}{
+						"account_id": testAccount3.Id.String(),
+						"name":       testAccount3.Name,
+						"cpf":        testAccount3.Cpf.Masked(),
+						"balance":    testAccount3.Balance.BRL(),
+						"created_at": testAccount3.CreatedAt.Format(time.RFC3339Nano),
+					},
 				},
-				{
-					Id:        account.AccountId(testId2),
-					Name:      "acceptable name",
-					Cpf:       testCpf2,
-					Secret:    testSecret,
-					CreatedAt: testTime,
-				},
-				{
-					Id:        account.AccountId(testId3),
-					Name:      "acceptable name",
-					Cpf:       testCpf3,
-					Secret:    testSecret,
-					Balance:   testMoney0,
-					CreatedAt: testTime,
-				},
-			}),
+			},
 		},
 		{
 			name: "successfully fetch 0 accounts",
@@ -130,11 +144,13 @@ func TestFetch(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
-					return []account.Account{}, accountuc.ErrNoAccountsToFetch
+					return []account.Account{}, nil
 				},
 			},
-			expectedStatus:  200,
-			expectedPayload: responses.NoAccounts,
+			expectedStatus: 200,
+			expectedPayload: map[string]interface{}{
+				"accounts": []interface{}{},
+			},
 		},
 		{
 			name: "fail due to repository error",
@@ -154,7 +170,7 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: responses.ErrInternalServerError,
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
 		},
 	}
 
@@ -176,23 +192,16 @@ func TestFetch(t *testing.T) {
 				t.Errorf("got status code %d expected %d", statusCode, tt.expectedStatus)
 			}
 
-			var got responses.Payload
+			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
 
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}
 
-			if got != tt.expectedPayload {
-				t.Fatalf("got response body: %s, expected %s", got, tt.expectedPayload)
+			if !reflect.DeepEqual(got, tt.expectedPayload) {
+				t.Fatalf("\ngot response body:\n %s\n expected response body:\n %s", got["accounts"], tt.expectedPayload)
 			}
 		})
 	}
-}
-
-func FetchPayloadTest(accountList []account.Account) interface{} {
-	j, _ := json.Marshal(accountList)
-	var response responses.Response
-
-	return response.Ok(responses.FetchedAccountsPayload(j)).Payload
 }
