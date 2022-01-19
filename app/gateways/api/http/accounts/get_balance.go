@@ -47,9 +47,7 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = balanceResponse
-
-	response.Ok().SendJSON()
+	response.Ok(balanceResponse).SendJSON()
 }
 
 func getAccountIdFromRequest(r *http.Request) (account.AccountId, error) {

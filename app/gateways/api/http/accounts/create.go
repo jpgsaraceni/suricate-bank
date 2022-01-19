@@ -80,7 +80,5 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = createdAccountPayload
-
-	response.Created().SendJSON()
+	response.Created(createdAccountPayload).SendJSON()
 }

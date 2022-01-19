@@ -26,7 +26,5 @@ func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Payload = accountListResponse
-
-	response.Ok().SendJSON()
+	response.Ok(accountListResponse).SendJSON()
 }

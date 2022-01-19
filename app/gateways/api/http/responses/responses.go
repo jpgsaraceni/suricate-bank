@@ -43,13 +43,15 @@ func (r Response) InternalServerError(err error) Response {
 	return r
 }
 
-func (r Response) Ok() Response {
+func (r Response) Ok(payload interface{}) Response {
 	r.Status = http.StatusOK
+	r.Payload = payload
 	return r
 }
 
-func (r Response) Created() Response {
+func (r Response) Created(payload interface{}) Response {
 	r.Status = http.StatusCreated
+	r.Payload = payload
 	return r
 }
 
