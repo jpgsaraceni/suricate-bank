@@ -15,8 +15,7 @@ import (
 )
 
 func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
-	var response responses.Response
-	response.Writer = w
+	response := responses.NewResponse(w)
 
 	accountId, err := getAccountIdFromRequest(r)
 

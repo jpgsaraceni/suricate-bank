@@ -18,6 +18,10 @@ type ErrorPayload struct {
 	Message string `json:"title,omitempty" example:"Message for some error"`
 }
 
+func NewResponse(w http.ResponseWriter) Response {
+	return Response{Writer: w}
+}
+
 func (r Response) BadRequest(err Error) Response {
 	r.Status = http.StatusBadRequest
 	r.Error = err.Err

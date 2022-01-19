@@ -8,8 +8,7 @@ import (
 )
 
 func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
-	var response responses.Response
-	response.Writer = w
+	response := responses.NewResponse(w)
 
 	accountList, err := h.usecase.Fetch(r.Context())
 

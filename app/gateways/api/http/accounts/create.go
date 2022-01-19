@@ -12,8 +12,7 @@ import (
 )
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
-	var response responses.Response
-	response.Writer = w
+	response := responses.NewResponse(w)
 
 	var createRequest schemas.CreateRequest
 
