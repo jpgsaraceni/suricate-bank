@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 
+	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
@@ -11,6 +12,7 @@ type MockRepository struct {
 	OnGetBalance    func(ctx context.Context, id AccountId) (int, error)
 	OnFetch         func(ctx context.Context) ([]Account, error)
 	OnGetById       func(ctx context.Context, id AccountId) (Account, error)
+	OnGetByCpf      func(ctx context.Context, cpf cpf.Cpf) (Account, error)
 	OnCreditAccount func(ctx context.Context, id AccountId, amount money.Money) error
 	OnDebitAccount  func(ctx context.Context, id AccountId, amount money.Money) error
 }
@@ -31,6 +33,10 @@ func (mock MockRepository) Fetch(ctx context.Context) ([]Account, error) {
 
 func (mock MockRepository) GetById(ctx context.Context, id AccountId) (Account, error) {
 	return mock.OnGetById(ctx, id)
+}
+
+func (mock MockRepository) GetByCpf(ctx context.Context, cpf cpf.Cpf) (Account, error) {
+	return mock.OnGetByCpf(ctx, cpf)
 }
 
 func (mock MockRepository) CreditAccount(ctx context.Context, id AccountId, amount money.Money) error {
