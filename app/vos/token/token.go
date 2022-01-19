@@ -12,7 +12,13 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-var ErrSignJWT = errors.New("failed to sign jwt")
+var (
+	ErrSignJWT         = errors.New("failed to sign jwt")
+	ErrMissingFieldJWT = errors.New("jwt missing account_id field")
+	ErrJwtSignature    = errors.New("invalid token signature")
+	ErrParseUuid       = errors.New("failed to parse account id to uuid")
+	ErrInvalidClaims   = errors.New("invalid jwt claims")
+)
 
 type Jwt struct {
 	token string
@@ -47,6 +53,33 @@ func Sign(accountId account.AccountId) (Jwt, error) {
 	}
 
 	return Jwt{token: signedToken}, nil
+}
+
+func (j Jwt) Verify() (account.AccountId, error) {
+	token, err := jwt.ParseWithClaims(j.token, &jwtClaimsSchema{}, func(token *jwt.Token) (interface{}, error) {
+		return loadSecret(), nil
+	})
+
+	if err != nil {
+
+		return account.AccountId{}, ErrJwtSignature
+	}
+
+	claims, ok := token.Claims.(*jwtClaimsSchema)
+
+	if !ok || !token.Valid {
+
+		return account.AccountId{}, ErrInvalidClaims
+	}
+
+	accountId, err := account.ParseAccountId(claims.AccountId)
+
+	if err != nil {
+
+		return account.AccountId{}, fmt.Errorf("%w: %s", ErrParseUuid, err)
+	}
+
+	return accountId, nil
 }
 
 func loadSecret() []byte {
