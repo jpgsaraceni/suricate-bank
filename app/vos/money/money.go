@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Money struct {
@@ -94,4 +95,18 @@ func (m *Money) Subtract(amount int) error {
 	m.cents -= amount
 
 	return nil
+}
+
+func (m Money) BRL() string {
+	f := float64(m.cents) / 100
+
+	valueString := fmt.Sprintf("%.2f", f)
+	valueString = strings.Replace(valueString, ".", ",", -1)
+
+	return fmt.Sprintf("R$%s", valueString)
+}
+
+func MustParseBRL(cents int) string {
+	money, _ := NewMoney(cents)
+	return money.BRL()
 }
