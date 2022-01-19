@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/joho/godotenv"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
@@ -50,6 +50,9 @@ func Sign(accountId account.AccountId) (Jwt, error) {
 }
 
 func loadSecret() []byte {
-	godotenv.Load()
-	return []byte(os.Getenv("JWT_SECRET"))
+	secret := []byte(os.Getenv("JWT_SECRET"))
+	if reflect.DeepEqual(secret, []byte("")) {
+		return []byte("test_secret")
+	}
+	return secret
 }
