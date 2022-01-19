@@ -16,5 +16,3 @@ func LoginToResponse(token token.Jwt) LoginResponse {
 		Token: token.Value(),
 	}
 }
-
-// TODO: create login schemas
