@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Money struct {
@@ -97,27 +98,12 @@ func (m *Money) Subtract(amount int) error {
 }
 
 func (m Money) BRL() string {
-	if m.cents == 0 {
-		return "R$0,00"
-	}
+	f := float64(m.cents) / 100
 
-	valueString := strconv.Itoa(m.cents)
+	valueString := fmt.Sprintf("%.2f", f)
+	valueString = strings.Replace(valueString, ".", ",", -1)
 
-	if digitLimit := 10; m.cents < digitLimit {
-		return "R$0,0" + valueString
-	}
-
-	wholePrefix := ""
-	if m.cents < 100 {
-		wholePrefix = "0"
-	}
-
-	wholePart := valueString[:len(valueString)-2]
-	decimalPart := valueString[len(valueString)-2:]
-
-	valueString = fmt.Sprintf("R$%s%s,%s", wholePrefix, wholePart, decimalPart)
-
-	return valueString
+	return fmt.Sprintf("R$%s", valueString)
 }
 
 func MustParseBRL(cents int) string {
