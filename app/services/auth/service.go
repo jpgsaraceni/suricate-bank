@@ -4,16 +4,15 @@ import (
 	"context"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
 
-// usecase calls Repository to be used in all methods of this package.
+// service calls Repository to be used in all methods of this package.
 type service struct {
 	repository account.Repository
 }
 
 type Service interface {
-	Authenticate(ctx context.Context, cpf cpf.Cpf, secret string) (string, error) // TODO: check cpf here?
+	Authenticate(ctx context.Context, cpfInput string, secret string) (string, error)
 }
 
 func NewService(r account.Repository) Service {

@@ -8,17 +8,24 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
-func (s service) Authenticate(ctx context.Context, cpf cpf.Cpf, secret string) (string, error) {
-	account, err := s.repository.GetByCpf(ctx, cpf)
+func (s service) Authenticate(ctx context.Context, cpfInput string, secret string) (string, error) {
+	validatedCpf, err := cpf.NewCpf(cpfInput)
 
 	if err != nil {
 
-		return "", fmt.Errorf("%w: %s", ErrInexistentCpf, err)
+		return "", fmt.Errorf("%w: %s", ErrCredentials, err)
+	}
+
+	account, err := s.repository.GetByCpf(ctx, validatedCpf)
+
+	if err != nil {
+
+		return "", fmt.Errorf("%w: %s", ErrCredentials, err)
 	}
 
 	if !account.Secret.Compare(secret) {
 
-		return "", fmt.Errorf("%w: %s", ErrWrongPassword, err)
+		return "", fmt.Errorf("%w: %s", ErrCredentials, err)
 	}
 
 	jwt, err := token.Sign(account.Id)

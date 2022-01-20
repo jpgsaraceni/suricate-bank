@@ -58,7 +58,7 @@ func TestAuthenticate(t *testing.T) {
 			name: "fail to authenticate request with inexistent cpf",
 			repository: account.MockRepository{
 				OnGetByCpf: func(ctx context.Context, cpf cpf.Cpf) (account.Account, error) {
-					return account.Account{}, ErrInexistentCpf
+					return account.Account{}, ErrCredentials
 				},
 			},
 			args: args{
@@ -66,7 +66,7 @@ func TestAuthenticate(t *testing.T) {
 				secret: "123456",
 			},
 			want: account.AccountId{},
-			err:  ErrInexistentCpf,
+			err:  ErrCredentials,
 		},
 		{
 			name: "fail to authenticate request with wrong password",
@@ -84,7 +84,7 @@ func TestAuthenticate(t *testing.T) {
 				secret: "12345",
 			},
 			want: account.AccountId{},
-			err:  ErrWrongPassword,
+			err:  ErrCredentials,
 		},
 	}
 
@@ -95,7 +95,7 @@ func TestAuthenticate(t *testing.T) {
 
 			s := service{tt.repository}
 
-			gotToken, err := s.Authenticate(context.Background(), tt.args.cpf, tt.args.secret)
+			gotToken, err := s.Authenticate(context.Background(), tt.args.cpf.Value(), tt.args.secret)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
