@@ -25,7 +25,7 @@ func (r Repository) GetByCpf(ctx context.Context, cpf cpf.Cpf) (account.Account,
 
 	var accountReturned account.Account
 
-	row := r.pool.QueryRow(ctx, query, cpf)
+	row := r.pool.QueryRow(ctx, query, cpf.Value())
 
 	err := row.Scan(
 		&accountReturned.Id,
