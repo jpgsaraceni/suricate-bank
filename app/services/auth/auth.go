@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
 func (s service) Authenticate(ctx context.Context, cpf cpf.Cpf, secret string) (string, error) {
@@ -20,6 +21,12 @@ func (s service) Authenticate(ctx context.Context, cpf cpf.Cpf, secret string) (
 		return "", fmt.Errorf("%w: %s", ErrWrongPassword, err)
 	}
 
-	// TODO: generate token using accountId
-	return "", nil
+	jwt, err := token.Sign(account.Id)
+
+	if err != nil {
+
+		return "", fmt.Errorf("%w: %s", ErrSignToken, err)
+	}
+
+	return jwt.Value(), nil
 }
