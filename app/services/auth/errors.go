@@ -3,7 +3,6 @@ package auth
 import "errors"
 
 var (
-	ErrInexistentCpf = errors.New("inexistent cpf")
-	ErrWrongPassword = errors.New("wrong password")
-	ErrSignToken     = errors.New("failed to sign jwt")
+	ErrCredentials = errors.New("wrong password or cpf")
+	ErrSignToken   = errors.New("failed to sign jwt")
 )
