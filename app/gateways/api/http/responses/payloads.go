@@ -55,4 +55,10 @@ var (
 		Err:     errors.New("account not found"),
 		Payload: ErrorPayload{Message: "Account not found"},
 	}
+
+	// login errors
+	ErrCredentials = Error{
+		Err:     errors.New("cpf or secret do not match"),
+		Payload: ErrorPayload{Message: "Incorrect CPF or password"},
+	}
 )
