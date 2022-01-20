@@ -55,8 +55,8 @@ func Sign(accountId account.AccountId) (Jwt, error) {
 	return Jwt{token: signedToken}, nil
 }
 
-func (j Jwt) Verify() (account.AccountId, error) {
-	token, err := jwt.ParseWithClaims(j.token, &jwtClaimsSchema{}, func(token *jwt.Token) (interface{}, error) {
+func Verify(tokenString string) (account.AccountId, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwtClaimsSchema{}, func(token *jwt.Token) (interface{}, error) {
 		return loadSecret(), nil
 	})
 

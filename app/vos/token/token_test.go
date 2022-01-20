@@ -141,9 +141,7 @@ func TestVerify(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			j := Jwt{token: tt.token}
-
-			accountId, err := j.Verify()
+			accountId, err := Verify(tt.token)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)
