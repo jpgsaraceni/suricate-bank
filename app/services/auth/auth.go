@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
@@ -12,14 +12,14 @@ func (s service) Authenticate(ctx context.Context, cpf cpf.Cpf, secret string) (
 
 	if err != nil {
 
-		return "", errors.New("inexistent cpf") // TODO: create error variable
+		return "", fmt.Errorf("%w: %s", ErrInexistentCpf, err)
 	}
 
 	if !account.Secret.Compare(secret) {
 
-		return "", errors.New("wrong password") // TODO: create error variable
+		return "", fmt.Errorf("%w: %s", ErrWrongPassword, err)
 	}
 
-	// generate token using accountId
+	// TODO: generate token using accountId
 	return "", nil
 }
