@@ -72,13 +72,5 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdAccountPayload := schemas.CreatedAccountToResponse(createdAccount)
-
-	if err != nil {
-		response.InternalServerError(err).SendJSON()
-
-		return
-	}
-
-	response.Created(createdAccountPayload).SendJSON()
+	response.Created(schemas.CreatedAccountToResponse(createdAccount)).SendJSON()
 }
