@@ -1,13 +1,13 @@
 package transfersroute
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -57,10 +57,9 @@ func TestCreate(t *testing.T) {
 		// CreatedAt: time.Now(),
 	}
 
-	//TODO: fix requestPayload
-	requestPayload := fmt.Sprintf(`{"account_destination_id":%s,"amount":5}`, testAccount2.Id.String())
+	requestPayload := fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount2.Id.String())
 	originIdToken, _ := token.Sign(testAccount1.Id)
-	requestHeader := fmt.Sprintf(`"Bearer %s"`, originIdToken.Value())
+	requestHeader := fmt.Sprintf("Bearer %s", originIdToken.Value())
 
 	testCases := []testCase{
 		{
@@ -70,7 +69,8 @@ func TestCreate(t *testing.T) {
 					request := httptest.NewRequest(
 						http.MethodPost,
 						"/transfers",
-						bytes.NewReader([]byte(requestPayload)))
+						strings.NewReader(requestPayload),
+					)
 					request.Header.Set("Authorization", requestHeader)
 					return request
 				}(),
@@ -92,8 +92,8 @@ func TestCreate(t *testing.T) {
 				"transfer_id":            testTransferId.String(),
 				"account_origin_id":      testAccount1.Id.String(),
 				"account_destination_id": testAccount2.Id.String(),
-				"amount":                 5,
-				"created_at":             testTime,
+				"amount":                 testMoney10.BRL(),
+				"created_at":             testTime.Format(time.RFC3339Nano),
 			},
 		},
 	}
