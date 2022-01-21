@@ -24,7 +24,7 @@ func (h handler) Login(w http.ResponseWriter, r *http.Request) {
 	account, err := h.service.Authenticate(r.Context(), loginRequest.Cpf, loginRequest.Secret)
 
 	if errors.Is(err, auth.ErrCredentials) {
-		response.BadRequest(responses.ErrCredentials).SendJSON()
+		response.Unauthorized(responses.ErrCredentials).SendJSON()
 
 		return
 	}

@@ -29,6 +29,13 @@ func (r Response) BadRequest(err Error) Response {
 	return r
 }
 
+func (r Response) Unauthorized(err Error) Response {
+	r.Status = http.StatusUnauthorized
+	r.Error = err.Err
+	r.Payload = err.Payload
+	return r
+}
+
 func (r Response) NotFound(err Error) Response {
 	r.Status = http.StatusNotFound
 	r.Error = err.Err

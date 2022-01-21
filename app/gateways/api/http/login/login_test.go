@@ -77,7 +77,7 @@ func TestCreate(t *testing.T) {
 					return "", auth.ErrCredentials
 				},
 			},
-			expectedStatus:  400,
+			expectedStatus:  401,
 			expectedPayload: map[string]interface{}{"title": responses.ErrCredentials.Payload.Message},
 		},
 		{
