@@ -8,7 +8,7 @@ import (
 
 type CreateTransferRequest struct {
 	AccountDestinationId string `json:"account_destination_id"`
-	Amount               string `json:"amount"`
+	Amount               int    `json:"amount"`
 }
 
 type CreateTransferResponse struct {
