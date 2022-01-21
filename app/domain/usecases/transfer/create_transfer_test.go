@@ -213,7 +213,7 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.repository, tt.crediter, tt.debiter}
+			uc := usecase{tt.repository, tt.crediter, tt.debiter}
 
 			newTransfer, err := uc.Create(context.Background(), tt.args.amount, tt.args.originId, tt.args.destinationId)
 

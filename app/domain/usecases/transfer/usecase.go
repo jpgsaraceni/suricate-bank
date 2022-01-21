@@ -8,7 +8,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-type Usecase struct {
+type usecase struct {
 	Repository transfer.Repository
 	Crediter
 	Debiter
@@ -20,4 +20,9 @@ type Debiter interface {
 
 type Crediter interface {
 	Credit(ctx context.Context, id account.AccountId, amount money.Money) error
+}
+
+type Usecase interface {
+	Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error)
+	Fetch(ctx context.Context) ([]transfer.Transfer, error)
 }

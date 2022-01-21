@@ -4,8 +4,24 @@ import (
 	"context"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
+
+type MockUsecase struct {
+	OnCreate func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error)
+	OnFetch  func(ctx context.Context) ([]transfer.Transfer, error)
+}
+
+var _ Usecase = (*MockUsecase)(nil)
+
+func (mock MockUsecase) Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
+	return mock.OnCreate(ctx, amount, originId, destinationId)
+}
+
+func (mock MockUsecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
+	return mock.OnFetch(ctx)
+}
 
 type MockDebiter struct {
 	OnDebit func(ctx context.Context, id account.AccountId, amount money.Money) error

@@ -9,7 +9,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
+func (uc usecase) Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
 
 	if originId == destinationId {
 
@@ -50,7 +50,7 @@ func (uc Usecase) Create(ctx context.Context, amount money.Money, originId, dest
 	return newTransfer, nil
 }
 
-func rollback(ctx context.Context, uc Usecase, hasCredited, hasDebited bool, originId, destinationId account.AccountId, amount money.Money) {
+func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, originId, destinationId account.AccountId, amount money.Money) {
 	if hasCredited {
 		uc.Debiter.Debit(ctx, destinationId, amount)
 	}
