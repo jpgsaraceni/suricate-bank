@@ -14,7 +14,7 @@ import (
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 
-	var createRequest schemas.CreateRequest
+	var createRequest schemas.CreateAccountRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
 		response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
