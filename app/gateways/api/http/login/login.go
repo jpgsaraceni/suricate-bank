@@ -16,7 +16,7 @@ func (h handler) Login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest schemas.LoginRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-		response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
+		response.BadRequest(responses.ErrInvalidLoginPayload).SendJSON()
 
 		return
 	}

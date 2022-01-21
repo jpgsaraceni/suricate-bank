@@ -17,13 +17,13 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	var createRequest schemas.CreateAccountRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
+		response.BadRequest(responses.ErrInvalidCreateAccountPayload).SendJSON()
 
 		return
 	}
 
 	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
-		response.BadRequest(responses.ErrMissingFields).SendJSON()
+		response.BadRequest(responses.ErrMissingFieldsAccountPayload).SendJSON()
 
 		return
 	}

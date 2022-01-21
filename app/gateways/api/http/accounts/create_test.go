@@ -81,7 +81,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidRequestPayload.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidCreateAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request missing name",
@@ -95,7 +95,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short name",
@@ -123,7 +123,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with invalid cpf length",
@@ -170,7 +170,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short secret",
