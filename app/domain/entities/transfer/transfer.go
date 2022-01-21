@@ -52,3 +52,8 @@ func newTransferId() TransferId {
 
 	return TransferId(uuid.New())
 }
+
+func (id TransferId) String() string {
+	parsedToUUID := uuid.UUID(id)
+	return parsedToUUID.String()
+}
