@@ -39,15 +39,7 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	balanceResponse := schemas.BalanceToResponse(accountId, balance)
-
-	if err != nil {
-		response.InternalServerError(err).SendJSON()
-
-		return
-	}
-
-	response.Ok(balanceResponse).SendJSON()
+	response.Ok(schemas.BalanceToResponse(accountId, balance)).SendJSON()
 }
 
 func getAccountIdFromRequest(r *http.Request) (account.AccountId, error) {

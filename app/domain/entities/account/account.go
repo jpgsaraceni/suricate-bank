@@ -77,3 +77,13 @@ func (id AccountId) String() string {
 	parsedToUUID := uuid.UUID(id)
 	return parsedToUUID.String()
 }
+
+func ParseAccountId(id string) (AccountId, error) {
+	accountId, err := uuid.Parse(id)
+
+	if err != nil {
+		return AccountId{}, err
+	}
+
+	return AccountId(accountId), nil
+}

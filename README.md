@@ -10,11 +10,12 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [pgx](https://github.com/jackc/pgx) - For configuring and connecting a pool to a PostgreSQL database and running queries;
 * [Dockertest](https://github.com/ory/dockertest) - For running integration tests on temporary database containers;
 * [bcrypt](https://golang.org/x/crypto/bcrypt) - For hashing and comparing hashed secrets;
+* [jwt](github.com/golang-jwt/jwt/v4) - For signing and verifying JSON Web Tokens for authenticatioin;
 * [Logrus](https://github.com/sirupsen/logrus) - For logging. This library is used in the dockertest example. I haven't set up logging for the project, so I will decide later if this will actually be used.
 
 ## Testing the app
 
-I've implemented only the internal layers (entities and usecases) and repositories, so you can't actually run the app. However, you can test all the packages that have been created so far. To do so, clone the project:
+So far I've implemented the internal layers (entities and usecases), repositories and handlers (missing router and main), so you can't actually run the app. However, you can test all the packages that have been created so far. To do so, clone the project:
 
 ```shell
 git clone https://github.com/jpgsaraceni/suricate-bank.git
@@ -26,7 +27,7 @@ In your local project directory, install dependencies:
 go mod download
 ```
 
-Then run all unit and integration tests (you will need [Docker](https://www.docker.com/) installed. I had some trouble with permissions on Linux, [this](https://stackoverflow.com/questions/48568172/docker-sock-permission-denied) fixed it for me.):
+Then run all unit and integration tests (you will need [Docker](https://www.docker.com/) installed. I had some trouble with permissions on Linux, [this](https://stackoverflow.com/questions/48568172/docker-sock-permission-denied) fixed it for me):
 
 ```shell
 go test ./...
