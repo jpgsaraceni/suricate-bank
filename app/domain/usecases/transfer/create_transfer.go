@@ -13,14 +13,14 @@ func (uc usecase) Create(ctx context.Context, amount money.Money, originId, dest
 
 	if originId == destinationId {
 
-		return transfer.Transfer{}, ErrSameAccounts
+		return transfer.Transfer{}, transfer.ErrSameAccounts
 	}
 
 	err := uc.Debiter.Debit(ctx, originId, amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
 	}
 
 	err = uc.Crediter.Credit(ctx, destinationId, amount)
@@ -28,7 +28,7 @@ func (uc usecase) Create(ctx context.Context, amount money.Money, originId, dest
 	if err != nil {
 		rollback(ctx, uc, false, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
 	}
 
 	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
@@ -44,7 +44,7 @@ func (uc usecase) Create(ctx context.Context, amount money.Money, originId, dest
 	if err != nil {
 		rollback(ctx, uc, true, true, originId, destinationId, amount)
 
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return newTransfer, nil

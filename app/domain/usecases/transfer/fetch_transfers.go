@@ -12,12 +12,7 @@ func (uc usecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 
 	if err != nil {
 
-		return []transfer.Transfer{}, fmt.Errorf("%w: %s", ErrFetchTransfers, err.Error())
-	}
-
-	if len(transferList) == 0 {
-
-		return transferList, ErrNoTransfersToFetch
+		return []transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return transferList, nil
