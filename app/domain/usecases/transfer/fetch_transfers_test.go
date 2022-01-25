@@ -20,10 +20,10 @@ func TestFetch(t *testing.T) {
 		err        error
 	}
 
-	var testUUID1, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-	var testUUID3, _ = uuid.NewUUID()
-	var testUUID4, _ = uuid.NewUUID()
+	var testUUID1 = uuid.New()
+	var testUUID2 = uuid.New()
+	var testUUID3 = uuid.New()
+	var testUUID4 = uuid.New()
 
 	testCases := []testCase{
 		{

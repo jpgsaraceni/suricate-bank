@@ -79,16 +79,6 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "fail transfer to same account",
-			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return nil
-				},
-			},
-			crediter: MockCrediter{
-				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return nil
-				},
-			},
 			args: args{
 				amount:        testMoney100,
 				originId:      account.AccountId(testUUID1),
@@ -134,23 +124,6 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "fail to create transfer amount 0",
-			repository: transfer.MockRepository{
-				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
-					transfer.Id = testTransferId
-					transfer.CreatedAt = testTime
-					return nil
-				},
-			},
-			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return nil
-				},
-			},
-			crediter: MockCrediter{
-				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return nil
-				},
-			},
 			args: args{
 				amount:        testMoney0,
 				originId:      account.AccountId(testUUID1),
