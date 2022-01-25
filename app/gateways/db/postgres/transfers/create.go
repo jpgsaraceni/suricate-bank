@@ -34,7 +34,7 @@ func (r Repository) Create(ctx context.Context, transfer *transfer.Transfer) err
 
 	if err != nil {
 
-		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
+		return fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 
 	return nil

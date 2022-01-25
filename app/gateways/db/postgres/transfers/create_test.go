@@ -83,7 +83,7 @@ func TestCreate(t *testing.T) {
 				Amount:               testMoney10,
 				CreatedAt:            testTime,
 			},
-			err: ErrQuery,
+			err: ErrCreateTransfer,
 		},
 		{
 			name: "fail transfer to inexistent account",
@@ -111,7 +111,7 @@ func TestCreate(t *testing.T) {
 				Amount:               testMoney10,
 				CreatedAt:            testTime,
 			},
-			err: ErrQuery,
+			err: ErrCreateTransfer,
 		},
 		{
 			name: "fail transfer to same account",
@@ -139,7 +139,7 @@ func TestCreate(t *testing.T) {
 				Amount:               testMoney10,
 				CreatedAt:            testTime,
 			},
-			err: ErrQuery,
+			err: ErrCreateTransfer,
 		},
 	}
 
