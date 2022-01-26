@@ -26,9 +26,9 @@ func NewTransfer(amount money.Money, originId, destinationId account.AccountId) 
 		return Transfer{}, ErrSameAccounts
 	}
 
-	if amount.Cents() == 0 {
+	if amount.Cents() <= 0 {
 
-		return Transfer{}, ErrAmountZero
+		return Transfer{}, ErrAmountNotPositive
 	}
 
 	newTransfer := Transfer{

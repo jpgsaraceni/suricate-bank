@@ -130,7 +130,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  transfer.ErrAmountZero,
+			err:  transfer.ErrAmountNotPositive,
 		},
 		{
 			name: "repository error creating transfer",

@@ -18,7 +18,7 @@ func (uc usecase) Create(ctx context.Context, amount money.Money, originId, dest
 
 	if amount.Cents() == 0 {
 
-		return transfer.Transfer{}, transfer.ErrAmountZero
+		return transfer.Transfer{}, transfer.ErrAmountNotPositive
 	}
 
 	err := uc.Debiter.Debit(ctx, originId, amount)
