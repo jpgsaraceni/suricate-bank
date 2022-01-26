@@ -91,7 +91,7 @@ func TestCreate(t *testing.T) {
 			name: "fail to debit from origin",
 			debiter: MockDebiter{
 				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return accountuc.ErrDebitAccount
+					return accountuc.ErrRepository
 				},
 			},
 			args: args{
@@ -100,7 +100,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  accountuc.ErrDebitAccount,
+			err:  accountuc.ErrRepository,
 		},
 		{
 			name: "fail to credit to destination",
@@ -111,7 +111,7 @@ func TestCreate(t *testing.T) {
 			},
 			crediter: MockCrediter{
 				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return accountuc.ErrCreditAccount
+					return accountuc.ErrRepository
 				},
 			},
 			args: args{
@@ -120,7 +120,7 @@ func TestCreate(t *testing.T) {
 				destinationId: account.AccountId(testUUID2),
 			},
 			want: transfer.Transfer{},
-			err:  accountuc.ErrCreditAccount,
+			err:  accountuc.ErrRepository,
 		},
 		{
 			name: "fail to create transfer amount 0",
