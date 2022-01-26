@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
-type contextValueKey string
-
-const ContextOriginId = contextValueKey("account_id")
+type originIdKey struct{}
 
 func Authorize(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +34,16 @@ func Authorize(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), ContextOriginId, originId)
+		ctx := WithOriginId(r.Context(), originId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func OriginIdFromContext(ctx context.Context) (account.AccountId, bool) {
+	originId, ok := ctx.Value(originIdKey{}).(account.AccountId)
+	return originId, ok
+}
+
+func WithOriginId(ctx context.Context, originId account.AccountId) context.Context {
+	return context.WithValue(ctx, originIdKey{}, originId)
 }

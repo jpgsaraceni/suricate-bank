@@ -53,8 +53,6 @@ func TestCreate(t *testing.T) {
 		Id: account.AccountId(uuid.New()),
 	}
 
-	originId := testAccount1.Id.String()
-
 	var (
 		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount2.Id.String())
 		requestPayloadZeroAmount     = fmt.Sprintf(`{"account_destination_id":"%s","amount":0}`, testAccount2.Id.String())
@@ -72,7 +70,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -122,7 +120,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(`{"account_destination_id":"","amount":5}`),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -141,7 +139,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadZeroAmount),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -160,7 +158,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadNegativeAmount),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -179,7 +177,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadRepeatedId),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -198,7 +196,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -222,7 +221,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -246,7 +246,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
+					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
