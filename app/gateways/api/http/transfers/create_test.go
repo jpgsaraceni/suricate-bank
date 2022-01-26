@@ -45,19 +45,12 @@ func TestCreate(t *testing.T) {
 	)
 
 	testAccount1 := account.Account{
-		Id: account.AccountId(uuid.New()),
-		// Name:      "nice name",
-		// Cpf:       cpf.Random(),
+		Id:      account.AccountId(uuid.New()),
 		Balance: testMoney10,
-		// CreatedAt: time.Now(),
 	}
 
 	testAccount2 := account.Account{
 		Id: account.AccountId(uuid.New()),
-		// Name:      "nice name",
-		// Cpf:       cpf.Random(),
-		// Balance: testMoney10,
-		// CreatedAt: time.Now(),
 	}
 
 	originIdToken, _ := token.Sign(testAccount1.Id)
