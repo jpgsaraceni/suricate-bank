@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
@@ -27,7 +26,7 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 
 	balance, err := h.usecase.GetBalance(r.Context(), accountId)
 
-	if errors.Is(err, accountuc.ErrIdNotFound) {
+	if errors.Is(err, account.ErrIdNotFound) {
 		response.NotFound(responses.ErrAccountNotFound).SendJSON()
 
 		return

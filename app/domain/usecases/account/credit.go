@@ -18,7 +18,7 @@ func (uc usecase) Credit(ctx context.Context, id account.AccountId, amount money
 	err := uc.repository.CreditAccount(ctx, id, amount)
 
 	if err != nil {
-		if errors.Is(err, ErrIdNotFound) {
+		if errors.Is(err, account.ErrIdNotFound) {
 
 			return err
 		}

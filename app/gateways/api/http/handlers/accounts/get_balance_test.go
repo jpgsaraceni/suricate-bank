@@ -111,7 +111,7 @@ func TestGetBalance(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
-					return 0, accountuc.ErrIdNotFound
+					return 0, account.ErrIdNotFound
 				},
 			},
 			expectedStatus:  404,

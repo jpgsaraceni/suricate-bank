@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
@@ -68,13 +67,13 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	createdTransfer, err := h.usecase.Create(r.Context(), amount, originId, destinationId)
 
 	if err != nil {
-		if errors.Is(err, accountuc.ErrInsufficientFunds) {
+		if errors.Is(err, account.ErrInsufficientFunds) {
 			response.UnprocessableEntity(responses.ErrInsuficientFunds).SendJSON()
 
 			return
 		}
 
-		if errors.Is(err, accountuc.ErrIdNotFound) {
+		if errors.Is(err, account.ErrIdNotFound) {
 			response.NotFound(responses.ErrAccountNotFound).SendJSON()
 
 			return

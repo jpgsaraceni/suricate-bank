@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
@@ -87,7 +86,7 @@ func TestDebit(t *testing.T) {
 				amount:    testMoney20,
 			},
 			expectedBalance: 10,
-			err:             accountuc.ErrInsufficientFunds,
+			err:             account.ErrInsufficientFunds,
 		},
 		{
 			name: "fail to debit inexistent account",
@@ -95,7 +94,7 @@ func TestDebit(t *testing.T) {
 				accountId: account.AccountId(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: accountuc.ErrIdNotFound,
+			err: account.ErrIdNotFound,
 		},
 	}
 

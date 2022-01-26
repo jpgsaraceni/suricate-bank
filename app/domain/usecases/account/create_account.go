@@ -36,7 +36,7 @@ func (uc usecase) Create(ctx context.Context, name, cpf, secret string) (account
 	err = uc.repository.Create(ctx, &newAccount)
 
 	if err != nil {
-		if errors.Is(err, ErrDuplicateCpf) {
+		if errors.Is(err, account.ErrDuplicateCpf) {
 
 			return account.Account{}, err
 		}

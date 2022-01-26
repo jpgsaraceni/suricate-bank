@@ -9,7 +9,6 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
@@ -34,13 +33,13 @@ func (r Repository) DebitAccount(ctx context.Context, id account.AccountId, amou
 		if errors.As(err, &pgErr) {
 			if pgErr.SQLState() == checkConstraintViolationCode && pgErr.ConstraintName == balanceConstraint {
 
-				return accountuc.ErrInsufficientFunds
+				return account.ErrInsufficientFunds
 			}
 		}
 
 		if errors.Is(err, pgx.ErrNoRows) {
 
-			return accountuc.ErrIdNotFound
+			return account.ErrIdNotFound
 		}
 
 		return fmt.Errorf("%w: %s", ErrQuery, err.Error())

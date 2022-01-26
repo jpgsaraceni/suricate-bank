@@ -8,10 +8,9 @@ import (
 	"github.com/jackc/pgconn"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 )
 
-func (r Repository) Create(ctx context.Context, account *account.Account) error {
+func (r Repository) Create(ctx context.Context, newAccount *account.Account) error {
 
 	const query = `
 		INSERT INTO
@@ -30,12 +29,12 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 	_, err := r.pool.Exec(
 		ctx,
 		query,
-		account.Id,
-		account.Name,
-		account.Cpf.Value(),
-		account.Secret.Value(),
-		account.Balance.Cents(),
-		account.CreatedAt,
+		newAccount.Id,
+		newAccount.Name,
+		newAccount.Cpf.Value(),
+		newAccount.Secret.Value(),
+		newAccount.Balance.Cents(),
+		newAccount.CreatedAt,
 	)
 
 	const uniqueKeyViolationCode = "23505"
@@ -46,7 +45,7 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 	if errors.As(err, &pgErr) {
 		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
 
-			return accountuc.ErrDuplicateCpf
+			return account.ErrDuplicateCpf
 		}
 	}
 

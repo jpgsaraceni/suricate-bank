@@ -198,7 +198,7 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{}, accountuc.ErrDuplicateCpf
+					return account.Account{}, account.ErrDuplicateCpf
 				},
 			},
 			expectedStatus:  400,

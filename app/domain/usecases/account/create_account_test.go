@@ -39,9 +39,9 @@ func TestCreate(t *testing.T) {
 		{
 			name: "successfully create account",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, account *account.Account) error {
-					account.Id = testAccountId
-					account.CreatedAt = testTime
+				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
+					createdAccount.Id = testAccountId
+					createdAccount.CreatedAt = testTime
 					return nil
 				},
 			},
@@ -90,8 +90,8 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to create new account with cpf that already exists",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, account *account.Account) error {
-					return ErrDuplicateCpf
+				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
+					return account.ErrDuplicateCpf
 				},
 			},
 			args: args{
@@ -100,12 +100,12 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  ErrDuplicateCpf,
+			err:  account.ErrDuplicateCpf,
 		},
 		{
 			name: "creates new account but Repository throws error",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, account *account.Account) error {
+				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
 					return errors.New("")
 				},
 			},

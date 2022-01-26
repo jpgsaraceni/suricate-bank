@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
@@ -86,7 +85,7 @@ func TestCreate(t *testing.T) {
 				Cpf:    repeatedCpf,
 				Secret: testHash,
 			},
-			err: accountuc.ErrDuplicateCpf,
+			err: account.ErrDuplicateCpf,
 		},
 		{
 			name: "successfully create 2 different accounts in sequence",

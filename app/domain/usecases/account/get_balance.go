@@ -11,7 +11,7 @@ import (
 func (uc usecase) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
 	balance, err := uc.repository.GetBalance(ctx, id)
 
-	if errors.Is(err, ErrIdNotFound) {
+	if errors.Is(err, account.ErrIdNotFound) {
 
 		return 0, err
 	}

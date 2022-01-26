@@ -51,12 +51,12 @@ func TestGetBalance(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
 
-					return 0, ErrIdNotFound
+					return 0, account.ErrIdNotFound
 				},
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  ErrIdNotFound,
+			err:  account.ErrIdNotFound,
 		},
 		{
 			name: "repository throws some other error",

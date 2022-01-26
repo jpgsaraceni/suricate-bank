@@ -205,7 +205,7 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: transferuc.MockUsecase{
 				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{}, accountuc.ErrInsufficientFunds
+					return transfer.Transfer{}, account.ErrInsufficientFunds
 				},
 			},
 			expectedStatus: 422,
@@ -229,7 +229,7 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: transferuc.MockUsecase{
 				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{}, accountuc.ErrIdNotFound
+					return transfer.Transfer{}, account.ErrIdNotFound
 				},
 			},
 			expectedStatus: 404,

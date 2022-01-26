@@ -18,12 +18,12 @@ func (uc usecase) Debit(ctx context.Context, id account.AccountId, amount money.
 	err := uc.repository.DebitAccount(ctx, id, amount)
 
 	if err != nil {
-		if errors.Is(err, ErrIdNotFound) {
+		if errors.Is(err, account.ErrIdNotFound) {
 
 			return err
 		}
 
-		if errors.Is(err, ErrInsufficientFunds) {
+		if errors.Is(err, account.ErrInsufficientFunds) {
 
 			return err
 		}

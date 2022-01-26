@@ -82,11 +82,11 @@ func TestCredit(t *testing.T) {
 			},
 			repository: account.MockRepository{
 				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return ErrIdNotFound
+					return account.ErrIdNotFound
 				},
 			},
 			amount: testMoney100,
-			err:    ErrIdNotFound,
+			err:    account.ErrIdNotFound,
 		},
 		{
 			name: "repository error",

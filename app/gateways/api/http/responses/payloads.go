@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 )
 
 type Error struct {
@@ -42,7 +41,7 @@ var (
 		Payload: ErrorPayload{Message: "CPF is invalid"},
 	}
 	ErrCpfAlreadyExists = Error{
-		Err:     accountuc.ErrDuplicateCpf,
+		Err:     account.ErrDuplicateCpf,
 		Payload: ErrorPayload{Message: "CPF already registered to an account"},
 	}
 
