@@ -166,7 +166,7 @@ func TestFetch(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
-					return []account.Account{}, accountuc.ErrFetchAccounts
+					return []account.Account{}, accountuc.ErrRepository
 				},
 			},
 			expectedStatus:  500,

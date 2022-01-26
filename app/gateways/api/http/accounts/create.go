@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 )
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if errors.Is(err, accountspg.ErrCpfAlreadyExists) {
+	if errors.Is(err, accountuc.ErrDuplicateCpf) {
 		response.BadRequest(responses.ErrCpfAlreadyExists).SendJSON()
 
 		return
