@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -35,19 +34,10 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(responses.ErrInvalidAmount).SendJSON()
 	}
 
-	authHeader := r.Header.Get("Authorization")
-	requestToken := strings.ReplaceAll(authHeader, "Bearer ", "")
+	originId, ok := r.Context().Value(middlewares.ContextOriginId).(account.AccountId)
 
-	if requestToken == "" {
-		response.Unauthorized(responses.ErrMissingAuthorizationHeader).SendJSON()
-
-		return
-	}
-
-	originId, err := token.Verify(requestToken)
-
-	if err != nil {
-		response.Forbidden(responses.ErrInvalidToken).SendJSON()
+	if !ok {
+		response.InternalServerError(errors.New("failed to parse origin id token")).SendJSON()
 
 		return
 	}
