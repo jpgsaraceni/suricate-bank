@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
+	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
 
@@ -56,7 +57,7 @@ func TestGetByCpf(t *testing.T) {
 			name:            "fail to get an inexixtent account",
 			cpf:             cpf.Random(),
 			expectedAccount: account.Account{},
-			err:             ErrCpfNotFound,
+			err:             auth.ErrCpfNotFound,
 		},
 	}
 

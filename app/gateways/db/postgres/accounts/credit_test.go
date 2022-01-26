@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
@@ -77,7 +78,7 @@ func TestCredit(t *testing.T) {
 				accountId: account.AccountId(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: ErrQuery,
+			err: accountuc.ErrIdNotFound,
 		},
 	}
 

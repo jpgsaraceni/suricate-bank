@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgconn"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 )
 
 func (r Repository) Create(ctx context.Context, account *account.Account) error {
@@ -45,7 +46,7 @@ func (r Repository) Create(ctx context.Context, account *account.Account) error 
 	if errors.As(err, &pgErr) {
 		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
 
-			return ErrCpfAlreadyExists
+			return accountuc.ErrDuplicateCpf
 		}
 	}
 
