@@ -92,7 +92,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidCreateAccountPayload.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidLoginPayload.Payload.Message},
 		},
 		{
 			name: "fail login service error",
