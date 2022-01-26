@@ -17,9 +17,9 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
 func TestCreate(t *testing.T) {
@@ -53,9 +53,7 @@ func TestCreate(t *testing.T) {
 		Id: account.AccountId(uuid.New()),
 	}
 
-	originIdToken, _ := token.Sign(testAccount1.Id)
-
-	requestHeader := fmt.Sprintf("Bearer %s", originIdToken.Value())
+	originId := testAccount1.Id.String()
 
 	var (
 		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount2.Id.String())
@@ -74,7 +72,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -124,7 +122,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(`{"account_destination_id":"","amount":5}`),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -143,7 +141,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadZeroAmount),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -162,7 +160,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadNegativeAmount),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -170,43 +168,6 @@ func TestCreate(t *testing.T) {
 			expectedStatus: 400,
 			expectedPayload: map[string]interface{}{
 				"title": responses.ErrInvalidAmount.Payload.Message,
-			},
-		},
-		{
-			name: "respond 401 to request missing authorization header",
-			httpIO: httpIO{
-				r: func() *http.Request {
-					request := httptest.NewRequest(
-						http.MethodPost,
-						"/transfers",
-						strings.NewReader(requestPayload),
-					)
-					return request
-				}(),
-				w: httptest.NewRecorder(),
-			},
-			expectedStatus: 401,
-			expectedPayload: map[string]interface{}{
-				"title": responses.ErrMissingAuthorizationHeader.Payload.Message,
-			},
-		},
-		{
-			name: "respond 403 to request with invalid token",
-			httpIO: httpIO{
-				r: func() *http.Request {
-					request := httptest.NewRequest(
-						http.MethodPost,
-						"/transfers",
-						strings.NewReader(requestPayload),
-					)
-					request.Header.Set("Authorization", "not a token")
-					return request
-				}(),
-				w: httptest.NewRecorder(),
-			},
-			expectedStatus: 403,
-			expectedPayload: map[string]interface{}{
-				"title": responses.ErrInvalidToken.Payload.Message,
 			},
 		},
 		{
@@ -218,7 +179,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadRepeatedId),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -237,7 +198,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -261,7 +222,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -285,7 +246,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request.Header.Set("Authorization", requestHeader)
+					request = request.WithContext(context.WithValue(context.Background(), middlewares.ContextOriginId, originId))
 					return request
 				}(),
 				w: httptest.NewRecorder(),

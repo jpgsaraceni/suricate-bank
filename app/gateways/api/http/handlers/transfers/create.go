@@ -34,9 +34,10 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(responses.ErrInvalidAmount).SendJSON()
 	}
 
-	originId, ok := r.Context().Value(middlewares.ContextOriginId).(account.AccountId)
+	originIdString := r.Context().Value(middlewares.ContextOriginId).(string)
+	originId, err := account.ParseAccountId(originIdString)
 
-	if !ok {
+	if err != nil {
 		response.InternalServerError(errors.New("failed to parse origin id token")).SendJSON()
 
 		return
