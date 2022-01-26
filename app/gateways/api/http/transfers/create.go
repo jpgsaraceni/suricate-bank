@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
@@ -31,7 +31,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if createRequest.Amount <= 0 {
+	if createRequest.Amount < 0 {
 		response.BadRequest(responses.ErrInvalidAmount).SendJSON()
 	}
 
@@ -68,23 +68,27 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdTransfer, err := h.usecase.Create(r.Context(), amount, originId, destinationId)
-
-	if errors.Is(err, transferuc.ErrSameAccounts) {
+	if destinationId == originId {
 		response.BadRequest(responses.ErrSameAccounts).SendJSON()
 
 		return
 	}
 
-	if errors.Is(err, money.ErrInsuficientFunds) {
-		response.UnprocessableEntity(responses.ErrInsuficientFunds).SendJSON()
-
-		return
-	}
-
-	// TODO: inexistent origin or destination account
+	createdTransfer, err := h.usecase.Create(r.Context(), amount, originId, destinationId)
 
 	if err != nil {
+		if errors.Is(err, accountuc.ErrInsufficientFunds) {
+			response.UnprocessableEntity(responses.ErrInsuficientFunds).SendJSON()
+
+			return
+		}
+
+		if errors.Is(err, accountuc.ErrIdNotFound) {
+			response.NotFound(responses.ErrAccountNotFound).SendJSON()
+
+			return
+		}
+
 		response.InternalServerError(err).SendJSON()
 
 		return
