@@ -17,7 +17,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
-func TestCreate(t *testing.T) {
+func TestLogin(t *testing.T) {
 	t.Parallel()
 
 	type httpIO struct {
