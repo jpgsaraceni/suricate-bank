@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
+	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 )
 
 type Error struct {
@@ -42,7 +42,7 @@ var (
 		Payload: ErrorPayload{Message: "CPF is invalid"},
 	}
 	ErrCpfAlreadyExists = Error{
-		Err:     accountspg.ErrCpfAlreadyExists,
+		Err:     accountuc.ErrDuplicateCpf,
 		Payload: ErrorPayload{Message: "CPF already registered to an account"},
 	}
 
