@@ -5,10 +5,12 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
+	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestFetch(t *testing.T) {
@@ -21,16 +23,36 @@ func TestFetch(t *testing.T) {
 		err        error
 	}
 
-	var testUUID1, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-	var testUUID3, _ = uuid.NewUUID()
-	var testUUID4, _ = uuid.NewUUID()
-	var testCpf = func(input string) cpf.Cpf {
-		newCpf, _ := cpf.NewCpf(input)
-		return newCpf
-	}
-
-	var errRepository = errors.New("repository error")
+	var (
+		testAccount1 = account.Account{
+			Id:        account.AccountId(uuid.New()),
+			Name:      "Nice name",
+			Cpf:       cpf.Random(),
+			Secret:    hash.Parse("123456"),
+			CreatedAt: time.Now(),
+		}
+		testAccount2 = account.Account{
+			Id:        account.AccountId(uuid.New()),
+			Name:      "Nice name",
+			Cpf:       cpf.Random(),
+			Secret:    hash.Parse("123456"),
+			CreatedAt: time.Now(),
+		}
+		testAccount3 = account.Account{
+			Id:        account.AccountId(uuid.New()),
+			Name:      "Nice name",
+			Cpf:       cpf.Random(),
+			Secret:    hash.Parse("123456"),
+			CreatedAt: time.Now(),
+		}
+		testAccount4 = account.Account{
+			Id:        account.AccountId(uuid.New()),
+			Name:      "Nice name",
+			Cpf:       cpf.Random(),
+			Secret:    hash.Parse("123456"),
+			CreatedAt: time.Now(),
+		}
+	)
 
 	testCases := []testCase{
 		{
@@ -39,20 +61,12 @@ func TestFetch(t *testing.T) {
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{
-						{
-							Id:   account.AccountId(testUUID1),
-							Name: "Account 1",
-							Cpf:  testCpf("220.614.460-35"),
-						},
+						testAccount1,
 					}, nil
 				},
 			},
 			want: []account.Account{
-				{
-					Id:   account.AccountId(testUUID1),
-					Name: "Account 1",
-					Cpf:  testCpf("220.614.460-35"),
-				},
+				testAccount1,
 			},
 		},
 		{
@@ -61,50 +75,18 @@ func TestFetch(t *testing.T) {
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
 					return []account.Account{
-						{
-							Id:   account.AccountId(testUUID1),
-							Name: "Account 1",
-							Cpf:  testCpf("220.614.460-35"),
-						},
-						{
-							Id:   account.AccountId(testUUID2),
-							Name: "Account 2",
-							Cpf:  testCpf("232.598.190-88"),
-						},
-						{
-							Id:   account.AccountId(testUUID3),
-							Name: "Account 3",
-							Cpf:  testCpf("816.413.860-61"),
-						},
-						{
-							Id:   account.AccountId(testUUID4),
-							Name: "Account 4",
-							Cpf:  testCpf("924.498.310-96"),
-						},
+						testAccount1,
+						testAccount2,
+						testAccount3,
+						testAccount4,
 					}, nil
 				},
 			},
 			want: []account.Account{
-				{
-					Id:   account.AccountId(testUUID1),
-					Name: "Account 1",
-					Cpf:  testCpf("220.614.460-35"),
-				},
-				{
-					Id:   account.AccountId(testUUID2),
-					Name: "Account 2",
-					Cpf:  testCpf("232.598.190-88"),
-				},
-				{
-					Id:   account.AccountId(testUUID3),
-					Name: "Account 3",
-					Cpf:  testCpf("816.413.860-61"),
-				},
-				{
-					Id:   account.AccountId(testUUID4),
-					Name: "Account 4",
-					Cpf:  testCpf("924.498.310-96"),
-				},
+				testAccount1,
+				testAccount2,
+				testAccount3,
+				testAccount4,
 			},
 		},
 		{
@@ -122,11 +104,11 @@ func TestFetch(t *testing.T) {
 			repository: account.MockRepository{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 
-					return []account.Account{}, errRepository
+					return []account.Account{}, errors.New("")
 				},
 			},
 			want: []account.Account{},
-			err:  ErrFetchAccounts,
+			err:  ErrRepository,
 		},
 	}
 

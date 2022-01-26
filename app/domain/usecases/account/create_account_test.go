@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 )
 
 func TestCreate(t *testing.T) {
@@ -30,53 +29,36 @@ func TestCreate(t *testing.T) {
 		err        error
 	}
 
-	var testUUID, _ = uuid.NewUUID()
-	var testAccountId = account.AccountId(testUUID)
-	var testTime = time.Now()
-
-	var wantHash = func(secret string) hash.Secret {
-		newHash, _ := hash.NewHash(secret)
-		return newHash
-	}
-
-	var mockCreateSuccess = func(ctx context.Context, account *account.Account) error {
-		account.Id = testAccountId
-		account.CreatedAt = testTime
-		account.Secret = wantHash("hashedpassphrase")
-		return nil
-	}
-
-	var wantCpf = func(input string) cpf.Cpf {
-		newCpf, _ := cpf.NewCpf(input)
-		return newCpf
-	}
-
-	var errRepository = errors.New("repository error")
+	var (
+		testAccountId = account.AccountId(uuid.New())
+		testCpf       = cpf.Random()
+		testTime      = time.Now()
+	)
 
 	testCases := []testCase{
 		{
 			name: "successfully create account",
 			repository: account.MockRepository{
-				OnCreate: mockCreateSuccess,
+				OnCreate: func(ctx context.Context, account *account.Account) error {
+					account.Id = testAccountId
+					account.CreatedAt = testTime
+					return nil
+				},
 			},
 			args: args{
 				name:   "meee",
-				cpf:    "220.614.460-35",
-				secret: "reallygoodpassphrase",
+				cpf:    testCpf.Masked(),
+				secret: "123456",
 			},
 			want: account.Account{
 				Name:      "meee",
-				Cpf:       wantCpf("22061446035"),
+				Cpf:       testCpf,
 				Id:        testAccountId,
 				CreatedAt: testTime,
-				Secret:    wantHash("hashedpassphrase"),
 			},
 		},
 		{
 			name: "fail to create account because password is too short",
-			repository: account.MockRepository{
-				OnCreate: nil,
-			},
 			args: args{
 				name:   "meee",
 				cpf:    "220.614.460-35",
@@ -87,9 +69,6 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "fail to create account because name is too short",
-			repository: account.MockRepository{
-				OnCreate: mockCreateSuccess,
-			},
 			args: args{
 				name:   "me",
 				cpf:    "220.614.460-35",
@@ -100,9 +79,6 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name: "fail to create account because NewAccount returned error",
-			repository: account.MockRepository{
-				OnCreate: mockCreateSuccess,
-			},
 			args: args{
 				name:   "meee",
 				cpf:    "220.614.4",
@@ -112,10 +88,10 @@ func TestCreate(t *testing.T) {
 			err:  account.ErrInvalidCpf,
 		},
 		{
-			name: "creates new account but Repository throws error",
+			name: "fail to create new account with cpf that already exists",
 			repository: account.MockRepository{
 				OnCreate: func(ctx context.Context, account *account.Account) error {
-					return errRepository
+					return ErrDuplicateCpf
 				},
 			},
 			args: args{
@@ -124,7 +100,22 @@ func TestCreate(t *testing.T) {
 				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
-			err:  ErrCreateAccount,
+			err:  ErrDuplicateCpf,
+		},
+		{
+			name: "creates new account but Repository throws error",
+			repository: account.MockRepository{
+				OnCreate: func(ctx context.Context, account *account.Account) error {
+					return errors.New("")
+				},
+			},
+			args: args{
+				name:   "meee",
+				cpf:    "220.614.460-35",
+				secret: "reallygoodpassphrase",
+			},
+			want: account.Account{},
+			err:  ErrRepository,
 		},
 	}
 

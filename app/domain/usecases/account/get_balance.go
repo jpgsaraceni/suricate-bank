@@ -12,12 +12,13 @@ func (uc usecase) GetBalance(ctx context.Context, id account.AccountId) (int, er
 	balance, err := uc.repository.GetBalance(ctx, id)
 
 	if errors.Is(err, ErrIdNotFound) {
+
 		return 0, err
 	}
 
 	if err != nil {
 
-		return 0, fmt.Errorf("%w: %s", ErrGetBalance, err.Error())
+		return 0, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return balance, nil

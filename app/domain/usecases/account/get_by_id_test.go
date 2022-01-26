@@ -21,9 +21,7 @@ func TestGetById(t *testing.T) {
 		err        error
 	}
 
-	var testUUID, _ = uuid.NewUUID()
-
-	var errRepository = errors.New("repository error")
+	var testAccountId = account.AccountId(uuid.New())
 
 	testCases := []testCase{
 		{
@@ -35,21 +33,21 @@ func TestGetById(t *testing.T) {
 					}, nil
 				},
 			},
-			id: account.AccountId(testUUID),
+			id: testAccountId,
 			want: account.Account{
-				Id: account.AccountId(testUUID),
+				Id: testAccountId,
 			},
 		},
 		{
 			name: "fail to get account",
 			repository: account.MockRepository{
 				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{}, errRepository
+					return account.Account{}, errors.New("")
 				},
 			},
-			id:   account.AccountId(testUUID),
+			id:   testAccountId,
 			want: account.Account{},
-			err:  ErrGetAccount,
+			err:  ErrRepository,
 		},
 	}
 

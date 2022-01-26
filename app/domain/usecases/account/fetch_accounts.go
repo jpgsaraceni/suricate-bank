@@ -12,7 +12,7 @@ func (uc usecase) Fetch(ctx context.Context) ([]account.Account, error) {
 
 	if err != nil {
 
-		return []account.Account{}, fmt.Errorf("%w: %s", ErrFetchAccounts, err.Error())
+		return []account.Account{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return accountList, nil

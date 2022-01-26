@@ -29,75 +29,52 @@ func TestDebit(t *testing.T) {
 		testMoney0, _   = money.NewMoney(0)
 	)
 
-	var testUUID, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-
-	var errRepository = errors.New("repository error")
+	var testAccountId = account.AccountId(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "successfully debit 100 from account with 100 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney100,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney100,
-					}, nil
-				},
 				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			amount: testMoney100,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 		},
 		{
 			name: "successfully debit 10 from account with 110 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney110,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney110,
-					}, nil
-				},
 				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			amount: testMoney10,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney100,
 			},
 		},
 		{
 			name: "fail to debit 0 from account with 10 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney10,
-			},
-			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney10,
-					}, nil
-				},
 			},
 			amount: testMoney0,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney10,
 			},
 			err: ErrAmount,
@@ -105,20 +82,12 @@ func TestDebit(t *testing.T) {
 		{
 			name: "fail to debit 0 from account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
-			},
-			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney0,
-					}, nil
-				},
 			},
 			amount: testMoney0,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			err: ErrAmount,
@@ -126,62 +95,53 @@ func TestDebit(t *testing.T) {
 		{
 			name: "fail to debit inexistent account",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID2),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{}, errRepository
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+					return ErrIdNotFound
 				},
 			},
 			amount: testMoney100,
 			want:   account.Account{},
-			err:    ErrGetAccount,
+			err:    ErrIdNotFound,
 		},
 		{
 			name: "fail to debit 10 from account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney0,
-					}, nil
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+					return ErrInsufficientFunds
 				},
 			},
 			amount: testMoney10,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
-			err: ErrAmount,
+			err: ErrInsufficientFunds,
 		},
 		{
 			name: "repository error",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney100,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney100,
-					}, nil
-				},
 				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return errRepository
+					return errors.New("")
 				},
 			},
 			amount: testMoney100,
 			want: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
-			err: ErrDebitAccount,
+			err: ErrRepository,
 		},
 	}
 

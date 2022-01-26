@@ -12,7 +12,7 @@ func (uc usecase) GetById(ctx context.Context, id account.AccountId) (account.Ac
 
 	if err != nil {
 
-		return account, fmt.Errorf("%w: %s", ErrGetAccount, err.Error())
+		return account, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return account, nil

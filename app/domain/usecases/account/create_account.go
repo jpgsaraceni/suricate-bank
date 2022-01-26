@@ -2,6 +2,7 @@ package accountuc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -35,8 +36,12 @@ func (uc usecase) Create(ctx context.Context, name, cpf, secret string) (account
 	err = uc.repository.Create(ctx, &newAccount)
 
 	if err != nil {
+		if errors.Is(err, ErrDuplicateCpf) {
 
-		return account.Account{}, fmt.Errorf("%w: %s", ErrCreateAccount, err.Error())
+			return account.Account{}, err
+		}
+
+		return account.Account{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return newAccount, nil

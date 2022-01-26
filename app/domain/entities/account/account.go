@@ -1,7 +1,7 @@
 package account
 
 import (
-	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,13 +23,6 @@ type Account struct {
 	Balance   money.Money
 	CreatedAt time.Time
 }
-
-var (
-	ErrInvalidCpf  = errors.New("invalid cpf")
-	ErrNewHash     = errors.New("hash failed")
-	ErrEmptyName   = errors.New("empty name")
-	ErrEmptySecret = errors.New("empty secret")
-)
 
 func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 	if len(name) == 0 {
@@ -53,7 +46,7 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 
 	if err != nil {
 
-		return Account{}, ErrNewHash
+		return Account{}, fmt.Errorf("failed to hash secret: %w", err)
 	}
 
 	newMoney, _ := money.NewMoney(0)

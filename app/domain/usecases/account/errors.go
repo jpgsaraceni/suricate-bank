@@ -5,14 +5,13 @@ import (
 )
 
 var (
-	ErrNameLength    = errors.New("invalid name length")
-	ErrShortSecret   = errors.New("invalid password length")
-	ErrCreateAccount = errors.New("failed to save account")
-	ErrCreditAccount = errors.New("failed to save credit to account")
-	ErrDebitAccount  = errors.New("failed to save debit to account")
-	ErrFetchAccounts = errors.New("failed to fetch accounts")
-	ErrGetBalance    = errors.New("failed to get account balance")
-	ErrIdNotFound    = errors.New("account id not found")
-	ErrGetAccount    = errors.New("failed to get account")
-	ErrAmount        = errors.New("invalid amount")
+	ErrInsufficientFunds = errors.New("debit amount is greater than balance")
+	ErrIdNotFound        = errors.New("account id not found")
+	ErrDuplicateCpf      = errors.New("cpf already assigned to existent account")
+
+	ErrNameLength  = errors.New("invalid name length")
+	ErrShortSecret = errors.New("invalid password length")
+	ErrAmount      = errors.New("invalid amount")
+
+	ErrRepository = errors.New("accounts repository error")
 )
