@@ -9,7 +9,6 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -23,16 +22,6 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if createRequest.AccountDestinationId == "" || createRequest.Amount == 0 {
-		response.BadRequest(responses.ErrMissingFieldsTransferPayload).SendJSON()
-
-		return
-	}
-
-	if createRequest.Amount < 0 {
-		response.BadRequest(responses.ErrInvalidAmount).SendJSON()
-	}
-
 	originId, ok := middlewares.OriginIdFromContext(r.Context())
 
 	if !ok {
@@ -41,29 +30,15 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	amount, err := money.NewMoney(createRequest.Amount)
+	transferInstance, ok := createRequest.Validate(&response, originId)
 
-	if err != nil {
-		response.InternalServerError(err).SendJSON()
-
-		return
-	}
-
-	destinationId, err := account.ParseAccountId(createRequest.AccountDestinationId)
-
-	if err != nil {
-		response.BadRequest(responses.ErrInvalidDestinationId).SendJSON()
+	if !ok {
+		response.SendJSON()
 
 		return
 	}
 
-	if destinationId == originId {
-		response.BadRequest(responses.ErrSameAccounts).SendJSON()
-
-		return
-	}
-
-	createdTransfer, err := h.usecase.Create(r.Context(), amount, originId, destinationId)
+	createdTransfer, err := h.usecase.Create(r.Context(), transferInstance.Amount, originId, transferInstance.AccountDestinationId)
 
 	if err != nil {
 		if errors.Is(err, account.ErrInsufficientFunds) {
