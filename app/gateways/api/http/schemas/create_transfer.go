@@ -3,7 +3,6 @@ package schemas
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -68,11 +67,13 @@ func (r CreateTransferRequest) Validate(response *responses.Response, originId a
 		return transfer.Transfer{}, false
 	}
 
-	return transfer.Transfer{
-		Id:                   transfer.TransferId(uuid.New()),
-		AccountOriginId:      originId,
-		AccountDestinationId: destinationId,
-		Amount:               amount,
-		CreatedAt:            time.Now(),
-	}, true
+	transferInstance, err := transfer.NewTransfer(amount, originId, destinationId)
+
+	if err != nil {
+
+		*response = response.InternalServerError(err)
+		return transfer.Transfer{}, false
+	}
+
+	return transferInstance, true
 }

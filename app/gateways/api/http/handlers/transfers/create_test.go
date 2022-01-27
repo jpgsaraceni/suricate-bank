@@ -35,7 +35,7 @@ func TestCreate(t *testing.T) {
 		usecase         transferuc.Usecase
 		httpIO          httpIO
 		expectedStatus  int
-		expectedPayload interface{}
+		expectedPayload map[string]interface{}
 	}
 
 	var (
@@ -54,7 +54,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	var (
-		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount2.Id.String())
+		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":10}`, testAccount2.Id.String())
 		requestPayloadZeroAmount     = fmt.Sprintf(`{"account_destination_id":"%s","amount":0}`, testAccount2.Id.String())
 		requestPayloadNegativeAmount = fmt.Sprintf(`{"account_destination_id":"%s","amount":-10}`, testAccount2.Id.String())
 		requestPayloadRepeatedId     = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount1.Id.String())
@@ -76,14 +76,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{
-						Id:                   testTransferId,
-						AccountOriginId:      testAccount1.Id,
-						AccountDestinationId: testAccount2.Id,
-						Amount:               testMoney10,
-						CreatedAt:            testTime,
-					}, nil
+				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
+					return nil
 				},
 			},
 			expectedStatus: 201,
@@ -203,8 +197,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{}, account.ErrInsufficientFunds
+				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
+					return account.ErrInsufficientFunds
 				},
 			},
 			expectedStatus: 422,
@@ -228,8 +222,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{}, account.ErrIdNotFound
+				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
+					return account.ErrIdNotFound
 				},
 			},
 			expectedStatus: 404,
@@ -253,8 +247,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
-					return transfer.Transfer{}, accountuc.ErrRepository
+				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
+					return accountuc.ErrRepository
 				},
 			},
 			expectedStatus: 500,
@@ -284,6 +278,11 @@ func TestCreate(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
+
+			if got["transfer_id"] != nil {
+				tt.expectedPayload["transfer_id"] = got["transfer_id"]
+				tt.expectedPayload["created_at"] = got["created_at"]
+			}
 
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
