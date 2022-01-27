@@ -60,7 +60,7 @@ func (r Response) UnprocessableEntity(err Error) Response {
 func (r Response) InternalServerError(err error) Response {
 	r.Status = http.StatusInternalServerError
 	r.Error = err
-	r.Payload = ErrInternalServerError
+	r.Payload = ErrInternalServerError.Payload
 	return r
 }
 

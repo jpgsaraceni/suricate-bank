@@ -167,7 +167,7 @@ func TestFetch(t *testing.T) {
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Payload.Message},
 		},
 	}
 

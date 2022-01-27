@@ -11,9 +11,15 @@ type Error struct {
 	Payload ErrorPayload
 }
 
+func (e Error) SetErr(err error) Error {
+	return Error{Payload: e.Payload, Err: err}
+}
+
 var (
 	// generic errors
-	ErrInternalServerError = ErrorPayload{Message: "Internal server error"}
+	ErrInternalServerError = Error{
+		Payload: ErrorPayload{Message: "Internal server error"},
+	}
 
 	// create account request errors
 	ErrMissingFieldsAccountPayload = Error{
