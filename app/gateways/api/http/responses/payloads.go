@@ -11,10 +11,6 @@ type Error struct {
 	Payload ErrorPayload
 }
 
-func (e Error) SetErr(err error) Error {
-	return Error{Payload: e.Payload, Err: err}
-}
-
 var (
 	// generic errors
 	ErrInternalServerError = Error{
