@@ -30,9 +30,9 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transferInstance, ok := createRequest.Validate(&response, originId)
+	transferInstance, response := createRequest.Validate(response, originId)
 
-	if !ok {
+	if response.IsComplete() {
 		response.SendJSON()
 
 		return

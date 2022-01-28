@@ -7,11 +7,12 @@ import (
 )
 
 type Response struct {
-	Status  int
-	Error   error
-	Payload interface{}
-	Headers map[string]string
-	Writer  http.ResponseWriter
+	Status     int
+	Error      error
+	Payload    interface{}
+	Headers    map[string]string
+	Writer     http.ResponseWriter
+	isComplete bool
 }
 
 type ErrorPayload struct {
@@ -20,6 +21,15 @@ type ErrorPayload struct {
 
 func NewResponse(w http.ResponseWriter) Response {
 	return Response{Writer: w}
+}
+
+func (r Response) Complete() Response {
+	r.isComplete = true
+	return r
+}
+
+func (r Response) IsComplete() bool {
+	return r.isComplete
 }
 
 func (r Response) BadRequest(err Error) Response {
