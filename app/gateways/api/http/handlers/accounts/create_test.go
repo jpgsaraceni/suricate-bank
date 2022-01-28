@@ -55,7 +55,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 					return testAccount, nil
 				},
 			},
@@ -108,7 +108,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrShortName.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrLengthName.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with missing cpf",
@@ -150,7 +150,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 					return account.Account{}, account.ErrInvalidCpf
 				},
 			},
@@ -197,7 +197,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 					return account.Account{}, account.ErrDuplicateCpf
 				},
 			},
@@ -216,7 +216,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 					return account.Account{}, accountuc.ErrRepository
 				},
 			},

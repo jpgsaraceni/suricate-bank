@@ -21,37 +21,15 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
-		response.BadRequest(responses.ErrMissingFieldsAccountPayload).SendJSON()
+	accountInstance, response := createRequest.Validate(response)
+
+	if response.IsComplete() {
+		response.SendJSON()
 
 		return
 	}
 
-	cpf := createRequest.Cpf
-
-	if len(cpf) != 11 && len(cpf) != 14 {
-		response.BadRequest(responses.ErrLengthCpf).SendJSON()
-
-		return
-	}
-
-	name := createRequest.Name
-
-	if len(name) < 3 {
-		response.BadRequest(responses.ErrShortName).SendJSON()
-
-		return
-	}
-
-	secret := createRequest.Secret
-
-	if len(secret) < 6 {
-		response.BadRequest(responses.ErrShortSecret).SendJSON()
-
-		return
-	}
-
-	createdAccount, err := h.usecase.Create(r.Context(), name, cpf, secret)
+	persistedAccount, err := h.usecase.Create(r.Context(), accountInstance)
 
 	if errors.Is(err, account.ErrInvalidCpf) {
 		response.BadRequest(responses.ErrInvalidCpf).SendJSON()
@@ -71,5 +49,5 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Created(schemas.CreatedAccountToResponse(createdAccount)).SendJSON()
+	response.Created(schemas.CreatedAccountToResponse(persistedAccount)).SendJSON()
 }

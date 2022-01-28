@@ -30,9 +30,9 @@ var (
 		Err:     errors.New("invalid cpf length"),
 		Payload: ErrorPayload{Message: "CPF must contain 11 numeric digits or 14 digits including 3 symbols"},
 	}
-	ErrShortName = Error{
-		Err:     errors.New("name too short"),
-		Payload: ErrorPayload{Message: "Name must have at least 3 digits"},
+	ErrLengthName = Error{
+		Err:     errors.New("invalid name length"),
+		Payload: ErrorPayload{Message: "Name must have from 3 to 100 digits"},
 	}
 	ErrShortSecret = Error{
 		Err:     errors.New("secret too short"),
