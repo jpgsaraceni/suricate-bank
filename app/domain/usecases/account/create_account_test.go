@@ -15,104 +15,47 @@ import (
 func TestCreate(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		name   string
-		cpf    string
-		secret string
-	}
-
 	type testCase struct {
-		name       string
-		repository account.Repository
-		args       args
-		want       account.Account
-		err        error
+		name            string
+		repository      account.Repository
+		accountInstance account.Account
+		want            account.Account
+		err             error
 	}
 
-	var (
-		testAccountId = account.AccountId(uuid.New())
-		testCpf       = cpf.Random()
-		testTime      = time.Now()
-	)
+	testAccount := account.Account{
+		Id:        account.AccountId(uuid.New()),
+		Name:      "cool name",
+		Cpf:       cpf.Random(),
+		CreatedAt: time.Now(),
+	}
 
 	testCases := []testCase{
 		{
 			name: "successfully create account",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
-					createdAccount.Id = testAccountId
-					createdAccount.CreatedAt = testTime
-					return nil
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
+					return testAccount, nil
 				},
 			},
-			args: args{
-				name:   "meee",
-				cpf:    testCpf.Masked(),
-				secret: "123456",
-			},
-			want: account.Account{
-				Name:      "meee",
-				Cpf:       testCpf,
-				Id:        testAccountId,
-				CreatedAt: testTime,
-			},
-		},
-		{
-			name: "fail to create account because password is too short",
-			args: args{
-				name:   "meee",
-				cpf:    "220.614.460-35",
-				secret: "123",
-			},
-			want: account.Account{},
-			err:  ErrShortSecret,
-		},
-		{
-			name: "fail to create account because name is too short",
-			args: args{
-				name:   "me",
-				cpf:    "220.614.460-35",
-				secret: "123",
-			},
-			want: account.Account{},
-			err:  ErrNameLength,
-		},
-		{
-			name: "fail to create account because NewAccount returned error",
-			args: args{
-				name:   "meee",
-				cpf:    "220.614.4",
-				secret: "123456",
-			},
-			want: account.Account{},
-			err:  account.ErrInvalidCpf,
+			want: testAccount,
 		},
 		{
 			name: "fail to create new account with cpf that already exists",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
-					return account.ErrDuplicateCpf
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
+					return account.Account{}, account.ErrDuplicateCpf
 				},
-			},
-			args: args{
-				name:   "meee",
-				cpf:    "220.614.460-35",
-				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
 			err:  account.ErrDuplicateCpf,
 		},
 		{
-			name: "creates new account but Repository throws error",
+			name: "repository throws error",
 			repository: account.MockRepository{
-				OnCreate: func(ctx context.Context, createdAccount *account.Account) error {
-					return errors.New("")
+				OnCreate: func(ctx context.Context, accountInstance account.Account) (account.Account, error) {
+					return account.Account{}, errors.New("")
 				},
-			},
-			args: args{
-				name:   "meee",
-				cpf:    "220.614.460-35",
-				secret: "reallygoodpassphrase",
 			},
 			want: account.Account{},
 			err:  ErrRepository,
@@ -126,7 +69,7 @@ func TestCreate(t *testing.T) {
 
 			uc := usecase{tt.repository}
 
-			newAccount, err := uc.Create(context.Background(), tt.args.name, tt.args.cpf, tt.args.secret)
+			newAccount, err := uc.Create(context.Background(), tt.accountInstance)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
