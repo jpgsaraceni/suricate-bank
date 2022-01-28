@@ -3,6 +3,7 @@ module github.com/jpgsaraceni/suricate-bank
 go 1.17
 
 require (
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgconn v1.10.1
@@ -22,6 +23,7 @@ require (
 	github.com/docker/docker v20.10.12+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/go-chi/chi v1.5.4
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
