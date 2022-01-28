@@ -76,8 +76,14 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
-					return nil
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return transfer.Transfer{
+						Id:                   testTransferId,
+						AccountOriginId:      testAccount1.Id,
+						AccountDestinationId: testAccount2.Id,
+						Amount:               testMoney10,
+						CreatedAt:            testTime,
+					}, nil
 				},
 			},
 			expectedStatus: 201,
@@ -197,8 +203,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
-					return account.ErrInsufficientFunds
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return transfer.Transfer{}, account.ErrInsufficientFunds
 				},
 			},
 			expectedStatus: 422,
@@ -222,8 +228,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
-					return account.ErrIdNotFound
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return transfer.Transfer{}, account.ErrIdNotFound
 				},
 			},
 			expectedStatus: 404,
@@ -247,8 +253,8 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			usecase: transferuc.MockUsecase{
-				OnCreate: func(ctx context.Context, transfer transfer.Transfer) error {
-					return accountuc.ErrRepository
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return transfer.Transfer{}, accountuc.ErrRepository
 				},
 			},
 			expectedStatus: 500,
@@ -278,11 +284,6 @@ func TestCreate(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
-			if got["transfer_id"] != nil {
-				tt.expectedPayload["transfer_id"] = got["transfer_id"]
-				tt.expectedPayload["created_at"] = got["created_at"]
-			}
 
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)

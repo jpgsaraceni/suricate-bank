@@ -38,7 +38,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.usecase.Create(r.Context(), transferInstance)
+	persistedTransfer, err := h.usecase.Create(r.Context(), transferInstance)
 
 	if err != nil {
 		if errors.Is(err, account.ErrInsufficientFunds) {
@@ -58,5 +58,5 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Created(schemas.CreatedTransferToResponse(transferInstance)).SendJSON()
+	response.Created(schemas.CreatedTransferToResponse(persistedTransfer)).SendJSON()
 }

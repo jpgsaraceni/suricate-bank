@@ -3,6 +3,7 @@ package transferuc
 import (
 	"context"
 	"errors"
+	"reflect"
 	"testing"
 	"time"
 
@@ -17,12 +18,13 @@ func TestCreate(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name             string
-		repository       transfer.Repository
-		debiter          Debiter
-		crediter         Crediter
-		transferInstance transfer.Transfer
-		err              error
+		name              string
+		repository        transfer.Repository
+		debiter           Debiter
+		crediter          Crediter
+		transferInstance  transfer.Transfer
+		persistedTransfer transfer.Transfer
+		err               error
 	}
 
 	var testUUID1, _ = uuid.NewUUID()
@@ -56,6 +58,13 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			transferInstance: transfer.Transfer{
+				Id:                   transfer.TransferId(testUUID3),
+				Amount:               testMoney100,
+				AccountOriginId:      account.AccountId(testUUID1),
+				AccountDestinationId: account.AccountId(testUUID2),
+				CreatedAt:            testTime,
+			},
+			persistedTransfer: transfer.Transfer{
 				Id:                   transfer.TransferId(testUUID3),
 				Amount:               testMoney100,
 				AccountOriginId:      account.AccountId(testUUID1),
@@ -116,10 +125,14 @@ func TestCreate(t *testing.T) {
 
 			uc := usecase{tt.repository, tt.crediter, tt.debiter}
 
-			err := uc.Create(context.Background(), tt.transferInstance)
+			gotTransfer, err := uc.Create(context.Background(), tt.transferInstance)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected %v", err, tt.err)
+			}
+
+			if !reflect.DeepEqual(gotTransfer, tt.persistedTransfer) {
+				t.Errorf("got transfer %v expected transfer %v", gotTransfer, tt.persistedTransfer)
 			}
 		})
 	}

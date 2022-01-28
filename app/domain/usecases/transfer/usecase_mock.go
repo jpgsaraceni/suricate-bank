@@ -9,14 +9,14 @@ import (
 )
 
 type MockUsecase struct {
-	OnCreate func(ctx context.Context, transfer transfer.Transfer) error
+	OnCreate func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error)
 	OnFetch  func(ctx context.Context) ([]transfer.Transfer, error)
 }
 
 var _ Usecase = (*MockUsecase)(nil)
 
-func (mock MockUsecase) Create(ctx context.Context, transfer transfer.Transfer) error {
-	return mock.OnCreate(ctx, transfer)
+func (mock MockUsecase) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+	return mock.OnCreate(ctx, transferInstance)
 }
 
 func (mock MockUsecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) {

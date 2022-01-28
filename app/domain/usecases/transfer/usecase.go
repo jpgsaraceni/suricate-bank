@@ -23,6 +23,6 @@ type Crediter interface {
 }
 
 type Usecase interface {
-	Create(ctx context.Context, transfer transfer.Transfer) error
+	Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error)
 	Fetch(ctx context.Context) ([]transfer.Transfer, error)
 }

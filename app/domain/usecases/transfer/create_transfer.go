@@ -7,32 +7,32 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 )
 
-func (uc usecase) Create(ctx context.Context, transfer transfer.Transfer) error {
+func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
 
-	err := uc.Debiter.Debit(ctx, transfer.AccountOriginId, transfer.Amount)
-
-	if err != nil {
-
-		return fmt.Errorf("failed to debit origin account: %w", err)
-	}
-
-	err = uc.Crediter.Credit(ctx, transfer.AccountDestinationId, transfer.Amount)
+	err := uc.Debiter.Debit(ctx, transferInstance.AccountOriginId, transferInstance.Amount)
 
 	if err != nil {
-		rollback(ctx, uc, false, true, transfer)
 
-		return fmt.Errorf("failed to credit destination account: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
 	}
 
-	err = uc.Repository.Create(ctx, &transfer)
+	err = uc.Crediter.Credit(ctx, transferInstance.AccountDestinationId, transferInstance.Amount)
 
 	if err != nil {
-		rollback(ctx, uc, true, true, transfer)
+		rollback(ctx, uc, false, true, transferInstance)
 
-		return fmt.Errorf("%w: %s", ErrRepository, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
 	}
 
-	return nil
+	err = uc.Repository.Create(ctx, &transferInstance)
+
+	if err != nil {
+		rollback(ctx, uc, true, true, transferInstance)
+
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
+	}
+
+	return transferInstance, nil
 }
 
 func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, transfer transfer.Transfer) {
