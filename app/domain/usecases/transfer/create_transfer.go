@@ -24,7 +24,7 @@ func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer
 		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
 	}
 
-	err = uc.Repository.Create(ctx, &transferInstance)
+	persistedTransfer, err := uc.Repository.Create(ctx, transferInstance)
 
 	if err != nil {
 		rollback(ctx, uc, true, true, transferInstance)
@@ -32,7 +32,7 @@ func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
-	return transferInstance, nil
+	return persistedTransfer, nil
 }
 
 func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, transfer transfer.Transfer) {

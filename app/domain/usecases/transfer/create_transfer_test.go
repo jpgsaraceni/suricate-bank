@@ -18,33 +18,30 @@ func TestCreate(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name              string
-		repository        transfer.Repository
-		debiter           Debiter
-		crediter          Crediter
-		transferInstance  transfer.Transfer
-		persistedTransfer transfer.Transfer
-		err               error
+		name       string
+		repository transfer.Repository
+		debiter    Debiter
+		crediter   Crediter
+		want       transfer.Transfer
+		err        error
 	}
 
-	var testUUID1, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-	var testUUID3, _ = uuid.NewUUID()
+	testMoney100, _ := money.NewMoney(100)
 
-	var testTransferId = transfer.TransferId(testUUID3)
-
-	var testMoney100, _ = money.NewMoney(100)
-
-	var testTime = time.Now()
+	testTransfer := transfer.Transfer{
+		Id:                   transfer.TransferId(uuid.New()),
+		AccountOriginId:      account.AccountId(uuid.New()),
+		AccountDestinationId: account.AccountId(uuid.New()),
+		Amount:               testMoney100,
+		CreatedAt:            time.Now(),
+	}
 
 	testCases := []testCase{
 		{
 			name: "create transfer",
 			repository: transfer.MockRepository{
-				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
-					transfer.Id = testTransferId
-					transfer.CreatedAt = testTime
-					return nil
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return testTransfer, nil
 				},
 			},
 			debiter: MockDebiter{
@@ -57,20 +54,7 @@ func TestCreate(t *testing.T) {
 					return nil
 				},
 			},
-			transferInstance: transfer.Transfer{
-				Id:                   transfer.TransferId(testUUID3),
-				Amount:               testMoney100,
-				AccountOriginId:      account.AccountId(testUUID1),
-				AccountDestinationId: account.AccountId(testUUID2),
-				CreatedAt:            testTime,
-			},
-			persistedTransfer: transfer.Transfer{
-				Id:                   transfer.TransferId(testUUID3),
-				Amount:               testMoney100,
-				AccountOriginId:      account.AccountId(testUUID1),
-				AccountDestinationId: account.AccountId(testUUID2),
-				CreatedAt:            testTime,
-			},
+			want: testTransfer,
 		},
 		{
 			name: "fail to debit from origin",
@@ -98,10 +82,8 @@ func TestCreate(t *testing.T) {
 		{
 			name: "repository error creating transfer",
 			repository: transfer.MockRepository{
-				OnCreate: func(ctx context.Context, transfer *transfer.Transfer) error {
-					transfer.Id = testTransferId
-					transfer.CreatedAt = testTime
-					return ErrRepository
+				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
+					return transfer.Transfer{}, ErrRepository
 				},
 			},
 			debiter: MockDebiter{
@@ -125,14 +107,14 @@ func TestCreate(t *testing.T) {
 
 			uc := usecase{tt.repository, tt.crediter, tt.debiter}
 
-			gotTransfer, err := uc.Create(context.Background(), tt.transferInstance)
+			gotTransfer, err := uc.Create(context.Background(), tt.want)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected %v", err, tt.err)
 			}
 
-			if !reflect.DeepEqual(gotTransfer, tt.persistedTransfer) {
-				t.Errorf("got transfer %v expected transfer %v", gotTransfer, tt.persistedTransfer)
+			if !reflect.DeepEqual(gotTransfer, tt.want) {
+				t.Errorf("got transfer %v expected transfer %v", gotTransfer, tt.want)
 			}
 		})
 	}
