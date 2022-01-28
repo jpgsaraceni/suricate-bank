@@ -86,7 +86,7 @@ func TestDebit(t *testing.T) {
 				amount:    testMoney20,
 			},
 			expectedBalance: 10,
-			err:             ErrQuery,
+			err:             account.ErrInsufficientFunds,
 		},
 		{
 			name: "fail to debit inexistent account",
@@ -94,7 +94,7 @@ func TestDebit(t *testing.T) {
 				accountId: account.AccountId(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: ErrQuery,
+			err: account.ErrIdNotFound,
 		},
 	}
 

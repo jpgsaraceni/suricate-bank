@@ -151,9 +151,8 @@ func TestFetch(t *testing.T) {
 			},
 		},
 		{
-			name:              "fail to fetch 0 transfers",
+			name:              "fetch 0 transfers",
 			expectedTransfers: nil,
-			err:               ErrEmptyFetch,
 		},
 	}
 

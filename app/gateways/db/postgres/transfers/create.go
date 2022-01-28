@@ -7,7 +7,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 )
 
-func (r Repository) Create(ctx context.Context, transfer *transfer.Transfer) error {
+func (r Repository) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
 
 	const query = `
 		INSERT INTO
@@ -19,23 +19,37 @@ func (r Repository) Create(ctx context.Context, transfer *transfer.Transfer) err
 				created_at
 			)
 		VALUES
-			($1, $2, $3, $4, $5);
+			($1, $2, $3, $4, $5)
+		RETURNING 
+			id,
+			account_origin_id,
+			account_destination_id,
+			amount,
+			created_at;
 	`
 
-	_, err := r.pool.Exec(
+	var transferReturned transfer.Transfer
+
+	err := r.pool.QueryRow(
 		ctx,
 		query,
-		transfer.Id,
-		transfer.AccountOriginId,
-		transfer.AccountDestinationId,
-		transfer.Amount.Cents(),
-		transfer.CreatedAt,
+		transferInstance.Id,
+		transferInstance.AccountOriginId,
+		transferInstance.AccountDestinationId,
+		transferInstance.Amount.Cents(),
+		transferInstance.CreatedAt,
+	).Scan(
+		&transferReturned.Id,
+		&transferReturned.AccountOriginId,
+		&transferReturned.AccountDestinationId,
+		&transferReturned.Amount,
+		&transferReturned.CreatedAt,
 	)
 
 	if err != nil {
 
-		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 
-	return nil
+	return transferReturned, nil
 }

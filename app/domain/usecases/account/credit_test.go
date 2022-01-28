@@ -27,25 +27,16 @@ func TestCredit(t *testing.T) {
 		testMoney0, _   = money.NewMoney(0)
 	)
 
-	var testUUID, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-
-	var errRepository = errors.New("repository error")
+	var testAccountId = account.AccountId(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "successfully credit 100 to account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney0,
-					}, nil
-				},
 				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
@@ -55,16 +46,10 @@ func TestCredit(t *testing.T) {
 		{
 			name: "successfully credit 100 to account with 10 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney10,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney10,
-					}, nil
-				},
 				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
@@ -74,16 +59,8 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit 0 to account with 10 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney10,
-			},
-			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney10,
-					}, nil
-				},
 			},
 			amount: testMoney0,
 			err:    ErrAmount,
@@ -91,16 +68,8 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit 0 to account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
-			},
-			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney0,
-					}, nil
-				},
 			},
 			amount: testMoney0,
 			err:    ErrAmount,
@@ -108,36 +77,30 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit inexistent account",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID2),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{}, errRepository
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+					return account.ErrIdNotFound
 				},
 			},
 			amount: testMoney100,
-			err:    ErrGetAccount,
+			err:    account.ErrIdNotFound,
 		},
 		{
 			name: "repository error",
 			testAccount: account.Account{
-				Id:      account.AccountId(testUUID),
+				Id:      testAccountId,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
-					return account.Account{
-						Id:      account.AccountId(testUUID),
-						Balance: testMoney0,
-					}, nil
-				},
 				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return errRepository
+					return errors.New("")
 				},
 			},
 			amount: testMoney100,
-			err:    ErrCreditAccount,
+			err:    ErrRepository,
 		},
 	}
 

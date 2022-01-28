@@ -22,6 +22,10 @@ func NewResponse(w http.ResponseWriter) Response {
 	return Response{Writer: w}
 }
 
+func (r Response) IsComplete() bool {
+	return r.Status > 0
+}
+
 func (r Response) BadRequest(err Error) Response {
 	r.Status = http.StatusBadRequest
 	r.Error = err.Err
@@ -36,8 +40,22 @@ func (r Response) Unauthorized(err Error) Response {
 	return r
 }
 
+func (r Response) Forbidden(err Error) Response {
+	r.Status = http.StatusForbidden
+	r.Error = err.Err
+	r.Payload = err.Payload
+	return r
+}
+
 func (r Response) NotFound(err Error) Response {
 	r.Status = http.StatusNotFound
+	r.Error = err.Err
+	r.Payload = err.Payload
+	return r
+}
+
+func (r Response) UnprocessableEntity(err Error) Response {
+	r.Status = http.StatusUnprocessableEntity
 	r.Error = err.Err
 	r.Payload = err.Payload
 	return r
@@ -46,7 +64,7 @@ func (r Response) NotFound(err Error) Response {
 func (r Response) InternalServerError(err error) Response {
 	r.Status = http.StatusInternalServerError
 	r.Error = err
-	r.Payload = ErrInternalServerError
+	r.Payload = ErrInternalServerError.Payload
 	return r
 }
 

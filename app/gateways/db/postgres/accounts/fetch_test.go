@@ -98,7 +98,6 @@ func TestFetch(t *testing.T) {
 		{
 			name:             "fail to fetch 0 accounts",
 			expectedAccounts: nil,
-			err:              ErrEmptyFetch,
 		},
 		{
 			name: "fail to scan accounts with invalid data",

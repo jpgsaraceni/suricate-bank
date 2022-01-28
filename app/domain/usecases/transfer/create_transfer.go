@@ -4,59 +4,44 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc Usecase) Create(ctx context.Context, amount money.Money, originId, destinationId account.AccountId) (transfer.Transfer, error) {
+func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
 
-	if originId == destinationId {
-
-		return transfer.Transfer{}, ErrSameAccounts
-	}
-
-	err := uc.Debiter.Debit(ctx, originId, amount)
+	err := uc.Debiter.Debit(ctx, transferInstance.AccountOriginId, transferInstance.Amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrDebitOrigin, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
 	}
 
-	err = uc.Crediter.Credit(ctx, destinationId, amount)
+	err = uc.Crediter.Credit(ctx, transferInstance.AccountDestinationId, transferInstance.Amount)
 
 	if err != nil {
-		rollback(ctx, uc, false, true, originId, destinationId, amount)
+		rollback(ctx, uc, false, true, transferInstance)
 
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreditDestination, err.Error())
+		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
 	}
 
-	newTransfer, err := transfer.NewTransfer(amount, originId, destinationId)
+	persistedTransfer, err := uc.Repository.Create(ctx, transferInstance)
 
 	if err != nil {
-		rollback(ctx, uc, true, true, originId, destinationId, amount)
+		rollback(ctx, uc, true, true, transferInstance)
 
-		return transfer.Transfer{}, fmt.Errorf("failed to create transfer instance: %w", err)
+		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
-	err = uc.Repository.Create(ctx, &newTransfer)
-
-	if err != nil {
-		rollback(ctx, uc, true, true, originId, destinationId, amount)
-
-		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
-	}
-
-	return newTransfer, nil
+	return persistedTransfer, nil
 }
 
-func rollback(ctx context.Context, uc Usecase, hasCredited, hasDebited bool, originId, destinationId account.AccountId, amount money.Money) {
+func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, transfer transfer.Transfer) {
 	if hasCredited {
-		uc.Debiter.Debit(ctx, destinationId, amount)
+		uc.Debiter.Debit(ctx, transfer.AccountOriginId, transfer.Amount)
 	}
 
 	if hasDebited {
-		uc.Crediter.Credit(ctx, originId, amount)
+		uc.Crediter.Credit(ctx, transfer.AccountDestinationId, transfer.Amount)
 	}
 }
 

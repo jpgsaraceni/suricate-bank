@@ -6,7 +6,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-type FetchResponse struct {
+type FetchAccountsResponse struct {
 	Accounts []FetchedAccount `json:"accounts"`
 }
 
@@ -18,7 +18,7 @@ type FetchedAccount struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func AccountsToResponse(accountList []account.Account) FetchResponse {
+func AccountsToResponse(accountList []account.Account) FetchAccountsResponse {
 	accountResponse := make([]FetchedAccount, 0, len(accountList))
 	for _, account := range accountList {
 		accountResponse = append(accountResponse, FetchedAccount{
@@ -29,5 +29,5 @@ func AccountsToResponse(accountList []account.Account) FetchResponse {
 			CreatedAt: account.CreatedAt,
 		})
 	}
-	return FetchResponse{Accounts: accountResponse}
+	return FetchAccountsResponse{Accounts: accountResponse}
 }

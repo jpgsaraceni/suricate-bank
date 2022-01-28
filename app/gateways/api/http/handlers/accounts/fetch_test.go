@@ -76,30 +76,9 @@ func TestFetch(t *testing.T) {
 			usecase: accountuc.MockUsecase{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
 					return []account.Account{
-						{
-							Id:        testAccount1.Id,
-							Name:      testAccount1.Name,
-							Cpf:       testAccount1.Cpf,
-							Secret:    testAccount1.Secret,
-							Balance:   testAccount1.Balance,
-							CreatedAt: testAccount1.CreatedAt,
-						},
-						{
-							Id:        testAccount2.Id,
-							Name:      testAccount2.Name,
-							Cpf:       testAccount2.Cpf,
-							Secret:    testAccount2.Secret,
-							Balance:   testAccount2.Balance,
-							CreatedAt: testAccount2.CreatedAt,
-						},
-						{
-							Id:        testAccount3.Id,
-							Name:      testAccount3.Name,
-							Cpf:       testAccount3.Cpf,
-							Secret:    testAccount3.Secret,
-							Balance:   testAccount3.Balance,
-							CreatedAt: testAccount3.CreatedAt,
-						},
+						testAccount1,
+						testAccount2,
+						testAccount3,
 					}, nil
 				},
 			},
@@ -166,11 +145,11 @@ func TestFetch(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnFetch: func(ctx context.Context) ([]account.Account, error) {
-					return []account.Account{}, accountuc.ErrFetchAccounts
+					return []account.Account{}, accountuc.ErrRepository
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Payload.Message},
 		},
 	}
 

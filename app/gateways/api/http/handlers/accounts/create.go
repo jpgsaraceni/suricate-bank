@@ -8,22 +8,21 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 )
 
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 
-	var createRequest schemas.CreateRequest
+	var createRequest schemas.CreateAccountRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createRequest); err != nil {
-		response.BadRequest(responses.ErrInvalidRequestPayload).SendJSON()
+		response.BadRequest(responses.ErrInvalidCreateAccountPayload).SendJSON()
 
 		return
 	}
 
 	if createRequest.Name == "" || createRequest.Cpf == "" || createRequest.Secret == "" {
-		response.BadRequest(responses.ErrMissingFields).SendJSON()
+		response.BadRequest(responses.ErrMissingFieldsAccountPayload).SendJSON()
 
 		return
 	}
@@ -60,7 +59,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if errors.Is(err, accountspg.ErrCpfAlreadyExists) {
+	if errors.Is(err, account.ErrDuplicateCpf) {
 		response.BadRequest(responses.ErrCpfAlreadyExists).SendJSON()
 
 		return

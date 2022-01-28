@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
-	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
@@ -63,7 +62,7 @@ func TestGetBalance(t *testing.T) {
 			name:            "fail to get balance from inexistent account",
 			accountId:       account.AccountId(uuid.New()),
 			expectedBalance: 0,
-			err:             accountuc.ErrIdNotFound,
+			err:             account.ErrIdNotFound,
 		},
 	}
 

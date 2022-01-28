@@ -2,6 +2,7 @@ package transferspg
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
@@ -18,16 +19,25 @@ func TestCreate(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name      string
-		runBefore func(testPool *pgxpool.Pool) error
-		transfer  *transfer.Transfer
-		err       error
+		name             string
+		runBefore        func(testPool *pgxpool.Pool) error
+		transferInstance transfer.Transfer
+		want             transfer.Transfer
+		err              error
 	}
 
 	var (
 		testAccountIdInitial0  = account.AccountId(uuid.New())
 		testAccountIdInitial10 = account.AccountId(uuid.New())
 	)
+
+	testTransfer := transfer.Transfer{
+		Id:                   transfer.TransferId(uuid.New()),
+		AccountOriginId:      testAccountIdInitial10,
+		AccountDestinationId: testAccountIdInitial0,
+		Amount:               testMoney10,
+		CreatedAt:            testTime,
+	}
 
 	testCases := []testCase{
 		{
@@ -49,13 +59,8 @@ func TestCreate(t *testing.T) {
 					},
 				)
 			},
-			transfer: &transfer.Transfer{
-				Id:                   transfer.TransferId(uuid.New()),
-				AccountOriginId:      testAccountIdInitial10,
-				AccountDestinationId: testAccountIdInitial0,
-				Amount:               testMoney10,
-				CreatedAt:            testTime,
-			},
+			transferInstance: testTransfer,
+			want:             testTransfer,
 		},
 		{
 			name: "fail transfer from inexistent account",
@@ -63,8 +68,8 @@ func TestCreate(t *testing.T) {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
 					[]account.AccountId{
+						account.AccountId(uuid.New()),
 						testAccountIdInitial0,
-						testAccountIdInitial10,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -76,14 +81,9 @@ func TestCreate(t *testing.T) {
 					},
 				)
 			},
-			transfer: &transfer.Transfer{
-				Id:                   transfer.TransferId(uuid.New()),
-				AccountOriginId:      account.AccountId(uuid.New()),
-				AccountDestinationId: testAccountIdInitial0,
-				Amount:               testMoney10,
-				CreatedAt:            testTime,
-			},
-			err: ErrQuery,
+			transferInstance: testTransfer,
+			want:             transfer.Transfer{},
+			err:              ErrCreateTransfer,
 		},
 		{
 			name: "fail transfer to inexistent account",
@@ -91,8 +91,8 @@ func TestCreate(t *testing.T) {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
 					[]account.AccountId{
-						testAccountIdInitial0,
 						testAccountIdInitial10,
+						account.AccountId(uuid.New()),
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -104,14 +104,9 @@ func TestCreate(t *testing.T) {
 					},
 				)
 			},
-			transfer: &transfer.Transfer{
-				Id:                   transfer.TransferId(uuid.New()),
-				AccountOriginId:      testAccountIdInitial10,
-				AccountDestinationId: account.AccountId(uuid.New()),
-				Amount:               testMoney10,
-				CreatedAt:            testTime,
-			},
-			err: ErrQuery,
+			transferInstance: testTransfer,
+			want:             transfer.Transfer{},
+			err:              ErrCreateTransfer,
 		},
 		{
 			name: "fail transfer to same account",
@@ -132,14 +127,15 @@ func TestCreate(t *testing.T) {
 					},
 				)
 			},
-			transfer: &transfer.Transfer{
+			transferInstance: transfer.Transfer{
 				Id:                   transfer.TransferId(uuid.New()),
 				AccountOriginId:      testAccountIdInitial10,
 				AccountDestinationId: testAccountIdInitial10,
 				Amount:               testMoney10,
 				CreatedAt:            testTime,
 			},
-			err: ErrQuery,
+			want: transfer.Transfer{},
+			err:  ErrCreateTransfer,
 		},
 	}
 
@@ -161,9 +157,15 @@ func TestCreate(t *testing.T) {
 				}
 			}
 
-			if err := testRepo.Create(testContext, tt.transfer); !errors.Is(err, tt.err) {
+			gotTransfer, err := testRepo.Create(testContext, tt.transferInstance)
 
-				t.Fatalf("got error: %s expected error: %s", err, tt.err)
+			if !errors.Is(err, tt.err) {
+
+				t.Fatalf("\ngot error: \n%s \nexpected error: \n%s", err, tt.err)
+			}
+
+			if !reflect.DeepEqual(gotTransfer, tt.want) {
+				t.Fatalf("got %v expected %v", gotTransfer, tt.want)
 			}
 		})
 	}

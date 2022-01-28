@@ -14,7 +14,6 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
-	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -81,7 +80,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidRequestPayload.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidCreateAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request missing name",
@@ -95,7 +94,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short name",
@@ -123,7 +122,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with invalid cpf length",
@@ -170,7 +169,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFields.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrMissingFieldsAccountPayload.Payload.Message},
 		},
 		{
 			name: "respond 400 to request with short secret",
@@ -199,7 +198,7 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{}, accountspg.ErrCpfAlreadyExists
+					return account.Account{}, account.ErrDuplicateCpf
 				},
 			},
 			expectedStatus:  400,
@@ -218,11 +217,11 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: accountuc.MockUsecase{
 				OnCreate: func(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-					return account.Account{}, accountuc.ErrCreateAccount
+					return account.Account{}, accountuc.ErrRepository
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Payload.Message},
 		},
 	}
 

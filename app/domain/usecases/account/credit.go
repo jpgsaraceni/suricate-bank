@@ -2,6 +2,7 @@ package accountuc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
@@ -9,25 +10,20 @@ import (
 )
 
 func (uc usecase) Credit(ctx context.Context, id account.AccountId, amount money.Money) error {
-	account, err := uc.GetById(ctx, id)
+	if amount.Cents() == 0 {
 
-	if err != nil {
-
-		return fmt.Errorf("failed to get account by id: %w", err)
+		return ErrAmount
 	}
 
-	err = account.Balance.Add(amount.Cents())
+	err := uc.repository.CreditAccount(ctx, id, amount)
 
 	if err != nil {
+		if errors.Is(err, account.ErrIdNotFound) {
 
-		return fmt.Errorf("%w: %s", ErrAmount, err.Error())
-	}
+			return err
+		}
 
-	err = uc.repository.CreditAccount(ctx, account.Id, amount)
-
-	if err != nil {
-
-		return fmt.Errorf("%w: %s", ErrCreditAccount, err.Error())
+		return fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
 	return nil

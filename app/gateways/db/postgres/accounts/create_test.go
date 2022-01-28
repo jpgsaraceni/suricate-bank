@@ -85,7 +85,7 @@ func TestCreate(t *testing.T) {
 				Cpf:    repeatedCpf,
 				Secret: testHash,
 			},
-			err: ErrCpfAlreadyExists,
+			err: account.ErrDuplicateCpf,
 		},
 		{
 			name: "successfully create 2 different accounts in sequence",

@@ -21,9 +21,7 @@ func TestGetBalance(t *testing.T) {
 		err        error
 	}
 
-	var testUUID, _ = uuid.NewUUID()
-
-	var errRepository = errors.New("repository error")
+	var testAccountId = account.AccountId(uuid.New())
 
 	testCases := []testCase{
 		{
@@ -34,7 +32,7 @@ func TestGetBalance(t *testing.T) {
 					return 0, nil
 				},
 			},
-			id:   account.AccountId(testUUID),
+			id:   testAccountId,
 			want: 0,
 		},
 		{
@@ -45,20 +43,32 @@ func TestGetBalance(t *testing.T) {
 					return 100, nil
 				},
 			},
-			id:   account.AccountId(testUUID),
+			id:   testAccountId,
 			want: 100,
 		},
 		{
-			name: "repository throws error",
+			name: "repository throws error id not found",
 			repository: account.MockRepository{
 				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
 
-					return 0, errRepository
+					return 0, account.ErrIdNotFound
 				},
 			},
 			id:   account.AccountId(uuid.Nil),
 			want: 0,
-			err:  ErrGetBalance,
+			err:  account.ErrIdNotFound,
+		},
+		{
+			name: "repository throws some other error",
+			repository: account.MockRepository{
+				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+
+					return 0, errors.New("")
+				},
+			},
+			id:   account.AccountId(uuid.Nil),
+			want: 0,
+			err:  ErrRepository,
 		},
 	}
 

@@ -17,7 +17,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
-func TestCreate(t *testing.T) {
+func TestLogin(t *testing.T) {
 	t.Parallel()
 
 	type httpIO struct {
@@ -92,7 +92,7 @@ func TestCreate(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			expectedStatus:  400,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidRequestPayload.Payload.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInvalidLoginPayload.Payload.Message},
 		},
 		{
 			name: "fail login service error",
@@ -111,7 +111,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			expectedStatus:  500,
-			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Message},
+			expectedPayload: map[string]interface{}{"title": responses.ErrInternalServerError.Payload.Message},
 		},
 	}
 

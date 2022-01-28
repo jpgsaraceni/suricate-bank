@@ -77,7 +77,7 @@ func TestCredit(t *testing.T) {
 				accountId: account.AccountId(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: ErrQuery,
+			err: account.ErrIdNotFound,
 		},
 	}
 

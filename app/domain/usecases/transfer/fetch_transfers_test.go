@@ -20,12 +20,10 @@ func TestFetch(t *testing.T) {
 		err        error
 	}
 
-	var testUUID1, _ = uuid.NewUUID()
-	var testUUID2, _ = uuid.NewUUID()
-	var testUUID3, _ = uuid.NewUUID()
-	var testUUID4, _ = uuid.NewUUID()
-
-	var errRepository = errors.New("repository error")
+	var testUUID1 = uuid.New()
+	var testUUID2 = uuid.New()
+	var testUUID3 = uuid.New()
+	var testUUID4 = uuid.New()
 
 	testCases := []testCase{
 		{
@@ -83,26 +81,25 @@ func TestFetch(t *testing.T) {
 			},
 		},
 		{
-			name: "no existent transfers error",
+			name: "fetch zero transfers",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
-					return []transfer.Transfer{}, nil
+					return nil, nil
 				},
 			},
-			want: []transfer.Transfer{},
-			err:  ErrNoTransfersToFetch,
+			want: nil,
 		},
 		{
 			name: "repository throws error",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
 
-					return []transfer.Transfer{}, errRepository
+					return []transfer.Transfer{}, ErrRepository
 				},
 			},
 			want: []transfer.Transfer{},
-			err:  ErrFetchTransfers,
+			err:  ErrRepository,
 		},
 	}
 
@@ -111,7 +108,7 @@ func TestFetch(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			uc := Usecase{tt.repository, MockCrediter{}, MockDebiter{}}
+			uc := usecase{tt.repository, MockCrediter{}, MockDebiter{}}
 
 			transfersList, err := uc.Fetch(context.Background())
 

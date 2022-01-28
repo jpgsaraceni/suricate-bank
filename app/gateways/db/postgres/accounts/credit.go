@@ -2,9 +2,11 @@ package accountspg
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -22,6 +24,10 @@ func (r Repository) CreditAccount(ctx context.Context, id account.AccountId, amo
 	err := r.pool.QueryRow(ctx, query, amount.Cents(), id).Scan(&updateId)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+
+			return account.ErrIdNotFound
+		}
 
 		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}

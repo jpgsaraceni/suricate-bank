@@ -22,7 +22,7 @@ func (r Repository) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 
 	if err != nil {
 
-		return nil, fmt.Errorf("%w: %s", ErrQuery, err.Error())
+		return nil, fmt.Errorf("%w: %s", ErrFetch, err.Error())
 	}
 
 	defer rows.Close()
@@ -44,11 +44,6 @@ func (r Repository) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 		}
 
 		transferList = append(transferList, transferReturned)
-	}
-
-	if len(transferList) == 0 {
-
-		return nil, ErrEmptyFetch
 	}
 
 	return transferList, nil
