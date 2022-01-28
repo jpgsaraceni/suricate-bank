@@ -12,7 +12,7 @@ type usecase struct {
 }
 
 type Usecase interface {
-	Create(ctx context.Context, name, cpf, secret string) (account.Account, error)
+	Create(ctx context.Context, accountInstance account.Account) (account.Account, error)
 	GetBalance(ctx context.Context, id account.AccountId) (int, error)
 	Fetch(ctx context.Context) ([]account.Account, error)
 }

@@ -7,15 +7,15 @@ import (
 )
 
 type MockUsecase struct {
-	OnCreate     func(ctx context.Context, name, cpf, secret string) (account.Account, error)
+	OnCreate     func(ctx context.Context, accountInstance account.Account) (account.Account, error)
 	OnGetBalance func(ctx context.Context, id account.AccountId) (int, error)
 	OnFetch      func(ctx context.Context) ([]account.Account, error)
 }
 
 var _ Usecase = (*MockUsecase)(nil)
 
-func (mock MockUsecase) Create(ctx context.Context, name, cpf, secret string) (account.Account, error) {
-	return mock.OnCreate(ctx, name, cpf, secret)
+func (mock MockUsecase) Create(ctx context.Context, accountInstance account.Account) (account.Account, error) {
+	return mock.OnCreate(ctx, accountInstance)
 }
 
 func (mock MockUsecase) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
