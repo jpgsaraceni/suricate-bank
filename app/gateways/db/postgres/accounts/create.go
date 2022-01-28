@@ -10,7 +10,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (r Repository) Create(ctx context.Context, newAccount *account.Account) error {
+func (r Repository) Create(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 
 	const query = `
 		INSERT INTO
@@ -23,18 +23,35 @@ func (r Repository) Create(ctx context.Context, newAccount *account.Account) err
 				created_at
 			)
 		VALUES
-			($1, $2, $3, $4, $5, $6);
+			($1, $2, $3, $4, $5, $6)
+		RETURNING
+			id,
+			name,
+			cpf,
+			secret,
+			balance,
+			created_at
+		;
 	`
 
-	_, err := r.pool.Exec(
+	var accountReturned account.Account
+
+	err := r.pool.QueryRow(
 		ctx,
 		query,
-		newAccount.Id,
-		newAccount.Name,
-		newAccount.Cpf.Value(),
-		newAccount.Secret.Value(),
-		newAccount.Balance.Cents(),
-		newAccount.CreatedAt,
+		accountInstance.Id,
+		accountInstance.Name,
+		accountInstance.Cpf.Value(),
+		accountInstance.Secret.Value(),
+		accountInstance.Balance.Cents(),
+		accountInstance.CreatedAt,
+	).Scan(
+		&accountReturned.Id,
+		&accountReturned.Name,
+		&accountReturned.Cpf,
+		&accountReturned.Secret,
+		&accountReturned.Balance,
+		&accountReturned.CreatedAt,
 	)
 
 	const uniqueKeyViolationCode = "23505"
@@ -42,17 +59,16 @@ func (r Repository) Create(ctx context.Context, newAccount *account.Account) err
 
 	var pgErr *pgconn.PgError
 
-	if errors.As(err, &pgErr) {
-		if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
-
-			return account.ErrDuplicateCpf
-		}
-	}
-
 	if err != nil {
+		if errors.As(err, &pgErr) {
+			if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
 
-		return fmt.Errorf("%w: %s", ErrQuery, err.Error())
+				return account.Account{}, account.ErrDuplicateCpf
+			}
+		}
+
+		return account.Account{}, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
-	return nil
+	return accountReturned, nil
 }

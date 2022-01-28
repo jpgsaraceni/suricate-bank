@@ -8,7 +8,7 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, account *Account) error
+	Create(ctx context.Context, account Account) (Account, error)
 	GetBalance(ctx context.Context, id AccountId) (int, error)
 	Fetch(ctx context.Context) ([]Account, error)
 	GetById(ctx context.Context, id AccountId) (Account, error)

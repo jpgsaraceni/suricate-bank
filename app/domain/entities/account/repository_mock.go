@@ -8,7 +8,7 @@ import (
 )
 
 type MockRepository struct {
-	OnCreate        func(ctx context.Context, account *Account) error
+	OnCreate        func(ctx context.Context, account Account) (Account, error)
 	OnGetBalance    func(ctx context.Context, id AccountId) (int, error)
 	OnFetch         func(ctx context.Context) ([]Account, error)
 	OnGetById       func(ctx context.Context, id AccountId) (Account, error)
@@ -19,7 +19,7 @@ type MockRepository struct {
 
 var _ Repository = (*MockRepository)(nil)
 
-func (mock MockRepository) Create(ctx context.Context, account *Account) error {
+func (mock MockRepository) Create(ctx context.Context, account Account) (Account, error) {
 	return mock.OnCreate(ctx, account)
 }
 
