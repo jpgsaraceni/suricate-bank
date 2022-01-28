@@ -35,38 +35,38 @@ func CreatedTransferToResponse(createdTransfer transfer.Transfer) CreateTransfer
 func (r CreateTransferRequest) Validate(response responses.Response, originId account.AccountId) (transfer.Transfer, responses.Response) {
 	if r.AccountDestinationId == "" || r.Amount == 0 {
 
-		return transfer.Transfer{}, response.BadRequest(responses.ErrMissingFieldsTransferPayload).Complete()
+		return transfer.Transfer{}, response.BadRequest(responses.ErrMissingFieldsTransferPayload)
 	}
 
 	if r.Amount < 0 {
 
-		return transfer.Transfer{}, response.BadRequest(responses.ErrInvalidAmount).Complete()
+		return transfer.Transfer{}, response.BadRequest(responses.ErrInvalidAmount)
 	}
 
 	amount, err := money.NewMoney(r.Amount)
 
 	if err != nil {
 
-		return transfer.Transfer{}, response.InternalServerError(err).Complete()
+		return transfer.Transfer{}, response.InternalServerError(err)
 	}
 
 	destinationId, err := account.ParseAccountId(r.AccountDestinationId)
 
 	if err != nil {
 
-		return transfer.Transfer{}, response.BadRequest(responses.ErrInvalidDestinationId).Complete()
+		return transfer.Transfer{}, response.BadRequest(responses.ErrInvalidDestinationId)
 	}
 
 	if destinationId == originId {
 
-		return transfer.Transfer{}, response.BadRequest(responses.ErrSameAccounts).Complete()
+		return transfer.Transfer{}, response.BadRequest(responses.ErrSameAccounts)
 	}
 
 	transferInstance, err := transfer.NewTransfer(amount, originId, destinationId)
 
 	if err != nil {
 
-		return transfer.Transfer{}, response.InternalServerError(err).Complete()
+		return transfer.Transfer{}, response.InternalServerError(err)
 	}
 
 	return transferInstance, response
