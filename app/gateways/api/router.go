@@ -36,7 +36,7 @@ func NewRouter(
 	r.Post("/transfers", middlewares.Authorize(transfersHandler.Create))
 	r.Get("/transfers", transfersHandler.Fetch)
 
-	r.Post("/", loginHandler.Login)
+	r.Post("/login", loginHandler.Login)
 
 	http.ListenAndServe(":8080", r) // TODO: get port from env var
 }
