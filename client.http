@@ -1,0 +1,44 @@
+# LOGIN
+### login
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "cpf":"22061446035",
+    "secret":"can't-tell-you"
+}
+
+# ACCOUNTS
+### get all accounts
+GET http://localhost:8080/accounts
+
+### create new account
+POST http://localhost:8080/accounts
+Content-type: application/json
+
+# {
+#     "name": "first client",
+#     "cpf": "22061446035",
+#     "secret": "can't-tell-you"
+# }
+
+# {
+#     "name": "second client",
+#     "cpf": "045.591.180-00",
+#     "secret": "still-can't-tell-you"
+# }
+
+{
+    "name": "second client",
+    "cpf": "045.591.180-00",
+    "secret": "still-can't-tell-you"
+}
+
+### get account balance
+GET http://localhost:8080/accounts/d9e8bde1-a36e-48cd-b90f-08adeef3460a/balance
+
+# TRANSFERS
+### get all transfers
+GET http://localhost:8080/transfers
+
+# token 
