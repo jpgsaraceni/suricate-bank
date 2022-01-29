@@ -198,8 +198,6 @@ func convertRestToDigit(dividend, divisor int) string {
 func checkVerifyingDigits(cpf string) bool {
 	firstVerifyingDigit := iterateDigits(cpf[:9])
 
-	fmt.Println(firstVerifyingDigit)
-
 	if firstVerifyingDigit != string(cpf[9]) {
 		return false
 	}
