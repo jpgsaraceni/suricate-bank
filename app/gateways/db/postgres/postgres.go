@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -27,6 +30,21 @@ func ConnectPool(ctx context.Context, url string) (*pgxpool.Pool, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", errConnectDb, err.Error())
+	}
+
+	migration, err := migrate.New(
+		"file://../app/gateways/db/postgres/migrations",
+		url)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not read migration files: %s", err)
+	}
+
+	err = migration.Up()
+
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+
+		return nil, err
 	}
 
 	return pool, nil
