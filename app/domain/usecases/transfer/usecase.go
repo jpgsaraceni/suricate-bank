@@ -15,14 +15,22 @@ type usecase struct {
 }
 
 type Debiter interface {
-	Debit(ctx context.Context, id account.AccountId, amount money.Money) error
+	DebitAccount(ctx context.Context, id account.AccountId, amount money.Money) error
 }
 
 type Crediter interface {
-	Credit(ctx context.Context, id account.AccountId, amount money.Money) error
+	CreditAccount(ctx context.Context, id account.AccountId, amount money.Money) error
 }
 
 type Usecase interface {
 	Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error)
 	Fetch(ctx context.Context) ([]transfer.Transfer, error)
+}
+
+func NewUsecase(r transfer.Repository, ar account.Repository) Usecase {
+	return &usecase{
+		Repository: r,
+		Crediter:   ar,
+		Debiter:    ar,
+	}
 }

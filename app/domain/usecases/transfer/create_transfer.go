@@ -9,14 +9,14 @@ import (
 
 func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
 
-	err := uc.Debiter.Debit(ctx, transferInstance.AccountOriginId, transferInstance.Amount)
+	err := uc.Debiter.DebitAccount(ctx, transferInstance.AccountOriginId, transferInstance.Amount)
 
 	if err != nil {
 
 		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
 	}
 
-	err = uc.Crediter.Credit(ctx, transferInstance.AccountDestinationId, transferInstance.Amount)
+	err = uc.Crediter.CreditAccount(ctx, transferInstance.AccountDestinationId, transferInstance.Amount)
 
 	if err != nil {
 		rollback(ctx, uc, false, true, transferInstance)
@@ -37,11 +37,11 @@ func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer
 
 func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, transfer transfer.Transfer) {
 	if hasCredited {
-		uc.Debiter.Debit(ctx, transfer.AccountOriginId, transfer.Amount)
+		uc.Debiter.DebitAccount(ctx, transfer.AccountOriginId, transfer.Amount)
 	}
 
 	if hasDebited {
-		uc.Crediter.Credit(ctx, transfer.AccountDestinationId, transfer.Amount)
+		uc.Crediter.CreditAccount(ctx, transfer.AccountDestinationId, transfer.Amount)
 	}
 }
 

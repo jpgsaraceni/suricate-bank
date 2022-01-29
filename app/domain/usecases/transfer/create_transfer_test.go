@@ -45,12 +45,12 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
@@ -59,7 +59,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to debit from origin",
 			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return accountuc.ErrRepository
 				},
 			},
@@ -68,12 +68,12 @@ func TestCreate(t *testing.T) {
 		{
 			name: "fail to credit to destination",
 			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return accountuc.ErrRepository
 				},
 			},
@@ -87,12 +87,12 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			debiter: MockDebiter{
-				OnDebit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnDebitAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
 			crediter: MockCrediter{
-				OnCredit: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
 					return nil
 				},
 			},
