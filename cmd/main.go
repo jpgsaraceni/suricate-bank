@@ -19,7 +19,7 @@ func main() {
 
 	cfg := config.ReadConfig(".env")
 
-	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.Url())
+	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.Url(), cfg.Postgres.MigrationsUrl)
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to db: %w", err))
 	}

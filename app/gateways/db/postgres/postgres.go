@@ -5,9 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -18,8 +15,8 @@ var (
 
 // ConnectPool builds a config using the url passed as argument,
 // then creates a new pool and connects using that config.
-func ConnectPool(ctx context.Context, url string) (*pgxpool.Pool, error) {
-	config, err := pgxpool.ParseConfig(url)
+func ConnectPool(ctx context.Context, databaseUrl, migrationsUrl string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseUrl)
 
 	if err != nil {
 
@@ -32,18 +29,9 @@ func ConnectPool(ctx context.Context, url string) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("%w: %s", errConnectDb, err.Error())
 	}
 
-	migration, err := migrate.New(
-		"file://../app/gateways/db/postgres/migrations",
-		url)
+	err = Migrate(databaseUrl, migrationsUrl)
 
 	if err != nil {
-		return nil, fmt.Errorf("could not read migration files: %s", err)
-	}
-
-	err = migration.Up()
-
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-
 		return nil, err
 	}
 

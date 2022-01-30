@@ -17,11 +17,12 @@ type Config struct {
 }
 
 type PostgresConfig struct {
-	User     string `env:"DATABASE_USER" env-default:"postgres"`
-	Password string `env:"DATABASE_PASSWORD" env-default:"good-password"`
-	Host     string `env:"DATABASE_HOST" env-default:"localhost"`
-	Port     string `env:"DATABASE_PORT" env-default:"5433"`
-	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
+	User          string `env:"DATABASE_USER" env-default:"postgres"`
+	Password      string `env:"DATABASE_PASSWORD" env-default:"good-password"`
+	Host          string `env:"DATABASE_HOST" env-default:"localhost"`
+	Port          string `env:"DATABASE_PORT" env-default:"5433"`
+	Instance      string `env:"DATABASE_NAME" env-default:"suricate"`
+	MigrationsUrl string `env:"MIGRATIONS_URL" env-default:"github://jpgsaraceni/suricate-bank/app/gateways/db/postgres/migrations"`
 }
 
 type HttpServerConfig struct {
