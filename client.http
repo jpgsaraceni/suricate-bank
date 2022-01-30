@@ -29,9 +29,9 @@ Content-type: application/json
 # }
 
 {
-    "name": "second client",
-    "cpf": "045.591.180-00",
-    "secret": "still-can't-tell-you"
+    "name": "another client",
+    "cpf": "488.569.610-08",
+    "secret": "really-good-one"
 }
 
 ### get account balance
@@ -41,4 +41,12 @@ GET http://localhost:8080/accounts/d9e8bde1-a36e-48cd-b90f-08adeef3460a/balance
 ### get all transfers
 GET http://localhost:8080/transfers
 
-# token 
+### create transfer
+POST http://localhost:8080/transfers
+Content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiZDllOGJkZTEtYTM2ZS00OGNkLWI5MGYtMDhhZGVlZjM0NjBhIiwiaXNzIjoic3VyaWNhdGUgYmFuayIsImV4cCI6MTY0MzU3MDA1MX0.CytvJYFw3APxabFe7j8etAti28Zp0viXy76cLNx1JRQ
+
+{
+    "account_destination_id": "438e4746-fb04-4339-bd09-6cba20561835",
+    "amount": 500
+}
