@@ -49,7 +49,7 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 		return Account{}, fmt.Errorf("failed to hash secret: %w", err)
 	}
 
-	newMoney, _ := money.NewMoney(0)
+	newMoney, _ := money.NewMoney(1000)
 
 	return Account{
 		Id:        newAccountId(),
