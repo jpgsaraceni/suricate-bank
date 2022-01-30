@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
