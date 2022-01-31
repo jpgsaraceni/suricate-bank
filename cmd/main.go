@@ -33,5 +33,5 @@ func main() {
 
 	authService := auth.NewService(accountsRepository)
 
-	api.NewRouter(accountsUsecase, transfersUsecase, authService)
+	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService)
 }
