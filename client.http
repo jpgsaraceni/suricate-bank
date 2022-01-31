@@ -3,9 +3,14 @@
 POST http://localhost:8080/login
 Content-Type: application/json
 
+# {
+#     "cpf":"22061446035",
+#     "secret":"can't-tell-you"
+# }
+
 {
-    "cpf":"22061446035",
-    "secret":"can't-tell-you"
+    "cpf":"488.569.610-08",
+    "secret":"really-good-one"
 }
 
 # ACCOUNTS
@@ -44,7 +49,7 @@ GET http://localhost:8080/transfers
 ### create transfer
 POST http://localhost:8080/transfers
 Content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiZDllOGJkZTEtYTM2ZS00OGNkLWI5MGYtMDhhZGVlZjM0NjBhIiwiaXNzIjoic3VyaWNhdGUgYmFuayIsImV4cCI6MTY0MzU3MDA1MX0.CytvJYFw3APxabFe7j8etAti28Zp0viXy76cLNx1JRQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiYjhkNGRjYTgtZDExMi00NDY5LWFmNWItMWM2ZjM2OWNlYTQ3IiwiaXNzIjoic3VyaWNhdGUgYmFuayIsImV4cCI6MTY0MzYzMzk5NH0._Ni5SkIchik5haoRhTWzTCMvBMGg9FOTCbb0r-Y7dM0
 
 {
     "account_destination_id": "438e4746-fb04-4339-bd09-6cba20561835",
