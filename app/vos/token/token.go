@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"reflect"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -84,8 +83,6 @@ func Verify(tokenString string) (account.AccountId, error) {
 
 func loadSecret() []byte {
 	secret := []byte(os.Getenv("JWT_SECRET"))
-	if reflect.DeepEqual(secret, []byte("")) {
-		return []byte("test_secret")
-	}
+
 	return secret
 }

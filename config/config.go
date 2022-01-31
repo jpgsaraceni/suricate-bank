@@ -73,3 +73,7 @@ func (cfg PostgresConfig) Url() string {
 		cfg.Instance,
 	)
 }
+
+func (cfg HttpServerConfig) ServerPort() string {
+	return fmt.Sprintf(":%s", cfg.Port)
+}
