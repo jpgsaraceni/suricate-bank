@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -14,9 +15,12 @@ import (
 	transfersroute "github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/handlers/transfers"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func NewRouter(
+	ctx context.Context,
+	cfg config.Config,
 	accountUC accountuc.Usecase,
 	transferUC transferuc.Usecase,
 	authService auth.Service,
@@ -33,10 +37,10 @@ func NewRouter(
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 
-	r.Post("/transfers", middlewares.Authorize(transfersHandler.Create))
+	r.With(middlewares.Authorize).Post("/transfers", transfersHandler.Create)
 	r.Get("/transfers", transfersHandler.Fetch)
 
 	r.Post("/login", loginHandler.Login)
 
-	http.ListenAndServe(":8080", r) // TODO: get port from env var
+	http.ListenAndServe(cfg.HttpServer.ServerPort(), r)
 }

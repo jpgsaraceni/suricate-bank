@@ -12,7 +12,7 @@ import (
 
 type originIdKey struct{}
 
-func Authorize(next http.HandlerFunc) http.HandlerFunc {
+func Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		response := responses.NewResponse(w)
