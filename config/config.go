@@ -65,7 +65,7 @@ func ReadConfig(filename string) *Config {
 }
 
 func (cfg PostgresConfig) Url() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
