@@ -31,7 +31,7 @@ func TestNewAccount(t *testing.T) {
 		newCpf, _ := cpf.NewCpf(input)
 		return newCpf
 	}
-	var testMoney, _ = money.NewMoney(0)
+	var testMoney, _ = money.NewMoney(1000)
 
 	testCases := []testCase{
 		{

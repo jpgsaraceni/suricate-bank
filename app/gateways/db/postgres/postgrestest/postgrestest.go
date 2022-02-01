@@ -51,7 +51,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = postgres.ConnectPool(context.Background(), databaseUrl, "github://jpgsaraceni/suricate-bank/app/gateways/db/postgres/migrations")
+		dbPool, err = postgres.ConnectPool(context.Background(), databaseUrl, "file://../migrations")
 
 		return err
 	}); err != nil {
