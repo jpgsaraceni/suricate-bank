@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
@@ -19,9 +18,9 @@ func main() {
 
 	cfg := config.ReadConfig(".env")
 
-	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.Url(), cfg.Postgres.MigrationsUrl)
+	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.Url())
 	if err != nil {
-		panic(fmt.Errorf("failed to connect to db: %w", err))
+		panic(err)
 	}
 	defer pgPool.Close()
 

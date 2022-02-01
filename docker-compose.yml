@@ -13,7 +13,6 @@ services:
       - DATABASE_HOST=suricate_db
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
-      - MIGRATIONS_URL=file://./app/gateways/db/postgres/migrations
     ports:
       - "8080:8080"
   

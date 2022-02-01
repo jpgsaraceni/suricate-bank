@@ -2,15 +2,17 @@ package postgrestest
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 )
 
 func GetTestPool() (*pgxpool.Pool, func()) {
@@ -51,7 +53,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = postgres.ConnectPool(context.Background(), databaseUrl, "file://../migrations")
+		dbPool, err = connectTestPool(context.Background(), databaseUrl)
 
 		return err
 	}); err != nil {
@@ -65,4 +67,46 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	}
 
 	return dbPool, tearDown
+}
+
+func connectTestPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseUrl)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	pool, err := pgxpool.ConnectConfig(ctx, config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = migrateTestDb(databaseUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pool, nil
+}
+
+func migrateTestDb(databaseUrl string) error {
+	migration, err := migrate.New(
+		"file://../migrations",
+		databaseUrl)
+
+	if err != nil {
+		return fmt.Errorf("could not read migration files: %s", err)
+	}
+
+	err = migration.Up()
+
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+
+		return err
+	}
+
+	return nil
 }

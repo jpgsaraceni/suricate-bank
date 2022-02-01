@@ -17,12 +17,11 @@ type Config struct {
 }
 
 type PostgresConfig struct {
-	User          string `env:"DATABASE_USER" env-default:"postgres"`
-	Password      string `env:"DATABASE_PASSWORD" env-default:"good-password"`
-	Host          string `env:"DATABASE_HOST" env-default:"localhost"`
-	Port          string `env:"DATABASE_PORT" env-default:"5433"`
-	Instance      string `env:"DATABASE_NAME" env-default:"suricate"`
-	MigrationsUrl string `env:"MIGRATIONS_URL" env-default:"github://jpgsaraceni/suricate-bank/app/gateways/db/postgres/migrations"`
+	User     string `env:"DATABASE_USER" env-default:"postgres"`
+	Password string `env:"DATABASE_PASSWORD" env-default:"good-password"`
+	Host     string `env:"DATABASE_HOST" env-default:"localhost"`
+	Port     string `env:"DATABASE_PORT" env-default:"5433"`
+	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
 }
 
 type HttpServerConfig struct {
@@ -65,13 +64,14 @@ func ReadConfig(filename string) *Config {
 }
 
 func (cfg PostgresConfig) Url() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
 		cfg.Port,
 		cfg.Instance,
 	)
+	return url
 }
 
 func (cfg HttpServerConfig) ServerPort() string {

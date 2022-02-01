@@ -15,7 +15,7 @@ var (
 
 // ConnectPool builds a config using the url passed as argument,
 // then creates a new pool and connects using that config.
-func ConnectPool(ctx context.Context, databaseUrl, migrationsUrl string) (*pgxpool.Pool, error) {
+func ConnectPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(databaseUrl)
 
 	if err != nil {
@@ -29,7 +29,7 @@ func ConnectPool(ctx context.Context, databaseUrl, migrationsUrl string) (*pgxpo
 		return nil, fmt.Errorf("%w: %s", errConnectDb, err.Error())
 	}
 
-	err = Migrate(databaseUrl, migrationsUrl)
+	err = Migrate(databaseUrl)
 
 	if err != nil {
 		return nil, err
