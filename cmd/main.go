@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
@@ -22,6 +23,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Printf("\033[34m---- HAPPY BANKING ----\033[37m\n")
+
 	defer pgPool.Close()
 
 	accountsRepository := accountspg.NewRepository(pgPool)

@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -28,10 +29,15 @@ func Migrate(databaseUrl string) error {
 
 	err = migration.Up()
 
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	if err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			log.Println("migrations successfully read, no changes")
 
+			return nil
+		}
 		return err
 	}
 
+	log.Println("migrations successfully read and run")
 	return nil
 }
