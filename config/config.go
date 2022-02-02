@@ -20,13 +20,13 @@ type PostgresConfig struct {
 	User     string `env:"DATABASE_USER" env-default:"postgres"`
 	Password string `env:"DATABASE_PASSWORD" env-default:"good-password"`
 	Host     string `env:"DATABASE_HOST" env-default:"localhost"`
-	Port     string `env:"DATABASE_PORT" env-default:"5433"`
+	Port     string `env:"DATABASE_PORT" env-default:"5432"`
 	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
 }
 
 type HttpServerConfig struct {
 	Host string `env:"SERVER_HOST" env-default:"localhost"`
-	Port string `env:"SERVER_PORT" env-default:"3000"`
+	Port string `env:"SERVER_PORT" env-default:"8080"`
 }
 
 type JwtConfig struct {
