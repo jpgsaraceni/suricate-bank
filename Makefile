@@ -12,5 +12,7 @@ start:
 	docker-compose up --build
 stop:
 	docker-compose down
-localdb:
-	systemctl start postgresql 
+localdb-start:
+	sudo systemctl start postgresql 
+localdb-stop:
+	sudo systemctl stop postgresql
