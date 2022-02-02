@@ -49,7 +49,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 
 	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
 
-	dockerPool.MaxWait = 10 * time.Second
+	dockerPool.MaxWait = 30 * time.Second
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
