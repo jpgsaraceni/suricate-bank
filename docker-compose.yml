@@ -19,7 +19,6 @@ services:
   suricate_db:
     image: "postgres:14-alpine"
     restart: unless-stopped
-    command: ["postgres", "-c", "log_statement=all"]
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
