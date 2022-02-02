@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine
+FROM golang:1.17-alpine AS build
 
 WORKDIR /app
 
@@ -9,6 +9,12 @@ RUN go mod download
 COPY . .
 
 RUN go build -o main ./cmd/main.go
+
+FROM alpine
+
+WORKDIR /
+
+COPY --from=build /app/main /
 
 EXPOSE 8080
 
