@@ -1,4 +1,4 @@
-# ⚠️ WORK IN PROGRESS ⚠️
+# ⚠️ WORK IN PROGRESS (DEVELOPMENT RELEASE) ⚠️
 
 Suricate Bank is an api that creates accounts and transfers money between them. It is being built following Clean Arch.
 
@@ -7,9 +7,11 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 ## TODO
 
 * Logging
-* Request tracing
+* RequestID tracing
 * Idempotency (redis)
-* Docker
+* Panic recovery
+* Docker multistage build
+* Swagger
 * GitHub Actions
 
 ## Dependencies
@@ -26,17 +28,9 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 
 ## Getting started
 
-### Requirements (while I haven't containerized the app)
+To run this app in a container, the only requirement is [Docker Compose](https://docs.docker.com/compose/install/).
 
-1. [Go](https://go.dev/dl/)
-2. [Docker](https://docs.docker.com/get-docker/) (for integration tests). *If you're using Linux, you might have problems with permissions for running the integration tests (they create a docker image). [this](https://stackoverflow.com/questions/48568172/docker-sock-permission-denied) solved it for me.*
-3. [Postgres](https://www.postgresql.org/download/) (run a database and create a .env file accordingly. View `/cmd/.env.example`.)
-
-### Automated testing
-
-```shell
-go test ./...
-```
+To run without a container, you will need [Go](https://go.dev/doc/install), [PostgreSQL](https://www.postgresql.org/download/) (configured and running), and optionally [Docker](https://docs.docker.com/get-docker/) to run integration tests.
 
 ### Running the app
 
@@ -46,20 +40,50 @@ go test ./...
 git clone https://github.com/jpgsaraceni/suricate-bank.git && cd suricate-bank
 ```
 
-2. Install dependencies:
+2. Run in docker container:
 
 ```shell
-go mod download
+make start
 ```
 
-3. Run the app
+or without docker (after preparation instructed above):
 
 ```shell
-go run cmd/main.go
+make build
+```
+
+### Automated tests (requires Docker for integration tests)
+
+```shell
+make test
 ```
 
 ### Manual testing
 
 The file `/client.http` can be used to test all available routes. I suggest using [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension for this (or any other HTTP request service you prefer).
 
-### Available routes (TODO)
+### Available routes (TODO: document payloads and status codes)
+
+#### POST `/accounts`
+
+Create new account
+
+#### GET `/accounts`
+
+List all accounts
+
+#### GET `/accounts/{account_id}/balance`
+
+Get account balance
+
+#### POST `/login`
+
+Login
+
+#### POST `/transfers`
+
+Create new transfer (requires Bearer token)
+
+#### GET `/transfers`
+
+List all transfers
