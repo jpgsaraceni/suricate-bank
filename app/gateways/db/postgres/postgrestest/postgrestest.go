@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -14,6 +16,8 @@ import (
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
 )
+
+const defaultTimeout = 30
 
 func GetTestPool() (*pgxpool.Pool, func()) {
 	var dbPool *pgxpool.Pool
@@ -49,7 +53,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 
 	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
 
-	dockerPool.MaxWait = 30 * time.Second
+	dockerPool.MaxWait = timeout() * time.Second
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
@@ -109,4 +113,16 @@ func migrateTestDb(databaseUrl string) error {
 	}
 
 	return nil
+}
+
+func timeout() time.Duration {
+	timeoutString := os.Getenv("DOCKERTEST_TIMEOUT")
+	timeout, err := strconv.Atoi(timeoutString)
+
+	if err != nil {
+
+		return time.Duration(defaultTimeout)
+	}
+
+	return time.Duration(timeout)
 }

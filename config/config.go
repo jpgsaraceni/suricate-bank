@@ -14,6 +14,7 @@ type Config struct {
 	Postgres   PostgresConfig
 	HttpServer HttpServerConfig
 	Jwt        JwtConfig
+	Dockertest DockertestConfig
 }
 
 type PostgresConfig struct {
@@ -30,17 +31,23 @@ type HttpServerConfig struct {
 }
 
 type JwtConfig struct {
-	Secret string `env:"JWT_SECRET" env-default:"BAD_SECRET"`
+	Secret  string `env:"JWT_SECRET" env-default:"BAD_SECRET"`
+	Timeout string `env:"JWT_TIMEOUT" env-default:"30"`
+}
+
+type DockertestConfig struct {
+	Timeout string `env:"DOCKERTEST_TIMEOUT" env-default:"30"`
 }
 
 func ReadConfigFromEnv() *Config {
 	var cfg Config
-
 	err := cleanenv.ReadEnv(&cfg)
 	if err != nil {
 		log.Panicf("failed to load config: %s", err)
 	}
 
+	cfg.setEnvs()
+	log.Println("successfully loaded from env")
 	return &cfg
 }
 
@@ -51,6 +58,8 @@ func ReadConfigFromFile(filename string) *Config {
 		log.Panicf("failed to load config: %s", err)
 	}
 
+	cfg.setEnvs()
+	log.Println("successfully loaded env variables from .env file")
 	return &cfg
 }
 
@@ -76,4 +85,10 @@ func (cfg PostgresConfig) Url() string {
 
 func (cfg HttpServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", cfg.Port)
+}
+
+func (cfg Config) setEnvs() {
+	os.Setenv("JWT_SECRET", cfg.Jwt.Secret)
+	os.Setenv("JWT_TIMEOUT", cfg.Jwt.Timeout)
+	os.Setenv("DOCKERTEST_TIMEOUT", cfg.Dockertest.Timeout)
 }
