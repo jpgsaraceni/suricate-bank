@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
+
+const defaultTimeout = 30
 
 var (
 	ErrSignJWT         = errors.New("failed to sign jwt")
@@ -34,11 +36,17 @@ type jwtClaimsSchema struct {
 }
 
 func Sign(accountId account.AccountId) (Jwt, error) {
+	timeoutString := os.Getenv("JWT_TIMEOUT")
+	timeout, err := strconv.Atoi(timeoutString)
+
+	if err != nil {
+		timeout = defaultTimeout
+	}
 
 	claims := jwtClaimsSchema{
 		accountId.String(),
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(timeout))),
 			Issuer:    "suricate bank",
 		},
 	}
@@ -84,8 +92,6 @@ func Verify(tokenString string) (account.AccountId, error) {
 
 func loadSecret() []byte {
 	secret := []byte(os.Getenv("JWT_SECRET"))
-	if reflect.DeepEqual(secret, []byte("")) {
-		return []byte("test_secret")
-	}
+
 	return secret
 }

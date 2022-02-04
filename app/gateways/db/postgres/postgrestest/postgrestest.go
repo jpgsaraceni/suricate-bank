@@ -2,7 +2,10 @@ package postgrestest
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -12,9 +15,9 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 )
+
+const defaultTimeout = 30
 
 func GetTestPool() (*pgxpool.Pool, func()) {
 	var dbPool *pgxpool.Pool
@@ -50,27 +53,15 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 
 	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
 
-	dockerPool.MaxWait = 10 * time.Second
+	dockerPool.MaxWait = timeout() * time.Second
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = postgres.ConnectPool(context.Background(), databaseUrl)
+		dbPool, err = connectTestPool(context.Background(), databaseUrl)
 
 		return err
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
-	}
-
-	migration, err := migrate.New(
-		"file://../migrations",
-		databaseUrl)
-
-	if err != nil {
-		log.Fatalf("Could not read migration files: %s", err)
-	}
-
-	if err := migration.Up(); err != nil {
-		log.Fatal(err)
 	}
 
 	// tearDown should be called to destroy container at the end of the test
@@ -80,4 +71,58 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	}
 
 	return dbPool, tearDown
+}
+
+func connectTestPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseUrl)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	pool, err := pgxpool.ConnectConfig(ctx, config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = migrateTestDb(databaseUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pool, nil
+}
+
+func migrateTestDb(databaseUrl string) error {
+	migration, err := migrate.New(
+		"file://../migrations",
+		databaseUrl)
+
+	if err != nil {
+		return fmt.Errorf("could not read migration files: %s", err)
+	}
+
+	err = migration.Up()
+
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+
+		return err
+	}
+
+	return nil
+}
+
+func timeout() time.Duration {
+	timeoutString := os.Getenv("DOCKERTEST_TIMEOUT")
+	timeout, err := strconv.Atoi(timeoutString)
+
+	if err != nil {
+
+		return time.Duration(defaultTimeout)
+	}
+
+	return time.Duration(timeout)
 }

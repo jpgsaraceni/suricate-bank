@@ -50,7 +50,6 @@ func (m *Money) Scan(value interface{}) error {
 		money, err := NewMoney(int(valueInt))
 
 		if err != nil {
-			fmt.Printf("money err: %d\n", value)
 
 			return err
 		}

@@ -1,5 +1,10 @@
-build
-
+.gitignore
+client.http
+docker-compose.yml
+Dockerfile
+Makefile
+README.md
+build/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/go,linux,macos,dotenv,windows,visualstudiocode,goland
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,linux,macos,dotenv,windows,visualstudiocode,goland

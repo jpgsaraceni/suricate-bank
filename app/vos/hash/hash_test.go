@@ -2,7 +2,6 @@ package hash
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"golang.org/x/crypto/bcrypt"
@@ -170,7 +169,6 @@ func TestScan(t *testing.T) {
 			var testSecret = Secret{}
 
 			if err := testSecret.Scan(tt.value); err != tt.err {
-				fmt.Println(tt.value)
 				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})
