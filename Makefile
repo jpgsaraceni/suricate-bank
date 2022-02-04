@@ -4,8 +4,7 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 # run tests
 test:
-	go clean -testcache
-	go test ./...
+	go test -race -count=1 ./...
 
 # run without docker-compose
 postgres-start:
