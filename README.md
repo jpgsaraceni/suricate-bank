@@ -63,11 +63,23 @@ make test
 
 The file `/client.http` can be used to test all available routes. I suggest using [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension for this (or any other HTTP request service you prefer).
 
-### Available routes (TODO: document payloads and status codes)
+### Available routes
 
 #### POST `/accounts`
 
 Create new account
+
+##### Create account request payload example
+
+```http
+Content-Type: application/json
+
+{
+    "name": "another client",
+    "cpf": "488.569.610-08",
+    "secret": "really-good-one"
+}
+```
 
 #### GET `/accounts`
 
@@ -81,9 +93,32 @@ Get account balance
 
 Login
 
+##### Login request payload example
+
+```http
+Content-Type: application/json
+
+{
+    "cpf":"22061446035",
+    "secret":"can't-tell-you"
+}
+```
+
 #### POST `/transfers`
 
 Create new transfer (requires Bearer token)
+
+##### Create transfer payload example
+
+```http
+Content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiYjhkNGRjYTgtZDExMi00NDY5LWFmNWItMWM2ZjM2OWNlYTQ3IiwiaXNzIjoic3VyaWNhdGUgYmFuayIsImV4cCI6MTY0MzgxMzA3MX0.a_cYUkI3usEmGHn2ve3snabv2q3IUqdCeowHGt9ijWw
+
+{
+    "account_destination_id": "438e4746-fb04-4339-bd09-6cba20561835",
+    "amount": 500
+}
+```
 
 #### GET `/transfers`
 
