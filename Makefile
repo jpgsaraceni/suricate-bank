@@ -1,24 +1,34 @@
+DOCKER_USER=saraceni
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: dev dev-build test postgres-start postgres-stop start stop
+.PHONY: test postgres-start postgres-stop dev dev-build start stop push-container pull-container
 
-# without docker-compose
+# run tests
+test:
+	go clean -testcache
+	go test ./...
+
+# run without docker-compose
+postgres-start:
+	systemctl start postgresql 
+postgres-stop:
+	systemctl stop postgresql
 dev:
 	go run cmd/main.go
 dev-build:
 	go build -o build/app cmd/main.go
 	./build/app
-test:
-	go clean -testcache
-	go test ./...
-postgres-start:
-	systemctl start postgresql 
-postgres-stop:
-	systemctl stop postgresql
 
 # with docker-compose
 start:
 	docker-compose up -d
-	docker image prune --filter label=stage=gobuilder -f
 	docker-compose logs
 stop:
 	docker-compose down
+
+# build and push image to registry (docker hub)
+push-container:
+	docker login -u $(DOCKER_USER)
+	docker build -t $(DOCKER_USER)/suricate-bank .
+	docker push $(DOCKER_USER)/suricate-bank
+pull-container:
+	docker pull saraceni/suricate-bank

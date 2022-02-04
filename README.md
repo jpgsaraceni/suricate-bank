@@ -10,7 +10,6 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * RequestID tracing
 * Idempotency (redis)
 * Panic recovery
-* Docker multistage build
 * Swagger
 * GitHub Actions
 
@@ -32,19 +31,21 @@ To run this app in a container, the only requirement is [Docker Compose](https:/
 
 To run without a container, you will need [Go](https://go.dev/doc/install), [PostgreSQL](https://www.postgresql.org/download/) (configured and running), and optionally [Docker](https://docs.docker.com/get-docker/) to run integration tests.
 
+An image of the application is available on Docker Hub registry [on this repository](https://hub.docker.com/r/saraceni/suricate-bank). You can pull it and use the postgres instance you prefer (directly on your machine or building a container) to run the app. To pull the image, just run `make pull-container`.
+
 ### Running the app
 
 1. Clone the project and enter directory:
 
-```shell
-git clone https://github.com/jpgsaraceni/suricate-bank.git && cd suricate-bank
-```
+    ```shell
+    git clone https://github.com/jpgsaraceni/suricate-bank.git && cd suricate-bank
+    ```
 
 2. Run in docker container:
 
-```shell
-make start
-```
+    ```shell
+    make start
+    ```
 
 or without docker (after preparation instructed above):
 
