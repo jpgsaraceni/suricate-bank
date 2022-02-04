@@ -112,8 +112,7 @@ Create new transfer (requires Bearer token)
 
 ```http
 Content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiYjhkNGRjYTgtZDExMi00NDY5LWFmNWItMWM2ZjM2OWNlYTQ3IiwiaXNzIjoic3VyaWNhdGUgYmFuayIsImV4cCI6MTY0MzgxMzA3MX0.a_cYUkI3usEmGHn2ve3snabv2q3IUqdCeowHGt9ijWw
-
+Authorization: Bearer <JWT>
 {
     "account_destination_id": "438e4746-fb04-4339-bd09-6cba20561835",
     "amount": 500
