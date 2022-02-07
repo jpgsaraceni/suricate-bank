@@ -28,13 +28,18 @@ func main() {
 
 	defer pgPool.Close()
 
+	// connect to redis
+	// defer redis close
+
 	accountsRepository := accountspg.NewRepository(pgPool)
 	transfersRepository := transferspg.NewRepository(pgPool)
+	// instantiate redis repository
 
 	accountsUsecase := accountuc.NewUsecase(accountsRepository)
 	transfersUsecase := transferuc.NewUsecase(transfersRepository, accountsRepository)
 
 	authService := auth.NewService(accountsRepository)
+	// instantiate idempotency service
 
 	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService)
 }

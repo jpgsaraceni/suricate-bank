@@ -33,7 +33,7 @@ func NewRouter(
 
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Post("/accounts", accountsHandler.Create)
+	r.Post("/accounts", accountsHandler.Create) // call idempotency middleware
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 
