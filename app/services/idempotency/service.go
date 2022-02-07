@@ -3,6 +3,7 @@ package idempotency
 import (
 	"context"
 
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis"
 )
 
@@ -12,7 +13,8 @@ type service struct {
 }
 
 type Service interface {
-	Idempotency(ctx context.Context, key string) error
+	GetKeyValue(ctx context.Context, key string) (responses.Response, error)
+	// TODO: SetKeyValue()
 }
 
 func NewService(r redis.Repository) Service {
