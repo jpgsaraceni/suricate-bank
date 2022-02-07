@@ -14,7 +14,7 @@ type service struct {
 
 type Service interface {
 	GetKeyValue(ctx context.Context, key string) (responses.Response, error)
-	// TODO: SetKeyValue()
+	SetKeyValue(key string, res responses.Response) error
 }
 
 func NewService(r redis.Repository) Service {

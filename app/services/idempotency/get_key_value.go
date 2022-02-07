@@ -7,7 +7,5 @@ import (
 )
 
 func (s service) GetKeyValue(ctx context.Context, key string) (responses.Response, error) {
-	// TODO: s.repository.Get(key)
-
-	return responses.Response{}, nil
+	return s.repository.GetKeyValue(key)
 }
