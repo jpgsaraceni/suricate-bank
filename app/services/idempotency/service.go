@@ -3,21 +3,20 @@ package idempotency
 import (
 	"context"
 
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis"
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 // service calls Repository to be used in all methods of this package.
 type service struct {
-	repository redis.Repository
+	repository Repository
 }
 
 type Service interface {
-	GetKeyValue(ctx context.Context, key string) (responses.Response, error)
-	SetKeyValue(key string, res responses.Response) error
+	GetKeyValue(ctx context.Context, key string) (schema.CachedResponse, error)
+	SetKeyValue(key string, request schema.CachedResponse) error
 }
 
-func NewService(r redis.Repository) Service {
+func NewService(r Repository) Service {
 	return &service{
 		repository: r,
 	}
