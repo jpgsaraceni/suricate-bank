@@ -1,18 +1,18 @@
 package idempotency
 
-import "github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+import "github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 
 type MockRepository struct {
-	OnGetKeyValue func(key string) (responses.Response, error)
-	OnSetKeyValue func(key string, res responses.Response) error
+	OnGetKeyValue func(key string) (schema.CachedResponse, error)
+	OnSetKeyValue func(key string, request schema.CachedResponse) error
 }
 
 var _ Repository = (*MockRepository)(nil)
 
-func (mock MockRepository) GetKeyValue(key string) (responses.Response, error) {
+func (mock MockRepository) GetKeyValue(key string) (schema.CachedResponse, error) {
 	return mock.OnGetKeyValue(key)
 }
 
-func (mock MockRepository) SetKeyValue(key string, res responses.Response) error {
+func (mock MockRepository) SetKeyValue(key string, res schema.CachedResponse) error {
 	return mock.OnSetKeyValue(key, res)
 }
