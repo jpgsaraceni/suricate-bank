@@ -90,38 +90,3 @@ func (r Response) SendJSON() {
 		log.Println(err) // TODO: fix after implementing log
 	}
 }
-
-func Unmarshal(src []interface{}) (Response, error) {
-	var status int
-	var payload map[string]interface{}
-	err := json.Unmarshal(src[0].([]byte), &status)
-
-	if err != nil {
-
-		return Response{}, err
-	}
-
-	err = json.Unmarshal(src[1].([]byte), &payload)
-
-	if err != nil {
-
-		return Response{}, err
-	}
-
-	return Response{Status: status, Payload: payload}, nil
-}
-
-// func (t *Response) RedisScan(src interface{}) (err error) {
-// 	if t == nil {
-// 		return fmt.Errorf("nil pointer")
-// 	}
-// 	switch src := src.(type) {
-// 	case int:
-// 		t.Status = src
-// 	case map[string]interface{}:
-// 		t.Payload = src
-// 	default:
-// 		err = fmt.Errorf("cannot convert from %T to %T", src, t)
-// 	}
-// 	return err
-// }

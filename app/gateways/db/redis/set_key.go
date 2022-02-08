@@ -3,54 +3,34 @@ package redis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 var errKeyExists = errors.New("key already exists in redis")
 
-func (r Repository) SetKeyValue(key string, res responses.Response) error {
+func (r Repository) CacheResponse(response schema.CachedResponse) error {
 	conn := r.pool.Get()
 	defer conn.Close()
 
-	payloadJson, err := json.Marshal(res.Payload)
+	j, err := json.Marshal(response)
 
 	if err != nil {
 
-		return fmt.Errorf("failed to marshal response payload: %s", err)
+		return err
 	}
 
-	reply, err := conn.Do("HSETNX", key, "status", res.Status)
-	if err != nil {
+	reply, err := conn.Do("SETNX", response.Key, j)
 
-		return fmt.Errorf("redis HSETNX command error: %s", err)
-	}
-	if reply.(int64) == 0 { // HSETNX returns 0 if key already exists
+	if reply.(int64) == 0 {
 
 		return errKeyExists
 	}
 
-	reply, err = conn.Do("HSETNX", key, "payload", payloadJson)
 	if err != nil {
 
-		return fmt.Errorf("redis HSETNX command error: %s", err)
+		return err
 	}
-	if reply.(int64) == 0 { // HSETNX returns 0 if key already exists
-
-		return errKeyExists
-	}
-
-	// redis unstable version:
-	// reply, err = conn.Do("HSETNX", key, "status", res.status, "payload", payloadJson)
-	// if err != nil {
-
-	// 	return fmt.Errorf("redis HSETNX command error: %s", err)
-	// }
-	// if reply.(int64) == 0 {
-
-	// 	return errKeyExists
-	// }
 
 	return nil
 }

@@ -1,30 +1,44 @@
 package redis
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 
-	"github.com/gomodule/redigo/redis"
-	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
-func (r Repository) GetKeyValue(key string) (responses.Response, error) {
+var errType = errors.New("failed to convert redis reply to []byte")
+
+func (r Repository) GetCachedResponse(key string) (schema.CachedResponse, error) {
 	conn := r.pool.Get()
 	defer conn.Close()
 
-	reply, err := redis.Values(conn.Do("HMGET", key, "status", "payload"))
+	var response schema.CachedResponse
+
+	reply, err := conn.Do("GET", key)
 
 	if err != nil {
 
-		return responses.Response{}, fmt.Errorf("redis HMGET command error: %s", err)
+		return response, err
 	}
 
-	response, err := responses.Unmarshal(reply)
-	// var response responses.Response
-	// _, err = redis.Scan(reply, &response)
+	if reply == nil { // key does not exist
+
+		return response, nil
+	}
+
+	replyBytes, ok := reply.([]byte)
+
+	if !ok {
+
+		return response, errType
+	}
+
+	err = json.Unmarshal(replyBytes, &response)
 
 	if err != nil {
 
-		return responses.Response{}, fmt.Errorf("failed to unmarshal reply from redis: %s", err)
+		return response, err
 	}
 
 	return response, nil
