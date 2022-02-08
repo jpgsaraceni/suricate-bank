@@ -17,6 +17,7 @@ func ConnectPool(addr string) (*redis.Conn, error) {
 	}
 
 	conn := pool.Get()
+	defer conn.Close()
 
 	_, err := conn.Do("PING") // check if redis server is responsive
 
