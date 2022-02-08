@@ -1,4 +1,29 @@
 package redis
 
-// set and get idempotency key with response as value
-// Idempotency-Key will be set in request header for post actions
+import (
+	"time"
+
+	"github.com/gomodule/redigo/redis"
+)
+
+func ConnectPool(addr string) (*redis.Conn, error) {
+	pool := &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+
+			return redis.Dial("tcp", addr)
+		},
+	}
+
+	conn := pool.Get()
+
+	_, err := conn.Do("PING") // check if redis server is responsive
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	return &conn, nil
+}
