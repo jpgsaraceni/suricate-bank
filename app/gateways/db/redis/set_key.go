@@ -18,10 +18,10 @@ func (r Repository) SetKeyValue(key string, res responses.Response) error {
 		return fmt.Errorf("failed to marshal response payload: %s", err)
 	}
 
-	_, err = conn.Do("HMSET", key, "status", res.Status, "payload", payloadJson)
+	_, err = conn.Do("HSET", key, "status", res.Status, "payload", payloadJson)
 	if err != nil {
 
-		return fmt.Errorf("redis HMSET command error: %s", err)
+		return fmt.Errorf("redis HSET command error: %s", err)
 	}
 
 	return nil
