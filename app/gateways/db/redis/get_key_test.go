@@ -40,11 +40,11 @@ func TestGetKeyValue(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:    "get a response",
+			name:    "get a created account response",
 			mustSet: true,
 			key:     "somekey",
 			res: responses.Response{
-				Status: 200,
+				Status: 201,
 				Payload: map[string]interface{}{
 					"account_id": testAccount.Id.String(),
 					"name":       testAccount.Name,

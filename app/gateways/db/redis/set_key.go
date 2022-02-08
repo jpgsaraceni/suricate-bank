@@ -26,7 +26,7 @@ func (r Repository) SetKeyValue(key string, res responses.Response) error {
 
 		return fmt.Errorf("redis HSETNX command error: %s", err)
 	}
-	if reply == 0 {
+	if reply.(int64) == 0 { // HSETNX returns 0 if key already exists
 
 		return errKeyExists
 	}
@@ -36,7 +36,7 @@ func (r Repository) SetKeyValue(key string, res responses.Response) error {
 
 		return fmt.Errorf("redis HSETNX command error: %s", err)
 	}
-	if reply == 0 {
+	if reply.(int64) == 0 { // HSETNX returns 0 if key already exists
 
 		return errKeyExists
 	}
@@ -47,7 +47,7 @@ func (r Repository) SetKeyValue(key string, res responses.Response) error {
 
 	// 	return fmt.Errorf("redis HSETNX command error: %s", err)
 	// }
-	// if reply == 0 {
+	// if reply.(int64) == 0 {
 
 	// 	return errKeyExists
 	// }
