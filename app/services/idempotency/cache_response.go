@@ -7,9 +7,9 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
-func (s service) CacheResponse(key string, request schema.CachedResponse) error {
+func (s service) CacheResponse(request schema.CachedResponse) error {
 
-	response, err := s.repository.GetCachedResponse(key)
+	response, err := s.repository.GetCachedResponse(request.Key)
 
 	if err != nil {
 
@@ -21,7 +21,7 @@ func (s service) CacheResponse(key string, request schema.CachedResponse) error 
 		return ErrResponseExists
 	}
 
-	err = s.repository.CacheResponse(key, request)
+	err = s.repository.CacheResponse(request)
 
 	if err != nil {
 

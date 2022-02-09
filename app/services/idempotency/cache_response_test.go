@@ -27,7 +27,7 @@ func TestCacheResponse(t *testing.T) {
 				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil
 				},
-				OnCacheResponse: func(key string, request schema.CachedResponse) error {
+				OnCacheResponse: func(request schema.CachedResponse) error {
 					return nil
 				},
 			},
@@ -43,7 +43,7 @@ func TestCacheResponse(t *testing.T) {
 						ResponseBody:   []byte("awesome marshaled json"),
 					}, nil
 				},
-				OnCacheResponse: func(key string, request schema.CachedResponse) error {
+				OnCacheResponse: func(request schema.CachedResponse) error {
 					return nil
 				},
 			},
@@ -66,7 +66,7 @@ func TestCacheResponse(t *testing.T) {
 				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil
 				},
-				OnCacheResponse: func(key string, request schema.CachedResponse) error {
+				OnCacheResponse: func(request schema.CachedResponse) error {
 					return errors.New("i am another error :( :(")
 				},
 			},
@@ -81,7 +81,7 @@ func TestCacheResponse(t *testing.T) {
 
 			s := NewService(tt.repository)
 
-			err := s.CacheResponse(tt.key, tt.request)
+			err := s.CacheResponse(tt.request)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
