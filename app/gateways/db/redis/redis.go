@@ -1,16 +1,18 @@
 package redis
 
 import (
+	"log"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
 
-func ConnectPool(addr string) (*redis.Conn, error) {
+func ConnectPool(addr string) (*redis.Pool, error) {
 	pool := &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
+			log.Printf("attempting to connect to redis on %s...\n", addr)
 
 			return redis.Dial("tcp", addr)
 		},
@@ -25,6 +27,7 @@ func ConnectPool(addr string) (*redis.Conn, error) {
 
 		return nil, err
 	}
+	log.Println("successfully connected to redis server")
 
-	return &conn, nil
+	return pool, nil
 }
