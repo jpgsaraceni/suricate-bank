@@ -5,3 +5,11 @@ type CachedResponse struct {
 	ResponseStatus int
 	ResponseBody   []byte
 }
+
+func NewCachedResponse(key string, status int, body []byte) CachedResponse {
+	return CachedResponse{
+		Key:            key,
+		ResponseStatus: status,
+		ResponseBody:   body,
+	}
+}

@@ -1,6 +1,9 @@
 package middlewares
 
 import (
+	"bytes"
+	"io"
+	"log"
 	"net/http"
 	"reflect"
 
@@ -9,7 +12,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
-func Idempotency(next http.Handler, s idempotency.Service) http.Handler {
+func Idempotency(s idempotency.Service, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		idempotencyKey := r.Header.Get("Idempotency-Key")
@@ -29,12 +32,57 @@ func Idempotency(next http.Handler, s idempotency.Service) http.Handler {
 		}
 
 		if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
-			next.ServeHTTP(w, r)
-			// TODO: set cached response
+			hijackedWriter := NewResponseHijack(w)
+			next(hijackedWriter, r)
+
+			err := s.CacheResponse(
+				schema.NewCachedResponse(
+					idempotencyKey,
+					hijackedWriter.StatusCode,
+					hijackedWriter.BodyBuffer.Bytes(),
+				),
+			)
+
+			if err != nil {
+
+				log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", idempotencyKey, err)
+			}
 
 			return
 		}
 
 		responses.NewResponse(w).UseCache(idempotentResponse).SendJSON()
 	})
+}
+
+// ResponseHijack writes a response to http.ResponseWriter and a copy to BodyBuffer and Status
+// using io.MultiWriter()
+type ResponseHijack struct {
+	w          http.ResponseWriter
+	multi      io.Writer
+	BodyBuffer *bytes.Buffer
+	StatusCode int
+}
+
+func NewResponseHijack(w http.ResponseWriter) *ResponseHijack {
+	bodyBuff := &bytes.Buffer{}
+	multi := io.MultiWriter(bodyBuff, w)
+	return &ResponseHijack{
+		w:          w,
+		multi:      multi,
+		BodyBuffer: bodyBuff,
+	}
+}
+
+func (h *ResponseHijack) Header() http.Header {
+	return h.w.Header()
+}
+
+func (h *ResponseHijack) Write(b []byte) (int, error) {
+	return h.multi.Write(b)
+}
+
+func (h *ResponseHijack) WriteHeader(i int) {
+	h.StatusCode = i
+	h.w.WriteHeader(i)
 }
