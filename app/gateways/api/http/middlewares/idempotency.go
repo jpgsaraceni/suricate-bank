@@ -51,7 +51,7 @@ func Idempotency(s idempotency.Service, next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		responses.NewResponse(w).UseCache(idempotentResponse).SendJSON()
+		responses.NewResponse(w).SendCachedResponse(idempotentResponse)
 	})
 }
 

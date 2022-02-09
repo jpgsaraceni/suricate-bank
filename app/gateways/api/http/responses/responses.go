@@ -28,12 +28,6 @@ func (r Response) IsComplete() bool {
 	return r.Status > 0
 }
 
-func (r Response) UseCache(cache schema.CachedResponse) Response {
-	r.Status = cache.ResponseStatus
-	r.Payload = cache.ResponseBody
-	return r
-}
-
 func (r Response) BadRequest(err Error) Response {
 	r.Status = http.StatusBadRequest
 	r.Error = err.Err
@@ -96,5 +90,13 @@ func (r Response) SendJSON() {
 	}
 	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
 		log.Println(err) // TODO: fix after implementing log
+	}
+}
+
+func (r Response) SendCachedResponse(cache schema.CachedResponse) {
+	r.Writer.Header().Set("Content-Type", "application/json")
+	r.Writer.WriteHeader(cache.ResponseStatus)
+	if _, err := r.Writer.Write(cache.ResponseBody); err != nil {
+		log.Println(err)
 	}
 }
