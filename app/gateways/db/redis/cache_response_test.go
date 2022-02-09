@@ -40,16 +40,6 @@ func TestCacheResponse(t *testing.T) {
 			CreatedAt: time.Now(),
 		}
 	}
-	// testTransfer := func(amount int) transfer.Transfer {
-	// 	amountTransfered, _ := money.NewMoney(amount)
-	// 	return transfer.Transfer{
-	// 		Id:                   transfer.TransferId(uuid.New()),
-	// 		AccountOriginId:      testAccount().Id,
-	// 		AccountDestinationId: testAccount().Id,
-	// 		Amount:               amountTransfered,
-	// 		CreatedAt:            time.Now(),
-	// 	}
-	// }
 
 	testAccounts := []account.Account{
 		testAccount(),
@@ -58,11 +48,6 @@ func TestCacheResponse(t *testing.T) {
 		testAccount(),
 	}
 
-	// testTransfers := []transfer.Transfer{
-	// 	testTransfer(10),
-	// 	testTransfer(5),
-	// 	testTransfer(100),
-	// }
 	repeatedKey := uuid.NewString()
 
 	createdAccountJson, _ := json.Marshal(testAccounts[0])
