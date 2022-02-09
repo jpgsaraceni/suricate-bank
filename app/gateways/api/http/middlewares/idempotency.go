@@ -12,47 +12,50 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
-func Idempotency(s idempotency.Service, next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
 
-		idempotencyKey := r.Header.Get("Idempotency-Key")
+			idempotencyKey := r.Header.Get("Idempotency-Key")
 
-		if idempotencyKey == "" { // client has not implemented idempotent requests
-			next.ServeHTTP(w, r)
+			if idempotencyKey == "" { // client has not implemented idempotent requests
+				next.ServeHTTP(w, r)
 
-			return
-		}
-
-		idempotentResponse, err := s.GetCachedResponse(r.Context(), idempotencyKey)
-
-		if err != nil {
-			responses.NewResponse(w).InternalServerError(err).SendJSON()
-
-			return
-		}
-
-		if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
-			hijackedWriter := NewResponseHijack(w)
-			next(hijackedWriter, r)
-
-			err := s.CacheResponse(
-				schema.NewCachedResponse(
-					idempotencyKey,
-					hijackedWriter.StatusCode,
-					hijackedWriter.BodyBuffer.Bytes(),
-				),
-			)
-
-			if err != nil {
-
-				log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", idempotencyKey, err)
+				return
 			}
 
-			return
-		}
+			idempotentResponse, err := s.GetCachedResponse(r.Context(), idempotencyKey)
 
-		responses.NewResponse(w).SendCachedResponse(idempotentResponse)
-	})
+			if err != nil {
+				responses.NewResponse(w).InternalServerError(err).SendJSON()
+
+				return
+			}
+
+			if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
+				hijackedWriter := NewResponseHijack(w)
+				next.ServeHTTP(hijackedWriter, r)
+
+				err := s.CacheResponse(
+					schema.NewCachedResponse(
+						idempotencyKey,
+						hijackedWriter.StatusCode,
+						hijackedWriter.BodyBuffer.Bytes(),
+					),
+				)
+
+				if err != nil {
+
+					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", idempotencyKey, err)
+				}
+
+				return
+			}
+
+			responses.NewResponse(w).SendCachedResponse(idempotentResponse)
+		}
+		return http.HandlerFunc(fn)
+	}
 }
 
 // ResponseHijack writes a response to http.ResponseWriter and a copy to BodyBuffer and Status

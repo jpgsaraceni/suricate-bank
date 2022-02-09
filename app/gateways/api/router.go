@@ -34,8 +34,9 @@ func NewRouter(
 	r := chi.NewRouter()
 
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middlewares.Idempotency(idempotencyService))
 
-	r.Post("/accounts", middlewares.Idempotency(idempotencyService, accountsHandler.Create))
+	r.Post("/accounts", accountsHandler.Create)
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 
