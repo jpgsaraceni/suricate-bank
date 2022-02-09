@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 type Response struct {
@@ -24,6 +26,12 @@ func NewResponse(w http.ResponseWriter) Response {
 
 func (r Response) IsComplete() bool {
 	return r.Status > 0
+}
+
+func (r Response) UseCache(cache schema.CachedResponse) Response {
+	r.Status = cache.ResponseStatus
+	r.Payload = cache.ResponseBody
+	return r
 }
 
 func (r Response) BadRequest(err Error) Response {
