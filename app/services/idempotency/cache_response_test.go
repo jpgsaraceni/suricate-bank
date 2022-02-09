@@ -1,6 +1,7 @@
 package idempotency
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -24,10 +25,10 @@ func TestCacheResponse(t *testing.T) {
 			name: "cache a response",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil
 				},
-				OnCacheResponse: func(request schema.CachedResponse) error {
+				OnCacheResponse: func(context.Context, schema.CachedResponse) error {
 					return nil
 				},
 			},
@@ -36,14 +37,14 @@ func TestCacheResponse(t *testing.T) {
 			name: "fail to cache a response that is already cached",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{
 						Key:            testKey,
 						ResponseStatus: 200,
 						ResponseBody:   []byte("awesome marshaled json"),
 					}, nil
 				},
-				OnCacheResponse: func(request schema.CachedResponse) error {
+				OnCacheResponse: func(context.Context, schema.CachedResponse) error {
 					return nil
 				},
 			},
@@ -53,7 +54,7 @@ func TestCacheResponse(t *testing.T) {
 			name: "fail due to repository error on getting cached response",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, errors.New("i am an error :(")
 				},
 			},
@@ -63,10 +64,10 @@ func TestCacheResponse(t *testing.T) {
 			name: "fail due to repository error on caching response",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil
 				},
-				OnCacheResponse: func(request schema.CachedResponse) error {
+				OnCacheResponse: func(context.Context, schema.CachedResponse) error {
 					return errors.New("i am another error :( :(")
 				},
 			},
@@ -81,7 +82,7 @@ func TestCacheResponse(t *testing.T) {
 
 			s := NewService(tt.repository)
 
-			err := s.CacheResponse(tt.request)
+			err := s.CacheResponse(context.Background(), tt.request)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

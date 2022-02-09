@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"log"
 	"net/http"
@@ -12,19 +13,23 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
+type idempotencyKey struct{}
+
 func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 
-			idempotencyKey := r.Header.Get("Idempotency-Key")
+			requestIdempotencyKey := r.Header.Get("Idempotency-Key")
 
-			if idempotencyKey == "" { // client has not implemented idempotent requests
+			if requestIdempotencyKey == "" { // client has not implemented idempotent requests
 				next.ServeHTTP(w, r)
 
 				return
 			}
 
-			idempotentResponse, err := s.GetCachedResponse(r.Context(), idempotencyKey)
+			ctx := WithIdempotency(r.Context(), requestIdempotencyKey)
+
+			idempotentResponse, err := s.GetCachedResponse(ctx, requestIdempotencyKey)
 
 			if err != nil {
 				responses.NewResponse(w).InternalServerError(err).SendJSON()
@@ -37,8 +42,9 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				next.ServeHTTP(hijackedWriter, r)
 
 				err := s.CacheResponse(
+					ctx,
 					schema.NewCachedResponse(
-						idempotencyKey,
+						requestIdempotencyKey,
 						hijackedWriter.StatusCode,
 						hijackedWriter.BodyBuffer.Bytes(),
 					),
@@ -46,7 +52,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 
 				if err != nil {
 
-					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", idempotencyKey, err)
+					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", requestIdempotencyKey, err)
 				}
 
 				return
@@ -56,6 +62,10 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 		}
 		return http.HandlerFunc(fn)
 	}
+}
+
+func WithIdempotency(ctx context.Context, key string) context.Context {
+	return context.WithValue(ctx, idempotencyKey{}, key)
 }
 
 // ResponseHijack writes a response to http.ResponseWriter and a copy to BodyBuffer and Status

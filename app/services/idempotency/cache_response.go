@@ -1,15 +1,16 @@
 package idempotency
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
-func (s service) CacheResponse(request schema.CachedResponse) error {
+func (s service) CacheResponse(ctx context.Context, request schema.CachedResponse) error {
 
-	response, err := s.repository.GetCachedResponse(request.Key)
+	response, err := s.repository.GetCachedResponse(ctx, request.Key)
 
 	if err != nil {
 
@@ -21,7 +22,7 @@ func (s service) CacheResponse(request schema.CachedResponse) error {
 		return ErrResponseExists
 	}
 
-	err = s.repository.CacheResponse(request)
+	err = s.repository.CacheResponse(ctx, request)
 
 	if err != nil {
 

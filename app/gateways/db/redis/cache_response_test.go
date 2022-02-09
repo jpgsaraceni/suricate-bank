@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"testing"
@@ -82,7 +83,7 @@ func TestCacheResponse(t *testing.T) {
 		{
 			name: "fail to set existent key",
 			runBefore: func() {
-				testRepo.CacheResponse(schema.CachedResponse{
+				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
 					Key: repeatedKey,
 				})
 			},
@@ -103,7 +104,7 @@ func TestCacheResponse(t *testing.T) {
 				tt.runBefore()
 			}
 
-			err := testRepo.CacheResponse(tt.response)
+			err := testRepo.CacheResponse(context.Background(), tt.response)
 
 			if !errors.Is(err, tt.err) {
 

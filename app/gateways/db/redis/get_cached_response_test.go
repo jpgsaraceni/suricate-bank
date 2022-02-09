@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"reflect"
@@ -61,7 +62,7 @@ func TestGetCachedResponse(t *testing.T) {
 			name: "get a created account response",
 			key:  testKey,
 			runBefore: func() {
-				testRepo.CacheResponse(schema.CachedResponse{
+				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
 					Key:            testKey,
 					ResponseStatus: 201,
 					ResponseBody:   createdAccountJson,
@@ -77,7 +78,7 @@ func TestGetCachedResponse(t *testing.T) {
 			name: "get an error response",
 			key:  testKey2,
 			runBefore: func() {
-				testRepo.CacheResponse(schema.CachedResponse{
+				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
 					Key:            testKey2,
 					ResponseStatus: 400,
 					ResponseBody:   badRequestJson,
@@ -105,7 +106,7 @@ func TestGetCachedResponse(t *testing.T) {
 				tt.runBefore()
 			}
 
-			got, err := testRepo.GetCachedResponse(tt.key)
+			got, err := testRepo.GetCachedResponse(context.Background(), tt.key)
 
 			if !errors.Is(err, tt.err) {
 

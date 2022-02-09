@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -9,7 +10,7 @@ import (
 
 var errKeyExists = errors.New("key already exists in redis")
 
-func (r Repository) CacheResponse(response schema.CachedResponse) error {
+func (r Repository) CacheResponse(ctx context.Context, response schema.CachedResponse) error {
 	conn := r.pool.Get()
 	defer conn.Close()
 

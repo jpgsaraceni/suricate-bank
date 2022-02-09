@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -9,7 +10,7 @@ import (
 
 var errType = errors.New("failed to convert redis reply to []byte")
 
-func (r Repository) GetCachedResponse(key string) (schema.CachedResponse, error) {
+func (r Repository) GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error) {
 	conn := r.pool.Get()
 	defer conn.Close()
 

@@ -40,7 +40,7 @@ func TestGetCachedResponse(t *testing.T) {
 			name: "get a created account response",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{
 						Key:            testKey,
 						ResponseStatus: 200,
@@ -58,7 +58,7 @@ func TestGetCachedResponse(t *testing.T) {
 			name: "repository error",
 			key:  testKey,
 			repository: MockRepository{
-				OnGetCachedResponse: func(key string) (schema.CachedResponse, error) {
+				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, errors.New("repository uh-oh")
 				},
 			},

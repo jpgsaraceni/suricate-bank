@@ -13,7 +13,7 @@ type service struct {
 
 type Service interface {
 	GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error)
-	CacheResponse(request schema.CachedResponse) error
+	CacheResponse(ctx context.Context, request schema.CachedResponse) error
 }
 
 func NewService(r Repository) Service {
