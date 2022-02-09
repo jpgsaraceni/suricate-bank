@@ -15,6 +15,7 @@ import (
 	transfersroute "github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/handlers/transfers"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/middlewares"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
@@ -24,6 +25,7 @@ func NewRouter(
 	accountUC accountuc.Usecase,
 	transferUC transferuc.Usecase,
 	authService auth.Service,
+	idempotencyService idempotency.Service,
 ) {
 	accountsHandler := accountsroute.NewHandler(accountUC)
 	transfersHandler := transfersroute.NewHandler(transferUC)
@@ -33,7 +35,7 @@ func NewRouter(
 
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Post("/accounts", accountsHandler.Create) // call idempotency middleware
+	r.Post("/accounts", middlewares.Idempotency(idempotencyService, accountsHandler.Create))
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 

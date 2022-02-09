@@ -10,7 +10,9 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres"
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	transferspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/transfers"
+	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
@@ -24,22 +26,26 @@ func main() {
 		panic(err)
 	}
 
-	log.Printf("\033[34m---- HAPPY BANKING ----\033[37m\n")
-
 	defer pgPool.Close()
 
-	// connect to redis
-	// defer redis close
+	redisPool, err := redis.ConnectPool("localhost:6379")
+	if err != nil {
+		panic(err)
+	}
+
+	defer redisPool.Close()
+
+	log.Printf("\033[34m---- HAPPY BANKING ----\033[37m\n")
 
 	accountsRepository := accountspg.NewRepository(pgPool)
 	transfersRepository := transferspg.NewRepository(pgPool)
-	// instantiate redis repository
+	idempotencyRepository := redis.NewRepository(redisPool)
 
 	accountsUsecase := accountuc.NewUsecase(accountsRepository)
 	transfersUsecase := transferuc.NewUsecase(transfersRepository, accountsRepository)
 
 	authService := auth.NewService(accountsRepository)
-	// instantiate idempotency service
+	idemppotencyService := idempotency.NewService(idempotencyRepository)
 
-	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService)
+	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService, idemppotencyService)
 }
