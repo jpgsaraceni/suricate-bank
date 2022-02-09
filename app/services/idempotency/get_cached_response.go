@@ -2,10 +2,18 @@ package idempotency
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 func (s service) GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error) {
-	return s.repository.GetCachedResponse(key)
+	response, err := s.repository.GetCachedResponse(key)
+
+	if err != nil {
+
+		return response, fmt.Errorf("%w:%s", ErrRepository, err)
+	}
+
+	return response, nil
 }
