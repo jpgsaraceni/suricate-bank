@@ -7,10 +7,12 @@ test:
 	go test -race -count=1 ./...
 
 # run without docker-compose
-postgres-start:
-	systemctl start postgresql 
-postgres-stop:
+db-start:
+	systemctl start postgresql
+	redis-server --daemonize yes 
+db-stop:
 	systemctl stop postgresql
+	redis-cli shutdown
 dev:
 	go run cmd/main.go
 dev-build:
