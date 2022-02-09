@@ -15,6 +15,7 @@ type Config struct {
 	HttpServer HttpServerConfig
 	Jwt        JwtConfig
 	Dockertest DockertestConfig
+	Redis      RedisConfig
 }
 
 type PostgresConfig struct {
@@ -37,6 +38,11 @@ type JwtConfig struct {
 
 type DockertestConfig struct {
 	Timeout string `env:"DOCKERTEST_TIMEOUT" env-default:"30"`
+}
+
+type RedisConfig struct {
+	Host string `env:"REDIS_HOST" env-default:"localhost"`
+	Port string `env:"REDIS_PORT" env-default:"6379"`
 }
 
 func ReadConfigFromEnv() *Config {
@@ -85,6 +91,10 @@ func (cfg PostgresConfig) Url() string {
 
 func (cfg HttpServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", cfg.Port)
+}
+
+func (cfg RedisConfig) Url() string {
+	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 }
 
 func (cfg Config) setEnvs() {

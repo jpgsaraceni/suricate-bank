@@ -28,7 +28,7 @@ func main() {
 
 	defer pgPool.Close()
 
-	redisPool, err := redis.ConnectPool("localhost:6379")
+	redisPool, err := redis.ConnectPool(cfg.Redis.Url())
 	if err != nil {
 		panic(err)
 	}
