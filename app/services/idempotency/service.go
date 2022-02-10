@@ -14,6 +14,7 @@ type service struct {
 type Service interface {
 	GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error)
 	CacheResponse(ctx context.Context, request schema.CachedResponse) error
+	Lock(ctx context.Context, key string) error
 }
 
 func NewService(r Repository) Service {

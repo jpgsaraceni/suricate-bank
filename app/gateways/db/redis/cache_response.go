@@ -3,12 +3,9 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
-
-var errKeyExists = errors.New("key already exists in redis")
 
 func (r Repository) CacheResponse(ctx context.Context, response schema.CachedResponse) error {
 	conn := r.pool.Get()
@@ -21,11 +18,11 @@ func (r Repository) CacheResponse(ctx context.Context, response schema.CachedRes
 		return err
 	}
 
-	reply, err := conn.Do("SETNX", response.Key, j)
+	reply, err := conn.Do("SET", response.Key, j, "XX")
 
-	if reply.(int64) == 0 {
+	if reply == nil {
 
-		return errKeyExists
+		return errKeyNotFound
 	}
 
 	if err != nil {

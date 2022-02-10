@@ -37,11 +37,26 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				return
 			}
 
+			if idempotentResponse.Key != "" && idempotentResponse.ResponseBody == nil { // key exists in redis but
+				// has not been populated yet
+				responses.NewResponse(w).Processing().SendJSON()
+
+				return
+			}
+
 			if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
+				err := s.Lock(ctx, requestIdempotencyKey)
+
+				if err != nil {
+					responses.NewResponse(w).InternalServerError(err).SendJSON()
+
+					return
+				}
+
 				hijackedWriter := NewResponseHijack(w)
 				next.ServeHTTP(hijackedWriter, r)
 
-				err := s.CacheResponse(
+				err = s.CacheResponse(
 					ctx,
 					schema.NewCachedResponse(
 						requestIdempotencyKey,

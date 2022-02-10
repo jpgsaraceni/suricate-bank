@@ -3,12 +3,9 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
-
-var errType = errors.New("failed to convert redis reply to []byte")
 
 func (r Repository) GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error) {
 	conn := r.pool.Get()
@@ -21,6 +18,12 @@ func (r Repository) GetCachedResponse(ctx context.Context, key string) (schema.C
 	if err != nil {
 
 		return response, err
+	}
+
+	if replyString, _ := reply.(string); replyString == "" { // request is being processed by api
+
+		response.Key = key
+		return response, nil
 	}
 
 	if reply == nil { // key does not exist

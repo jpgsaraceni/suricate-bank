@@ -20,6 +20,10 @@ type ErrorPayload struct {
 	Message string `json:"title,omitempty" example:"Message for some error"`
 }
 
+type ProcessingPayload struct {
+	Message string `json:"title,omitempty" example:"Request is being processed"`
+}
+
 func NewResponse(w http.ResponseWriter) Response {
 	return Response{Writer: w}
 }
@@ -79,6 +83,12 @@ func (r Response) Ok(payload interface{}) Response {
 func (r Response) Created(payload interface{}) Response {
 	r.Status = http.StatusCreated
 	r.Payload = payload
+	return r
+}
+
+func (r Response) Processing() Response {
+	r.Status = http.StatusProcessing
+	r.Payload = ProcessingPayload{Message: "Request is duplicate. Original request is being processed."}
 	return r
 }
 
