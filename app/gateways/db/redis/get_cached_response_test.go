@@ -56,17 +56,32 @@ func TestGetCachedResponse(t *testing.T) {
 
 	testKey := uuid.NewString()
 	testKey2 := uuid.NewString()
+	testKeyEmpty := uuid.NewString()
 
 	testCases := []testCase{
 		{
 			name: "get a created account response",
 			key:  testKey,
 			runBefore: func() {
-				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
+				conn := testRepo.pool.Get()
+
+				toCache, err := json.Marshal(schema.CachedResponse{
 					Key:            testKey,
 					ResponseStatus: 201,
 					ResponseBody:   createdAccountJson,
 				})
+
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+
+				_, err = conn.Do("SET", testKey, toCache)
+
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+
+				conn.Close()
 			},
 			response: schema.CachedResponse{
 				Key:            testKey,
@@ -78,11 +93,25 @@ func TestGetCachedResponse(t *testing.T) {
 			name: "get an error response",
 			key:  testKey2,
 			runBefore: func() {
-				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
+				conn := testRepo.pool.Get()
+
+				toCache, err := json.Marshal(schema.CachedResponse{
 					Key:            testKey2,
 					ResponseStatus: 400,
 					ResponseBody:   badRequestJson,
 				})
+
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+
+				_, err = conn.Do("SET", testKey2, toCache)
+
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+
+				conn.Close()
 			},
 			response: schema.CachedResponse{
 				Key:            testKey2,
@@ -94,6 +123,24 @@ func TestGetCachedResponse(t *testing.T) {
 			name:     "respond empty when trying to get key that does not exist",
 			key:      uuid.NewString(),
 			response: schema.CachedResponse{},
+		},
+		{
+			name: "get an empty key from redis meaning server is still processing request",
+			key:  testKeyEmpty,
+			runBefore: func() {
+				conn := testRepo.pool.Get()
+
+				_, err := conn.Do("SET", testKeyEmpty, "")
+
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+
+				conn.Close()
+			},
+			response: schema.CachedResponse{
+				Key: testKeyEmpty,
+			},
 		},
 	}
 

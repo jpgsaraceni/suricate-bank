@@ -17,19 +17,42 @@ func TestLock(t *testing.T) {
 	t.Cleanup(tearDown)
 
 	type testCase struct {
-		name string
-		key  string
-		err  error
+		name      string
+		runBefore func()
+		key       string
+		err       error
 	}
 
+	repeatedKey := "nicekey"
+
 	testCases := []testCase{
-		{},
+		{
+			name: "fail to set a key that already exists in redis",
+			runBefore: func() {
+				conn := testRepo.pool.Get()
+				_, err := conn.Do("SET", repeatedKey, "")
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+				conn.Close()
+			},
+			key: repeatedKey,
+			err: errKeyExists,
+		},
+		{
+			name: "set a key",
+			key:  "greatkey",
+		},
 	}
 
 	for _, tt := range testCases {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
+			if tt.runBefore != nil {
+				tt.runBefore()
+			}
 
 			err := testRepo.Lock(context.Background(), tt.key)
 

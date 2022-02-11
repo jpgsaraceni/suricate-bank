@@ -49,7 +49,9 @@ func TestCacheResponse(t *testing.T) {
 		testAccount(),
 	}
 
-	repeatedKey := uuid.NewString()
+	testKey := uuid.NewString()
+	testKey2 := uuid.NewString()
+	testKey3 := uuid.NewString()
 
 	createdAccountJson, _ := json.Marshal(testAccounts[0])
 	fetchedAccountsJson, _ := json.Marshal(testAccounts)
@@ -58,40 +60,59 @@ func TestCacheResponse(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "set a created account response",
+			runBefore: func() {
+				conn := testRepo.pool.Get()
+				_, err := conn.Do("SET", testKey, "")
+				if err != nil {
+					t.Fatalf("failed to set key: %s", err)
+				}
+				conn.Close()
+			},
 			response: schema.CachedResponse{
-				Key:            uuid.NewString(),
+				Key:            testKey,
 				ResponseStatus: 201,
 				ResponseBody:   createdAccountJson,
 			},
 		},
 		{
 			name: "set a create account error response",
+			runBefore: func() {
+				conn := testRepo.pool.Get()
+				_, err := conn.Do("SET", testKey2, "")
+				if err != nil {
+					t.Fatalf("failed to set key: %s", err)
+				}
+				conn.Close()
+			},
 			response: schema.CachedResponse{
-				Key:            uuid.NewString(),
+				Key:            testKey2,
 				ResponseStatus: 400,
 				ResponseBody:   createAccountErrorJson,
 			},
 		},
 		{
 			name: "set a fetched accounts slice response",
+			runBefore: func() {
+				conn := testRepo.pool.Get()
+				_, err := conn.Do("SET", testKey3, "")
+				if err != nil {
+					t.Fatalf("failed to set key: %s", err)
+				}
+				conn.Close()
+			},
 			response: schema.CachedResponse{
-				Key:            uuid.NewString(),
+				Key:            testKey3,
 				ResponseStatus: 200,
 				ResponseBody:   fetchedAccountsJson,
 			},
 		},
 		{
-			name: "fail to set existent key",
-			runBefore: func() {
-				testRepo.CacheResponse(context.Background(), schema.CachedResponse{
-					Key: repeatedKey,
-				})
-			},
+			name: "fail to set inexistent key",
 			response: schema.CachedResponse{
-				Key:            repeatedKey,
+				Key:            uuid.NewString(),
 				ResponseStatus: 201,
 			},
-			err: errKeyExists,
+			err: errKeyNotFound,
 		},
 	}
 
