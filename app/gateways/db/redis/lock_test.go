@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis/redistest"
@@ -13,14 +14,16 @@ func TestLock(t *testing.T) {
 
 	testConn, tearDown := redistest.GetTestPool()
 	testRepo := NewRepository(testConn)
+	os.Setenv("IDEMPOTENCY_TTL", "24")
 
 	t.Cleanup(tearDown)
 
 	type testCase struct {
-		name      string
-		runBefore func()
-		key       string
-		err       error
+		name          string
+		runBefore     func()
+		key           string
+		shouldSucceed bool
+		err           error
 	}
 
 	repeatedKey := "nicekey"
@@ -40,8 +43,9 @@ func TestLock(t *testing.T) {
 			err: errKeyExists,
 		},
 		{
-			name: "set a key",
-			key:  "greatkey",
+			name:          "set a key",
+			key:           "greatkey",
+			shouldSucceed: true,
 		},
 	}
 
@@ -58,6 +62,18 @@ func TestLock(t *testing.T) {
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)
+			}
+
+			if tt.shouldSucceed {
+				conn := testRepo.pool.Get()
+				reply, err := conn.Do("TTL", tt.key)
+				if err != nil {
+					t.Fatalf("runBefore failed: %s", err)
+				}
+				if replyInt := reply.(int64); replyInt < 23*60*60 {
+					t.Fatalf("expect TTL > 23 hours, got %d", replyInt)
+				}
+				conn.Close()
 			}
 		})
 	}
