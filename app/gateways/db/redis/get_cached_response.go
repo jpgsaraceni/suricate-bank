@@ -20,18 +20,18 @@ func (r Repository) GetCachedResponse(ctx context.Context, key string) (schema.C
 		return response, err
 	}
 
-	if replyString, _ := reply.(string); replyString == "" { // request is being processed by api
-
-		response.Key = key
-		return response, nil
-	}
-
 	if reply == nil { // key does not exist
 
 		return response, nil
 	}
 
 	replyBytes, ok := reply.([]byte)
+
+	if ok && len(replyBytes) == 0 { // request is being processed by api
+
+		response.Key = key
+		return response, nil
+	}
 
 	if !ok {
 

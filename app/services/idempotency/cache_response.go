@@ -3,7 +3,6 @@ package idempotency
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
@@ -17,7 +16,7 @@ func (s service) CacheResponse(ctx context.Context, request schema.CachedRespons
 		return fmt.Errorf("%w:%s", ErrRepository, err)
 	}
 
-	if !reflect.DeepEqual(response, schema.CachedResponse{}) {
+	if response.ResponseStatus > 0 { // key exists and is populated
 
 		return ErrResponseExists
 	}
