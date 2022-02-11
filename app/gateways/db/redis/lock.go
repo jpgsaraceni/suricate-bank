@@ -22,7 +22,7 @@ func (r Repository) Lock(ctx context.Context, key string) error {
 
 	reply, err := conn.Do("SET", key, "", "EX", ttlSeconds, "NX") // set with ttl and only if not exist
 
-	if reply.(int64) == 0 {
+	if reply == nil {
 
 		return errKeyExists
 	}
