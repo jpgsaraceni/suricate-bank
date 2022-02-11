@@ -27,15 +27,15 @@ func (r Repository) GetCachedResponse(ctx context.Context, key string) (schema.C
 
 	replyBytes, ok := reply.([]byte)
 
-	if ok && len(replyBytes) == 0 { // request is being processed by api
-
-		response.Key = key
-		return response, nil
-	}
-
 	if !ok {
 
 		return response, errType
+	}
+
+	if len(replyBytes) == 0 { // request is being processed by api
+
+		response.Key = key
+		return response, nil
 	}
 
 	err = json.Unmarshal(replyBytes, &response)
