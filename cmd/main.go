@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	ctx := context.TODO()
+	ctx := context.Background()
 
 	cfg := config.ReadConfig(".env")
 
