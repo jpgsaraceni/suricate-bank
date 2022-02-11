@@ -87,7 +87,7 @@ func (r Response) Created(payload interface{}) Response {
 }
 
 func (r Response) Processing() Response {
-	r.Status = http.StatusProcessing
+	r.Status = http.StatusBadRequest
 	r.Payload = ProcessingPayload{Message: "Request is duplicate. Original request is being processed."}
 	return r
 }
