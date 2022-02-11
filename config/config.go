@@ -41,8 +41,9 @@ type DockertestConfig struct {
 }
 
 type RedisConfig struct {
-	Host string `env:"REDIS_HOST" env-default:"localhost"`
-	Port string `env:"REDIS_PORT" env-default:"6379"`
+	Host              string `env:"REDIS_HOST" env-default:"localhost"`
+	Port              string `env:"REDIS_PORT" env-default:"6379"`
+	IdempotencyKeyTTL string `env:"IDEMPOTENCY_TTL_HOURS" env-default:"24"`
 }
 
 func ReadConfigFromEnv() *Config {
@@ -101,4 +102,5 @@ func (cfg Config) setEnvs() {
 	os.Setenv("JWT_SECRET", cfg.Jwt.Secret)
 	os.Setenv("JWT_TIMEOUT", cfg.Jwt.Timeout)
 	os.Setenv("DOCKERTEST_TIMEOUT", cfg.Dockertest.Timeout)
+	os.Setenv("IDEMPOTENCY_TTL", cfg.Redis.IdempotencyKeyTTL)
 }
