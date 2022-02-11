@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"log"
 	"net/http"
@@ -12,8 +11,6 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
-
-type idempotencyKey struct{}
 
 func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -27,9 +24,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				return
 			}
 
-			ctx := WithIdempotency(r.Context(), requestIdempotencyKey)
-
-			idempotentResponse, err := s.GetCachedResponse(ctx, requestIdempotencyKey)
+			idempotentResponse, err := s.GetCachedResponse(r.Context(), requestIdempotencyKey)
 
 			if err != nil {
 				responses.NewResponse(w).InternalServerError(err).SendJSON()
@@ -45,7 +40,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 			}
 
 			if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
-				err := s.Lock(ctx, requestIdempotencyKey)
+				err := s.Lock(r.Context(), requestIdempotencyKey)
 
 				if err != nil {
 					responses.NewResponse(w).InternalServerError(err).SendJSON()
@@ -57,7 +52,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				next.ServeHTTP(hijackedWriter, r)
 
 				err = s.CacheResponse(
-					ctx,
+					r.Context(),
 					schema.NewCachedResponse(
 						requestIdempotencyKey,
 						hijackedWriter.StatusCode,
@@ -77,10 +72,6 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 		}
 		return http.HandlerFunc(fn)
 	}
-}
-
-func WithIdempotency(ctx context.Context, key string) context.Context {
-	return context.WithValue(ctx, idempotencyKey{}, key)
 }
 
 // ResponseHijack writes a response to http.ResponseWriter and a copy to BodyBuffer and Status
