@@ -2,6 +2,8 @@ package middlewares
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"io"
 	"log"
 	"net/http"
@@ -20,6 +22,13 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 
 			if requestIdempotencyKey == "" { // client has not implemented idempotent requests
 				next.ServeHTTP(w, r)
+
+				return
+			}
+
+			encodedRequest, err := encodeRequestBody(r)
+			if err != nil {
+				responses.NewResponse(w).InternalServerError(err).SendJSON()
 
 				return
 			}
@@ -53,17 +62,24 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 
 				err = s.CacheResponse(
 					r.Context(),
-					schema.NewCachedResponse(
-						requestIdempotencyKey,
-						hijackedWriter.StatusCode,
-						hijackedWriter.BodyBuffer.Bytes(),
-					),
+					schema.CachedResponse{
+						Key:            requestIdempotencyKey,
+						ResponseStatus: hijackedWriter.StatusCode,
+						ResponseBody:   hijackedWriter.BodyBuffer.Bytes(),
+						EncodedRequest: encodedRequest,
+					},
 				)
 
 				if err != nil {
 
 					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", requestIdempotencyKey, err)
 				}
+
+				return
+			}
+
+			if encodedRequest != idempotentResponse.EncodedRequest {
+				responses.NewResponse(w).Conflict().SendJSON()
 
 				return
 			}
@@ -104,4 +120,22 @@ func (h *ResponseHijack) Write(b []byte) (int, error) {
 func (h *ResponseHijack) WriteHeader(i int) {
 	h.StatusCode = i
 	h.w.WriteHeader(i)
+}
+
+func encodeRequestBody(r *http.Request) (string, error) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+
+		return "", err
+	}
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+	encodedRequest := hashBytes(body)
+
+	return encodedRequest, nil
+}
+
+func hashBytes(b []byte) string {
+	hash := md5.Sum(b)
+	hashEncoding := hex.EncodeToString(hash[:])
+	return hashEncoding
 }

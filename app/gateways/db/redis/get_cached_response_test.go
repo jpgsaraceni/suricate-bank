@@ -52,7 +52,7 @@ func TestGetCachedResponse(t *testing.T) {
 	}
 
 	createdAccountJson, _ := json.Marshal(testAccounts[0])
-	badRequestJson, _ := json.Marshal(responses.ErrorPayload{Message: "Great and meaningful error message"})
+	badRequestJson, _ := json.Marshal(responses.CustomPayload{Message: "Great and meaningful error message"})
 
 	testKey := uuid.NewString()
 	testKey2 := uuid.NewString()
