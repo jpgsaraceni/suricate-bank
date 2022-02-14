@@ -1,4 +1,6 @@
 # ⚠️ WORK IN PROGRESS (DEVELOPMENT RELEASE) ⚠️
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjpgsaraceni%2Fsuricate-bank.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjpgsaraceni%2Fsuricate-bank?ref=badge_shield)
+
 
 Suricate Bank is an api that creates accounts and transfers money between them. It is being built following Clean Arch.
 
@@ -122,3 +124,7 @@ Authorization: Bearer <JWT>
 #### GET `/transfers`
 
 List all transfers
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjpgsaraceni%2Fsuricate-bank.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjpgsaraceni%2Fsuricate-bank?ref=badge_large)
