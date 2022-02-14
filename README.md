@@ -4,12 +4,18 @@ Suricate Bank is an api that creates accounts and transfers money between them. 
 
 A very special thanks to my Golang and Clean Arch mentor, [Helder](https://github.com/helder-jaspion). It's been a ride!
 
+## Features
+
+* RESTful API
+* Support for idempotent requests
+* Bearer Token (JWT) Auth on private routes (create transfer)
+* Clean Architecture
+* Containerized
+* Meaningful unit and integration tests
+
 ## TODO
 
-* Logging
-* RequestID tracing
-* Idempotency (redis)
-* Panic recovery
+* Logging, requestID tracing and panic recovery middlewares
 * Swagger
 * GitHub Actions
 
@@ -23,6 +29,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [jwt](github.com/golang-jwt/jwt/v4) - For signing and verifying JSON Web Tokens for authenticatioin;
 * [chi](github.com/go-chi/chi) - For routing;
 * [cleanenv](github.com/ilyakaznacheev/cleanenv) - For reading .env and loading env variables;
+* [redigo](github.com/gomodule/redigo) - For connecting and running commands on Redis (for idempotent HTTP requests);
 * [Logrus](https://github.com/sirupsen/logrus) - For logging. This library is used in the dockertest example. I haven't set up logging for the project, so I will decide later if this will actually be used.
 
 ## Getting started
@@ -31,7 +38,7 @@ To run this app in a container, the only requirement is [Docker Compose](https:/
 
 To run without a container, you will need [Go](https://go.dev/doc/install), [PostgreSQL](https://www.postgresql.org/download/) (configured and running), and optionally [Docker](https://docs.docker.com/get-docker/) to run integration tests.
 
-An image of the application is available on Docker Hub registry [on this repository](https://hub.docker.com/r/saraceni/suricate-bank). You can pull it and use the postgres instance you prefer (directly on your machine or building a container) to run the app. To pull the image, just run `make pull-container`.
+An image of the application is available on Docker Hub registry [on this repository](https://hub.docker.com/r/saraceni/suricate-bank). You can pull it and use the postgres and redis instances you prefer (directly on your machine or building a container) to run the app. To pull the image, just run `make pull-container`.
 
 ### Running the app
 
