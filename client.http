@@ -7,11 +7,15 @@ Content-Type: application/json
 #     "cpf":"22061446035",
 #     "secret":"can't-tell-you"
 # }
-
 {
-    "cpf":"403.055.690-66",
-    "secret":"really-good-one"
+    "cpf": "045.591.180-00",
+    "secret": "still-can't-tell-you"
 }
+
+# {
+#     "cpf":"403.055.690-66",
+#     "secret":"really-good-one"
+# }
 
 # ACCOUNTS
 ### get all accounts
@@ -20,7 +24,7 @@ GET http://localhost:8080/accounts
 ### create new account
 POST http://localhost:8080/accounts
 Content-type: application/json
-Idempotency-Key: 072335a1-3b08-444f-a3e1-835850b8d491
+Idempotency-Key: 025a1-3b08-444f-a3e1-835850b8d491
 
 # {
 #     "name": "first client",
@@ -34,10 +38,16 @@ Idempotency-Key: 072335a1-3b08-444f-a3e1-835850b8d491
 #     "secret": "still-can't-tell-you"
 # }
 
+# {
+#     "name": "idempotent client",
+#     "cpf": "403.055.690-66",
+#     "secret": "really-good-one"
+# }
+
 {
-    "name": "idempotent client",
-    "cpf": "403.055.690-66",
-    "secret": "really-good-one"
+    "name": "zé ninguém",
+    "cpf": "715.189.730-86",
+    "secret": "123456"
 }
 
 ### get account balance
@@ -50,9 +60,10 @@ GET http://localhost:8080/transfers
 ### create transfer
 POST http://localhost:8080/transfers
 Content-type: application/json
-Authorization: Bearer <JWT>
+Idempotency-Key: 0235a1-3b08-444f-a3e1-835850b8d492
+Authorization: Bearer <TOKEN>
 
 {
-    "account_destination_id": "438e4746-fb04-4339-bd09-6cba20561835",
+    "account_destination_id": "e28c9d22-bd04-4e32-9984-8254d1bbd6bb",
     "amount": 500
 }
