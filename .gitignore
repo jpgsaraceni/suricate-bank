@@ -198,3 +198,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/go,linux,macos,dotenv,windows,visualstudiocode,goland
 .vscode/launch.json
+dump.rdb
