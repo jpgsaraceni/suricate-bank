@@ -34,13 +34,17 @@ func NewRouter(
 	r := chi.NewRouter()
 
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Use(middlewares.Idempotency(idempotencyService))
 
-	r.Post("/accounts", accountsHandler.Create)
+	r.With(
+		middlewares.Idempotency(idempotencyService),
+	).Post("/accounts", accountsHandler.Create)
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 
-	r.With(middlewares.Authorize).Post("/transfers", transfersHandler.Create)
+	r.With(
+		middlewares.Authorize,
+		middlewares.Idempotency(idempotencyService),
+	).Post("/transfers", transfersHandler.Create)
 	r.Get("/transfers", transfersHandler.Fetch)
 
 	r.Post("/login", loginHandler.Login)
