@@ -43,7 +43,7 @@ type DockertestConfig struct {
 type RedisConfig struct {
 	Host              string `env:"REDIS_HOST" env-default:"localhost"`
 	Port              string `env:"REDIS_PORT" env-default:"6379"`
-	IdempotencyKeyTTL string `env:"IDEMPOTENCY_TTL_HOURS" env-default:"24"`
+	IdempotencyKeyTTL string `env:"IDEMPOTENCY_TTL" env-default:"86400"`
 }
 
 func ReadConfigFromEnv() *Config {
