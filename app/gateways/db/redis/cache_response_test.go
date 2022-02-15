@@ -55,7 +55,7 @@ func TestCacheResponse(t *testing.T) {
 
 	createdAccountJson, _ := json.Marshal(testAccounts[0])
 	fetchedAccountsJson, _ := json.Marshal(testAccounts)
-	createAccountErrorJson, _ := json.Marshal(responses.CustomPayload{Message: "Super descriptive error message"})
+	createAccountErrorJson, _ := json.Marshal(responses.ErrorPayload{Message: "Super descriptive error message"})
 
 	testCases := []testCase{
 		{

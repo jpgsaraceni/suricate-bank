@@ -16,7 +16,7 @@ type Response struct {
 	Writer  http.ResponseWriter
 }
 
-type CustomPayload struct {
+type ErrorPayload struct {
 	Message string `json:"title,omitempty" example:"Message for some error"`
 }
 
@@ -30,7 +30,7 @@ func (r Response) IsComplete() bool {
 
 func (r Response) Processing() Response {
 	r.Status = http.StatusBadRequest
-	r.Payload = CustomPayload{Message: "Request is duplicate. Original request is being processed."}
+	r.Payload = ErrorPayload{Message: "Request is duplicate. Original request is being processed."}
 	return r
 }
 
@@ -71,7 +71,7 @@ func (r Response) UnprocessableEntity(err Error) Response {
 
 func (r Response) Conflict() Response {
 	r.Status = http.StatusConflict
-	r.Payload = CustomPayload{Message: `Idempotency-Key already used for a different request`}
+	r.Payload = ErrorPayload{Message: `Idempotency-Key already used for a different request`}
 	return r
 }
 
