@@ -31,7 +31,7 @@ func ConnectPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, error)
 		return nil, fmt.Errorf("%w: %s", errConnectDb, err.Error())
 	}
 
-	log.Printf("successfully connected \n running migrations...\n")
+	log.Printf("successfully connected to postgres server. running migrations...\n")
 	err = Migrate(databaseUrl)
 
 	if err != nil {

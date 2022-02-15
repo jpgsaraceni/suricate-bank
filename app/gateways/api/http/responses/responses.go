@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 type Response struct {
@@ -24,6 +26,12 @@ func NewResponse(w http.ResponseWriter) Response {
 
 func (r Response) IsComplete() bool {
 	return r.Status > 0
+}
+
+func (r Response) Processing() Response {
+	r.Status = http.StatusBadRequest
+	r.Payload = ErrorPayload{Message: "Request is duplicate. Original request is being processed."}
+	return r
 }
 
 func (r Response) BadRequest(err Error) Response {
@@ -61,6 +69,12 @@ func (r Response) UnprocessableEntity(err Error) Response {
 	return r
 }
 
+func (r Response) Conflict() Response {
+	r.Status = http.StatusConflict
+	r.Payload = ErrorPayload{Message: `Idempotency-Key already used for a different request`}
+	return r
+}
+
 func (r Response) InternalServerError(err error) Response {
 	r.Status = http.StatusInternalServerError
 	r.Error = err
@@ -88,5 +102,13 @@ func (r Response) SendJSON() {
 	}
 	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
 		log.Println(err) // TODO: fix after implementing log
+	}
+}
+
+func (r Response) SendCachedResponse(cache schema.CachedResponse) {
+	r.Writer.Header().Set("Content-Type", "application/json")
+	r.Writer.WriteHeader(cache.ResponseStatus)
+	if _, err := r.Writer.Write(cache.ResponseBody); err != nil {
+		log.Println(err)
 	}
 }

@@ -4,6 +4,7 @@ services:
   app:
     depends_on:
       - suricate_db
+      - suricate_idempotency
     build: .
     container_name: suricate-bank
     environment:
@@ -13,6 +14,8 @@ services:
       - DATABASE_HOST=suricate_db
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
+      - REDIS_HOST=suricate_idempotency
+      - REDIS_PORT=6379
     ports:
       - "8080:8080"
   
@@ -32,6 +35,17 @@ services:
       retries: 5
     ports:
       - "5432:5432"
+
+  suricate_idempotency:
+    image: "redis:6-alpine"
+    command: redis-server
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli","ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres:
