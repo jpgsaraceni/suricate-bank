@@ -4,16 +4,33 @@ Suricate Bank is an api that creates accounts and transfers money between them. 
 
 A very special thanks to my Golang and Clean Arch mentor, [Helder](https://github.com/helder-jaspion). It's been a ride!
 
+## Contents
+
+* [Features](#features)
+* [Coming Soon](#coming-soon)
+* [Dependencies](#dependencies)
+* [Getting Started](#getting-started)
+  * [Running the App](#running-the-app)
+  * [Automated Tests](#automated-tests-requires-docker-for-integration-tests)
+  * [Manual Testing](#manual-testing)
+  * [Available Routes](#available-routes)
+    * [POST /accounts](#post-accounts)
+    * [GET /accounts](#get-accounts)
+    * [POST /login](#post-login)
+    * [POST /transfers](#post-transfers)
+    * [GET /transfers](#get-transfers)
+
 ## Features
 
 * RESTful API
-* Support for idempotent requests
+* Persistence on PostgreSQL DB with migrations
+* Support for idempotent requests on create routes (account and transfer)
 * Bearer Token (JWT) Auth on private routes (create transfer)
 * Clean Architecture
-* Containerized
+* Containerized (Docker and Docker-Compose)
 * Meaningful unit and integration tests
 
-## TODO
+## Coming Soon
 
 * Logging, requestID tracing and panic recovery middlewares
 * Swagger
