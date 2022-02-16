@@ -89,6 +89,10 @@ issues:
         - gocyclo
         - gosec
         - gomnd
+    - path: app/gateways/api/http/middlewares/idempotency.go
+      text: "weak cryptographic primitive"
+      linters:
+        - gosec
 
 linters:
   enable:
