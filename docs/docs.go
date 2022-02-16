@@ -251,7 +251,7 @@ const docTemplate_swagger = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Access token": []
                     }
                 ],
                 "description": "Creates a transfer from origin account matching bearer token account ID\nto account with request body account ID.\nAmount must be greater than 0, both accounts exist and origin must have\nbalance greater than amoun.",
@@ -516,7 +516,7 @@ const docTemplate_swagger = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.2.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Suricate Bank API",

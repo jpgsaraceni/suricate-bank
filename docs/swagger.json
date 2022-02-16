@@ -14,7 +14,6 @@
         },
         "version": "0.2.0"
     },
-    "host": "localhost:8080",
     "paths": {
         "/accounts": {
             "get": {
@@ -243,7 +242,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Access token": []
                     }
                 ],
                 "description": "Creates a transfer from origin account matching bearer token account ID\nto account with request body account ID.\nAmount must be greater than 0, both accounts exist and origin must have\nbalance greater than amoun.",
