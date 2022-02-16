@@ -8,83 +8,112 @@ definitions:
   schemas.CreateAccountRequest:
     properties:
       cpf:
+        example: "22061446035"
         type: string
       name:
+        example: Zé do Caroço
         type: string
       secret:
+        example: great-parrword
         type: string
     type: object
   schemas.CreateAccountResponse:
     properties:
       account_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
         type: string
       balance:
+        example: R$10,00
         type: string
       cpf:
+        example: 220.614.460-35
         type: string
       created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
         type: string
       name:
+        example: Zé do Caroço
         type: string
     type: object
   schemas.CreateTransferRequest:
     properties:
       account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
         type: string
       amount:
+        example: 100
         type: integer
     type: object
   schemas.CreateTransferResponse:
     properties:
       account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
         type: string
       account_origin_id:
+        example: fbba165f-0382-491d-8a83-b950cb6482c9
         type: string
       amount:
+        example: R$1,00
         type: string
       created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
         type: string
       transfer_id:
+        example: d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b
         type: string
     type: object
   schemas.FetchedAccount:
     properties:
       account_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
         type: string
       balance:
+        example: R$10,00
         type: string
       cpf:
+        example: 220.614.460-35
         type: string
       created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
         type: string
       name:
+        example: Zé do Caroço
         type: string
     type: object
   schemas.FetchedTransfer:
     properties:
       account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
         type: string
       account_origin_id:
+        example: fbba165f-0382-491d-8a83-b950cb6482c9
         type: string
       amount:
+        example: R$1,00
         type: string
       created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
         type: string
       transfer_id:
+        example: d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b
         type: string
     type: object
   schemas.GetBalanceResponse:
     properties:
       account_id:
+        example: 3d368560-e8e4-4108-8bb8-9f8753db09af
         type: string
       balance:
+        example: R$10,00
         type: string
     type: object
   schemas.LoginRequest:
     properties:
       cpf:
+        example: "04559118000"
         type: string
       secret:
+        example: great-password
         type: string
     type: object
   schemas.LoginResponse:

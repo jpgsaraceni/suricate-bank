@@ -11,11 +11,11 @@ type FetchAccountsResponse struct {
 }
 
 type FetchedAccount struct {
-	AccountID string    `json:"account_id"`
-	Name      string    `json:"name"`
-	Cpf       string    `json:"cpf"`
-	Balance   string    `json:"balance"`
-	CreatedAt time.Time `json:"created_at"`
+	AccountID string    `json:"account_id" example:"5738eda2-49f5-4702-83e4-b87b18cf0d31"`
+	Name      string    `json:"name" example:"Zé do Caroço"`
+	Cpf       string    `json:"cpf" example:"220.614.460-35"`
+	Balance   string    `json:"balance" example:"R$10,00"`
+	CreatedAt time.Time `json:"created_at" example:"2022-01-28T19:39:04.585238-03:00"`
 }
 
 func AccountsToResponse(accountList []account.Account) FetchAccountsResponse {

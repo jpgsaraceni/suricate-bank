@@ -338,13 +338,16 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "cpf": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "22061446035"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Zé do Caroço"
                 },
                 "secret": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "great-parrword"
                 }
             }
         },
@@ -352,19 +355,24 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
                 },
                 "balance": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "R$10,00"
                 },
                 "cpf": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "220.614.460-35"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Zé do Caroço"
                 }
             }
         },
@@ -372,10 +380,12 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_destination_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
                 },
                 "amount": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 100
                 }
             }
         },
@@ -383,19 +393,24 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_destination_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
                 },
                 "account_origin_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "fbba165f-0382-491d-8a83-b950cb6482c9"
                 },
                 "amount": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "R$1,00"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
                 },
                 "transfer_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b"
                 }
             }
         },
@@ -403,19 +418,24 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
                 },
                 "balance": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "R$10,00"
                 },
                 "cpf": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "220.614.460-35"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Zé do Caroço"
                 }
             }
         },
@@ -423,19 +443,24 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_destination_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
                 },
                 "account_origin_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "fbba165f-0382-491d-8a83-b950cb6482c9"
                 },
                 "amount": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "R$1,00"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
                 },
                 "transfer_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b"
                 }
             }
         },
@@ -443,10 +468,12 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "3d368560-e8e4-4108-8bb8-9f8753db09af"
                 },
                 "balance": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "R$10,00"
                 }
             }
         },
@@ -454,10 +481,12 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "cpf": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "04559118000"
                 },
                 "secret": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "great-password"
                 }
             }
         },
