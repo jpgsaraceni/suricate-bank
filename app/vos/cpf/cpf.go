@@ -6,12 +6,12 @@
 package cpf
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 type Cpf struct {
@@ -43,6 +43,7 @@ const (
 	unmaskedCpfLength = 11
 	module            = 11
 	minimumRest       = 2
+	maxRandom         = 10
 )
 
 // NewCpf creates a Cpf struct with value and masked, or empty and returns error if invalid
@@ -60,10 +61,9 @@ func NewCpf(input string) (Cpf, error) {
 func Random() Cpf {
 	var body string
 
-	rand.Seed(time.Now().UnixMicro())
-
 	for i := 0; i < 9; i++ {
-		body += fmt.Sprint(rand.Intn(10))
+		randomDigit, _ := rand.Int(rand.Reader, big.NewInt(maxRandom))
+		body += fmt.Sprintf("%d", int(randomDigit.Int64()))
 	}
 
 	body += iterateDigits(body)
@@ -74,10 +74,9 @@ func Random() Cpf {
 	for isKnownInvalid {
 		body = ""
 
-		rand.Seed(time.Now().UnixMicro())
-
 		for i := 0; i < 9; i++ {
-			body += fmt.Sprint(rand.Intn(10))
+			randomDigit, _ := rand.Int(rand.Reader, big.NewInt(maxRandom))
+			body += fmt.Sprintf("%d", int(randomDigit.Int64()))
 		}
 
 		body += iterateDigits(body)

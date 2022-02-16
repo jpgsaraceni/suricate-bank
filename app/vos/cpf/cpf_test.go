@@ -156,7 +156,7 @@ func TestScan(t *testing.T) {
 
 			testCpf := Cpf{}
 
-			if err := testCpf.Scan(tt.value); errors.Is(err, tt.err) {
+			if err := testCpf.Scan(tt.value); !errors.Is(err, tt.err) {
 				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})
