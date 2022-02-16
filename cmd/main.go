@@ -20,6 +20,16 @@ import (
 // @title Suricate Bank API
 // @version 0.2.0
 // @description Suricate Bank is an api that creates accounts and transfers money between them.
+// @description ### Authorization
+// @description To create a transfer (`POST /transfer`) you will need to add an Authorization header
+// @description to your request, in the format **Authorization: Bearer <TOKEN>**. You can set this
+// @description clicking on the authorize button and entering "Bearer YOUR_TOKEN". You can get your
+// @description token from the login response.
+// @description ### Idempotent Requests
+// @description Create transfer and account routes (`POST /transfer` and `POST /account`) support
+// @description idempotent requests (you will always get the same response for the same
+// @description request, without creating duplicates). To use, just set an Idempotency-Key on your
+// @description request (any string, for example a UUID).
 
 // @contact.name João Saraceni
 // @contact.url https://www.linkedin.com/in/joaosaraceni/

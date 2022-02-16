@@ -12,8 +12,10 @@ import (
 )
 
 // @Summary Create transfer
-// @Description Creates a transfer from origin account matching bearer token account id
-// @Description to account with request body account ID
+// @Description Creates a transfer from origin account matching bearer token account ID
+// @Description to account with request body account ID.
+// @Description Amount must be greater than 0, both accounts exist and origin must have
+// @Description balance greater than amoun.
 // @Tags Transfer
 // @Accept json
 // @Produce json
