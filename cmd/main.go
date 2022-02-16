@@ -22,7 +22,7 @@ import (
 // @description Suricate Bank is an api that creates accounts and transfers money between them.
 // @description ### Authorization
 // @description To create a transfer (`POST /transfer`) you will need to add an Authorization header
-// @description to your request, in the format **Authorization: Bearer <TOKEN>**. You can set this
+// @description to your request, in the format **Authorization: Bearer YOUR_TOKEN**. You can set this
 // @description clicking on the authorize button and entering "Bearer YOUR_TOKEN". You can get your
 // @description token from the login response.
 // @description ### Idempotent Requests
