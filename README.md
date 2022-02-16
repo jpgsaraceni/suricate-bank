@@ -48,7 +48,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [cleanenv](github.com/ilyakaznacheev/cleanenv) - For reading .env and loading env variables;
 * [redigo](github.com/gomodule/redigo) - For connecting and running commands on Redis (for idempotent HTTP requests);
 * [Logrus](https://github.com/sirupsen/logrus) - For logging. This library is used in the dockertest example. I haven't set up logging for the project, so I will decide later if this will actually be used.
-* [Swaggo](https://github.com/swaggo) - For generating maintanable Swagger docs and Swagger UI
+* [Swaggo](https://github.com/swaggo) - For generating maintainable Swagger docs and Swagger UI
 
 ## Getting started
 
