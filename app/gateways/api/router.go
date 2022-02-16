@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
@@ -51,6 +52,8 @@ func NewRouter(
 	r.Get("/transfers", transfersHandler.Fetch)
 
 	r.Post("/login", loginHandler.Login)
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.ServerPort(), r); err != nil {
 		log.Fatalf("failed to listen and serve: %s", err)
