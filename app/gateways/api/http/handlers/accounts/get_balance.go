@@ -13,6 +13,17 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
 
+// @Summary Get account balance
+// @Description Gets the balance of the account matching account ID
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param id path string true "Account ID"
+// @Success 200 {object} schemas.GetBalanceResponse
+// @Failure 400 {object} responses.ErrorPayload
+// @Failure 404 {object} responses.ErrorPayload
+// @Failure 500 {object} responses.ErrorPayload
+// @Router /accounts/{id}/balance [get]
 func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 

@@ -29,11 +29,11 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * Clean Architecture
 * Containerized (Docker and Docker-Compose)
 * Meaningful unit and integration tests
+* Swagger Documentation
 
 ## Coming Soon
 
 * Logging, requestID tracing and panic recovery middlewares
-* Swagger
 * GitHub Actions
 
 ## Dependencies
@@ -48,6 +48,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [cleanenv](github.com/ilyakaznacheev/cleanenv) - For reading .env and loading env variables;
 * [redigo](github.com/gomodule/redigo) - For connecting and running commands on Redis (for idempotent HTTP requests);
 * [Logrus](https://github.com/sirupsen/logrus) - For logging. This library is used in the dockertest example. I haven't set up logging for the project, so I will decide later if this will actually be used.
+* [Swaggo](https://github.com/swaggo) - For generating maintainable Swagger docs and Swagger UI
 
 ## Getting started
 
@@ -87,7 +88,11 @@ make test
 
 The file `/client.http` can be used to test all available routes. I suggest using [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension for this (or any other HTTP request service you prefer).
 
+You can also use Swagger UI for manual testing, as explained [below](#available-routes)
+
 ### Available routes
+
+You check out all routes on Swagger UI. Just access `http://HOST_RUNNING_THIS_APP:PORT_ITS_LISTENING_ON/swagger`. If you are running on the default URL, `http://localhost:8080/swagger`
 
 #### POST `/accounts`
 

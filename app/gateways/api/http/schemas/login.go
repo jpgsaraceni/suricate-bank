@@ -1,8 +1,8 @@
 package schemas
 
 type LoginRequest struct {
-	Cpf    string `json:"cpf"`
-	Secret string `json:"secret"`
+	Cpf    string `json:"cpf" example:"04559118000"`
+	Secret string `json:"secret" example:"great-password"`
 }
 
 type LoginResponse struct {

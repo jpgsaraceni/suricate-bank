@@ -1,0 +1,505 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Suricate Bank is an api that creates accounts and transfers money between them.\n### Authorization\nTo create a transfer (`POST /transfer`) you will need to add an Authorization header\nto your request, in the format **Authorization: Bearer YOUR_TOKEN**. You can set this\nclicking on the authorize button and entering \"Bearer YOUR_TOKEN\". You can get your\ntoken from the login response.\n### Idempotent Requests\nCreate transfer and account routes (`POST /transfer` and `POST /account`) support\nidempotent requests (you will always get the same response for the same\nrequest, without creating duplicates). To use, just set an Idempotency-Key on your\nrequest (any string, for example a UUID).",
+        "title": "Suricate Bank API",
+        "contact": {
+            "name": "João Saraceni",
+            "url": "https://www.linkedin.com/in/joaosaraceni/",
+            "email": "jpgome@id.uff.br"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/jpgsaraceni/suricate-bank/blob/main/LICENSE"
+        },
+        "version": "0.2.0"
+    },
+    "paths": {
+        "/accounts": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get all accounts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.FetchedAccount"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates an account with BRL$10.00 initial balance.\nCPF must be valid and not belong to an existent account.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Create a new account",
+                "parameters": [
+                    {
+                        "description": "Account",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateAccountRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Idempotency key",
+                        "name": "Idempotency-Key",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateAccountResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{id}/balance": {
+            "get": {
+                "description": "Gets the balance of the account matching account ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get account balance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GetBalanceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Login Credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/transfers": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transfer"
+                ],
+                "summary": "Get all transfers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.FetchedTransfer"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Access token": []
+                    }
+                ],
+                "description": "Creates a transfer from origin account matching bearer token account ID\nto account with request body account ID.\nAmount must be greater than 0, both accounts exist and origin must have\nbalance greater than amoun.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transfer"
+                ],
+                "summary": "Create transfer",
+                "parameters": [
+                    {
+                        "description": "Transfer",
+                        "name": "transfer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateTransferRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Idempotency key",
+                        "name": "Idempotency-Key",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateTransferResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorPayload"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "responses.ErrorPayload": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "example": "Message for some error"
+                }
+            }
+        },
+        "schemas.CreateAccountRequest": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string",
+                    "example": "22061446035"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Zé do Caroço"
+                },
+                "secret": {
+                    "type": "string",
+                    "example": "great-parrword"
+                }
+            }
+        },
+        "schemas.CreateAccountResponse": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
+                },
+                "balance": {
+                    "type": "string",
+                    "example": "R$10,00"
+                },
+                "cpf": {
+                    "type": "string",
+                    "example": "220.614.460-35"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Zé do Caroço"
+                }
+            }
+        },
+        "schemas.CreateTransferRequest": {
+            "type": "object",
+            "properties": {
+                "account_destination_id": {
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
+                },
+                "amount": {
+                    "type": "integer",
+                    "example": 100
+                }
+            }
+        },
+        "schemas.CreateTransferResponse": {
+            "type": "object",
+            "properties": {
+                "account_destination_id": {
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
+                },
+                "account_origin_id": {
+                    "type": "string",
+                    "example": "fbba165f-0382-491d-8a83-b950cb6482c9"
+                },
+                "amount": {
+                    "type": "string",
+                    "example": "R$1,00"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
+                },
+                "transfer_id": {
+                    "type": "string",
+                    "example": "d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b"
+                }
+            }
+        },
+        "schemas.FetchedAccount": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
+                },
+                "balance": {
+                    "type": "string",
+                    "example": "R$10,00"
+                },
+                "cpf": {
+                    "type": "string",
+                    "example": "220.614.460-35"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Zé do Caroço"
+                }
+            }
+        },
+        "schemas.FetchedTransfer": {
+            "type": "object",
+            "properties": {
+                "account_destination_id": {
+                    "type": "string",
+                    "example": "5738eda2-49f5-4702-83e4-b87b18cf0d31"
+                },
+                "account_origin_id": {
+                    "type": "string",
+                    "example": "fbba165f-0382-491d-8a83-b950cb6482c9"
+                },
+                "amount": {
+                    "type": "string",
+                    "example": "R$1,00"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-01-28T19:39:04.585238-03:00"
+                },
+                "transfer_id": {
+                    "type": "string",
+                    "example": "d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b"
+                }
+            }
+        },
+        "schemas.GetBalanceResponse": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string",
+                    "example": "3d368560-e8e4-4108-8bb8-9f8753db09af"
+                },
+                "balance": {
+                    "type": "string",
+                    "example": "R$10,00"
+                }
+            }
+        },
+        "schemas.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string",
+                    "example": "04559118000"
+                },
+                "secret": {
+                    "type": "string",
+                    "example": "great-password"
+                }
+            }
+        },
+        "schemas.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Access token": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

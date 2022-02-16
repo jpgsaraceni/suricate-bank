@@ -97,6 +97,10 @@ func (cfg HTTPServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", cfg.Port)
 }
 
+func (cfg HTTPServerConfig) HostAndPort() string {
+	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+}
+
 func (cfg RedisConfig) URL() string {
 	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 }

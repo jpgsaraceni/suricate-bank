@@ -10,6 +10,20 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
 
+// @Summary Create a new account
+// @Description Creates an account with BRL$10.00 initial balance.
+// @Description CPF must be valid and not belong to an existent account.
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param account body schemas.CreateAccountRequest true "Account"
+// @Param Idempotency-Key header string false "Idempotency key"
+// @Success 201 {object} schemas.CreateAccountResponse
+// @Failure 400 {object} responses.ErrorPayload
+// @Failure 404 {object} responses.ErrorPayload
+// @Failure 409 {object} responses.ErrorPayload
+// @Failure 500 {object} responses.ErrorPayload
+// @Router /accounts [post]
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 

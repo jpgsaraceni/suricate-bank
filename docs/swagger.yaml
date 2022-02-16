@@ -1,0 +1,356 @@
+definitions:
+  responses.ErrorPayload:
+    properties:
+      title:
+        example: Message for some error
+        type: string
+    type: object
+  schemas.CreateAccountRequest:
+    properties:
+      cpf:
+        example: "22061446035"
+        type: string
+      name:
+        example: Zé do Caroço
+        type: string
+      secret:
+        example: great-parrword
+        type: string
+    type: object
+  schemas.CreateAccountResponse:
+    properties:
+      account_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
+        type: string
+      balance:
+        example: R$10,00
+        type: string
+      cpf:
+        example: 220.614.460-35
+        type: string
+      created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
+        type: string
+      name:
+        example: Zé do Caroço
+        type: string
+    type: object
+  schemas.CreateTransferRequest:
+    properties:
+      account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
+        type: string
+      amount:
+        example: 100
+        type: integer
+    type: object
+  schemas.CreateTransferResponse:
+    properties:
+      account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
+        type: string
+      account_origin_id:
+        example: fbba165f-0382-491d-8a83-b950cb6482c9
+        type: string
+      amount:
+        example: R$1,00
+        type: string
+      created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
+        type: string
+      transfer_id:
+        example: d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b
+        type: string
+    type: object
+  schemas.FetchedAccount:
+    properties:
+      account_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
+        type: string
+      balance:
+        example: R$10,00
+        type: string
+      cpf:
+        example: 220.614.460-35
+        type: string
+      created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
+        type: string
+      name:
+        example: Zé do Caroço
+        type: string
+    type: object
+  schemas.FetchedTransfer:
+    properties:
+      account_destination_id:
+        example: 5738eda2-49f5-4702-83e4-b87b18cf0d31
+        type: string
+      account_origin_id:
+        example: fbba165f-0382-491d-8a83-b950cb6482c9
+        type: string
+      amount:
+        example: R$1,00
+        type: string
+      created_at:
+        example: "2022-01-28T19:39:04.585238-03:00"
+        type: string
+      transfer_id:
+        example: d8e0810f-64aa-4b26-8eab-7dc2ebf0b02b
+        type: string
+    type: object
+  schemas.GetBalanceResponse:
+    properties:
+      account_id:
+        example: 3d368560-e8e4-4108-8bb8-9f8753db09af
+        type: string
+      balance:
+        example: R$10,00
+        type: string
+    type: object
+  schemas.LoginRequest:
+    properties:
+      cpf:
+        example: "04559118000"
+        type: string
+      secret:
+        example: great-password
+        type: string
+    type: object
+  schemas.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact:
+    email: jpgome@id.uff.br
+    name: João Saraceni
+    url: https://www.linkedin.com/in/joaosaraceni/
+  description: |-
+    Suricate Bank is an api that creates accounts and transfers money between them.
+    ### Authorization
+    To create a transfer (`POST /transfer`) you will need to add an Authorization header
+    to your request, in the format **Authorization: Bearer YOUR_TOKEN**. You can set this
+    clicking on the authorize button and entering "Bearer YOUR_TOKEN". You can get your
+    token from the login response.
+    ### Idempotent Requests
+    Create transfer and account routes (`POST /transfer` and `POST /account`) support
+    idempotent requests (you will always get the same response for the same
+    request, without creating duplicates). To use, just set an Idempotency-Key on your
+    request (any string, for example a UUID).
+  license:
+    name: MIT
+    url: https://github.com/jpgsaraceni/suricate-bank/blob/main/LICENSE
+  title: Suricate Bank API
+  version: 0.2.0
+paths:
+  /accounts:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.FetchedAccount'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get all accounts
+      tags:
+      - Account
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Creates an account with BRL$10.00 initial balance.
+        CPF must be valid and not belong to an existent account.
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateAccountRequest'
+      - description: Idempotency key
+        in: header
+        name: Idempotency-Key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CreateAccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Create a new account
+      tags:
+      - Account
+  /accounts/{id}/balance:
+    get:
+      consumes:
+      - application/json
+      description: Gets the balance of the account matching account ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetBalanceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get account balance
+      tags:
+      - Account
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Login
+      tags:
+      - Login
+  /transfers:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.FetchedTransfer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get all transfers
+      tags:
+      - Transfer
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Creates a transfer from origin account matching bearer token account ID
+        to account with request body account ID.
+        Amount must be greater than 0, both accounts exist and origin must have
+        balance greater than amoun.
+      parameters:
+      - description: Transfer
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateTransferRequest'
+      - description: Idempotency key
+        in: header
+        name: Idempotency-Key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CreateTransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      security:
+      - Access token: []
+      summary: Create transfer
+      tags:
+      - Transfer
+securityDefinitions:
+  Access token:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
