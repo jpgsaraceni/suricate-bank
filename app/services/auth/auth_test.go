@@ -26,12 +26,12 @@ func TestAuthenticate(t *testing.T) {
 		name       string
 		repository account.Repository
 		args       args
-		want       account.AccountId
+		want       account.ID
 		err        error
 	}
 
 	var (
-		testId        = account.AccountId(uuid.New())
+		testID        = account.ID(uuid.New())
 		testCpf       = cpf.Random()
 		testSecret, _ = hash.NewHash("123456")
 	)
@@ -42,7 +42,7 @@ func TestAuthenticate(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetByCpf: func(ctx context.Context, cpf cpf.Cpf) (account.Account, error) {
 					return account.Account{
-						Id:     testId,
+						ID:     testID,
 						Cpf:    testCpf,
 						Secret: testSecret,
 					}, nil
@@ -52,7 +52,7 @@ func TestAuthenticate(t *testing.T) {
 				cpf:    testCpf,
 				secret: "123456",
 			},
-			want: testId,
+			want: testID,
 		},
 		{
 			name: "fail to authenticate request with inexistent cpf",
@@ -65,7 +65,7 @@ func TestAuthenticate(t *testing.T) {
 				cpf:    testCpf,
 				secret: "123456",
 			},
-			want: account.AccountId{},
+			want: account.ID{},
 			err:  ErrCredentials,
 		},
 		{
@@ -73,7 +73,7 @@ func TestAuthenticate(t *testing.T) {
 			repository: account.MockRepository{
 				OnGetByCpf: func(ctx context.Context, cpf cpf.Cpf) (account.Account, error) {
 					return account.Account{
-						Id:     testId,
+						ID:     testID,
 						Cpf:    testCpf,
 						Secret: testSecret,
 					}, nil
@@ -83,7 +83,7 @@ func TestAuthenticate(t *testing.T) {
 				cpf:    testCpf,
 				secret: "12345",
 			},
-			want: account.AccountId{},
+			want: account.ID{},
 			err:  ErrCredentials,
 		},
 	}
@@ -101,10 +101,10 @@ func TestAuthenticate(t *testing.T) {
 				t.Fatalf("got %s expected %s", err, tt.err)
 			}
 
-			gotId, _ := token.Verify(gotToken)
+			gotID, _ := token.Verify(gotToken)
 
-			if !reflect.DeepEqual(gotId, tt.want) {
-				t.Errorf("got %v expected %v", gotId, tt.want)
+			if !reflect.DeepEqual(gotID, tt.want) {
+				t.Errorf("got %v expected %v", gotID, tt.want)
 			}
 		})
 	}

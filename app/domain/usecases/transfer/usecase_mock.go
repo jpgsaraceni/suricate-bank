@@ -24,21 +24,21 @@ func (mock MockUsecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) 
 }
 
 type MockDebiter struct {
-	OnDebitAccount func(ctx context.Context, id account.AccountId, amount money.Money) error
+	OnDebitAccount func(ctx context.Context, id account.ID, amount money.Money) error
 }
 
 var _ Debiter = (*MockDebiter)(nil)
 
-func (mock MockDebiter) DebitAccount(ctx context.Context, id account.AccountId, amount money.Money) error {
+func (mock MockDebiter) DebitAccount(ctx context.Context, id account.ID, amount money.Money) error {
 	return mock.OnDebitAccount(ctx, id, amount)
 }
 
 type MockCrediter struct {
-	OnCreditAccount func(ctx context.Context, id account.AccountId, amount money.Money) error
+	OnCreditAccount func(ctx context.Context, id account.ID, amount money.Money) error
 }
 
 var _ Crediter = (*MockCrediter)(nil)
 
-func (mock MockCrediter) CreditAccount(ctx context.Context, id account.AccountId, amount money.Money) error {
+func (mock MockCrediter) CreditAccount(ctx context.Context, id account.ID, amount money.Money) error {
 	return mock.OnCreditAccount(ctx, id, amount)
 }

@@ -9,17 +9,14 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (uc usecase) Credit(ctx context.Context, id account.AccountId, amount money.Money) error {
+func (uc usecase) Credit(ctx context.Context, id account.ID, amount money.Money) error {
 	if amount.Cents() == 0 {
-
 		return ErrAmount
 	}
 
 	err := uc.repository.CreditAccount(ctx, id, amount)
-
 	if err != nil {
-		if errors.Is(err, account.ErrIdNotFound) {
-
+		if errors.Is(err, account.ErrIDNotFound) {
 			return err
 		}
 

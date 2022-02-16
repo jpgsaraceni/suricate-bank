@@ -10,10 +10,8 @@ import (
 
 func (uc usecase) Create(ctx context.Context, accountInstance account.Account) (account.Account, error) {
 	persistedAccount, err := uc.repository.Create(ctx, accountInstance)
-
 	if err != nil {
 		if errors.Is(err, account.ErrDuplicateCpf) {
-
 			return account.Account{}, err
 		}
 

@@ -12,7 +12,6 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
-	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 func TestCreate(t *testing.T) {
@@ -31,17 +30,16 @@ func TestCreate(t *testing.T) {
 	}
 
 	var (
-		testSecret, _  = hash.NewHash("123456")
-		testMoney10, _ = money.NewMoney(10)
-		repeatedId     = account.AccountId(uuid.New())
-		repeatedCpf    = cpf.Random()
+		testSecret, _ = hash.NewHash("123456")
+		repeatedID    = account.ID(uuid.New())
+		repeatedCpf   = cpf.Random()
 	)
 
 	testCases := []testCase{
 		{
 			name: "successfully create account",
 			account: account.Account{
-				Id:        account.AccountId(uuid.New()),
+				ID:        account.ID(uuid.New()),
 				Name:      "Nice name",
 				Cpf:       cpf.Random(),
 				Secret:    testSecret,
@@ -51,7 +49,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "successfully create account with initial balance",
 			account: account.Account{
-				Id:        account.AccountId(uuid.New()),
+				ID:        account.ID(uuid.New()),
 				Name:      "Nice name",
 				Cpf:       cpf.Random(),
 				Secret:    testSecret,
@@ -64,13 +62,13 @@ func TestCreate(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					repeatedId,
+					repeatedID,
 					cpf.Random().Value(),
 					0,
 				)
 			},
 			account: account.Account{
-				Id:        repeatedId,
+				ID:        repeatedID,
 				Name:      "Nice name",
 				Cpf:       cpf.Random(),
 				Secret:    testSecret,
@@ -83,13 +81,13 @@ func TestCreate(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					account.AccountId(uuid.New()),
+					account.ID(uuid.New()),
 					repeatedCpf.Value(),
 					0,
 				)
 			},
 			account: account.Account{
-				Id:        account.AccountId(uuid.New()),
+				ID:        account.ID(uuid.New()),
 				Name:      "Nice name",
 				Cpf:       repeatedCpf,
 				Secret:    testSecret,
@@ -102,13 +100,13 @@ func TestCreate(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					account.AccountId(uuid.New()),
+					account.ID(uuid.New()),
 					cpf.Random().Value(),
 					0,
 				)
 			},
 			account: account.Account{
-				Id:        account.AccountId(uuid.New()),
+				ID:        account.ID(uuid.New()),
 				Name:      "Nice name",
 				Cpf:       cpf.Random(),
 				Secret:    testSecret,
@@ -124,7 +122,6 @@ func TestCreate(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
@@ -132,7 +129,6 @@ func TestCreate(t *testing.T) {
 
 			gotAccount, err := testRepo.Create(testContext, tt.account)
 			if !errors.Is(err, tt.err) {
-
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 

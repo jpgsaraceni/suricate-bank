@@ -17,6 +17,8 @@ import (
 )
 
 func TestGetCachedResponse(t *testing.T) {
+	t.Parallel()
+
 	type testCase struct {
 		name       string
 		repository MockRepository
@@ -27,13 +29,13 @@ func TestGetCachedResponse(t *testing.T) {
 
 	testKey := uuid.NewString()
 	testAccount := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "nice name",
 		Cpf:       cpf.Random(),
 		Balance:   money.Money{},
 		CreatedAt: time.Now(),
 	}
-	createdAccountJson, _ := json.Marshal(testAccount)
+	createdAccountJSON, _ := json.Marshal(testAccount)
 
 	testCases := []testCase{
 		{
@@ -44,14 +46,14 @@ func TestGetCachedResponse(t *testing.T) {
 					return schema.CachedResponse{
 						Key:            testKey,
 						ResponseStatus: 200,
-						ResponseBody:   createdAccountJson,
+						ResponseBody:   createdAccountJSON,
 					}, nil
 				},
 			},
 			want: schema.CachedResponse{
 				Key:            testKey,
 				ResponseStatus: 200,
-				ResponseBody:   createdAccountJson,
+				ResponseBody:   createdAccountJSON,
 			},
 		},
 		{

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
@@ -34,46 +35,41 @@ func TestFetch(t *testing.T) {
 	}
 
 	var (
-		testMoney10, _  = money.NewMoney(10)
-		testMoney20, _  = money.NewMoney(50)
-		testMoney100, _ = money.NewMoney(100)
+		testMoney10, _ = money.NewMoney(10)
+		testMoney20, _ = money.NewMoney(50)
 	)
 
 	testAccount1 := account.Account{
-		Id:      account.AccountId(uuid.New()),
-		Balance: testMoney100,
+		ID: account.ID(uuid.New()),
 	}
 	testAccount2 := account.Account{
-		Id:      account.AccountId(uuid.New()),
-		Balance: money.Money{},
+		ID: account.ID(uuid.New()),
 	}
 	testAccount3 := account.Account{
-		Id:      account.AccountId(uuid.New()),
-		Balance: testMoney10,
+		ID: account.ID(uuid.New()),
 	}
 	testAccount4 := account.Account{
-		Id:      account.AccountId(uuid.New()),
-		Balance: testMoney10,
+		ID: account.ID(uuid.New()),
 	}
 
 	testTransfer1 := transfer.Transfer{
-		Id:                   transfer.TransferId(uuid.New()),
-		AccountOriginId:      testAccount1.Id,
-		AccountDestinationId: testAccount2.Id,
+		ID:                   transfer.ID(uuid.New()),
+		AccountOriginID:      testAccount1.ID,
+		AccountDestinationID: testAccount2.ID,
 		Amount:               testMoney20,
 		CreatedAt:            time.Now(),
 	}
 	testTransfer2 := transfer.Transfer{
-		Id:                   transfer.TransferId(uuid.New()),
-		AccountOriginId:      testAccount1.Id,
-		AccountDestinationId: testAccount3.Id,
+		ID:                   transfer.ID(uuid.New()),
+		AccountOriginID:      testAccount1.ID,
+		AccountDestinationID: testAccount3.ID,
 		Amount:               testMoney10,
 		CreatedAt:            time.Now(),
 	}
 	testTransfer3 := transfer.Transfer{
-		Id:                   transfer.TransferId(uuid.New()),
-		AccountOriginId:      testAccount4.Id,
-		AccountDestinationId: testAccount3.Id,
+		ID:                   transfer.ID(uuid.New()),
+		AccountOriginID:      testAccount4.ID,
+		AccountDestinationID: testAccount3.ID,
 		Amount:               testMoney10,
 		CreatedAt:            time.Now(),
 	}
@@ -104,23 +100,23 @@ func TestFetch(t *testing.T) {
 			expectedPayload: map[string]interface{}{
 				"transfers": []interface{}{
 					map[string]interface{}{
-						"transfer_id":            testTransfer1.Id.String(),
-						"account_origin_id":      testAccount1.Id.String(),
-						"account_destination_id": testAccount2.Id.String(),
+						"transfer_id":            testTransfer1.ID.String(),
+						"account_origin_id":      testAccount1.ID.String(),
+						"account_destination_id": testAccount2.ID.String(),
 						"amount":                 testTransfer1.Amount.BRL(),
 						"created_at":             testTransfer1.CreatedAt.Format(time.RFC3339Nano),
 					},
 					map[string]interface{}{
-						"transfer_id":            testTransfer2.Id.String(),
-						"account_origin_id":      testAccount1.Id.String(),
-						"account_destination_id": testAccount3.Id.String(),
+						"transfer_id":            testTransfer2.ID.String(),
+						"account_origin_id":      testAccount1.ID.String(),
+						"account_destination_id": testAccount3.ID.String(),
 						"amount":                 testTransfer2.Amount.BRL(),
 						"created_at":             testTransfer2.CreatedAt.Format(time.RFC3339Nano),
 					},
 					map[string]interface{}{
-						"transfer_id":            testTransfer3.Id.String(),
-						"account_origin_id":      testAccount4.Id.String(),
-						"account_destination_id": testAccount3.Id.String(),
+						"transfer_id":            testTransfer3.ID.String(),
+						"account_origin_id":      testAccount4.ID.String(),
+						"account_destination_id": testAccount3.ID.String(),
 						"amount":                 testTransfer3.Amount.BRL(),
 						"created_at":             testTransfer3.CreatedAt.Format(time.RFC3339Nano),
 					},
@@ -191,7 +187,6 @@ func TestFetch(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}

@@ -109,7 +109,7 @@ func TestCompare(t *testing.T) {
 
 			hash, err := bcrypt.GenerateFromPassword([]byte(tt.storedSecret), hashCost)
 
-			if err != tt.err {
+			if !errors.Is(err, tt.err) {
 				t.Errorf("expected error %s got error %s", err, tt.err)
 
 				return
@@ -137,7 +137,7 @@ func TestScan(t *testing.T) {
 		err   error
 	}
 
-	var testHash, _ = bcrypt.GenerateFromPassword([]byte("abc"), 10)
+	testHash, _ := bcrypt.GenerateFromPassword([]byte("abc"), 10)
 
 	testCases := []testCase{
 		{
@@ -166,9 +166,9 @@ func TestScan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			var testSecret = Secret{}
+			testSecret := Secret{}
 
-			if err := testSecret.Scan(tt.value); err != tt.err {
+			if err := testSecret.Scan(tt.value); !errors.Is(err, tt.err) {
 				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})

@@ -4,37 +4,36 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
 type (
-	TransferId uuid.UUID
+	ID uuid.UUID
 )
 
 type Transfer struct {
-	Id                   TransferId
-	AccountOriginId      account.AccountId
-	AccountDestinationId account.AccountId
+	ID                   ID
+	AccountOriginID      account.ID
+	AccountDestinationID account.ID
 	Amount               money.Money
 	CreatedAt            time.Time
 }
 
-func NewTransfer(amount money.Money, originId, destinationId account.AccountId) (Transfer, error) {
-	if originId == destinationId {
-
+func NewTransfer(amount money.Money, originID, destinationID account.ID) (Transfer, error) {
+	if originID == destinationID {
 		return Transfer{}, ErrSameAccounts
 	}
 
 	if amount.Cents() <= 0 {
-
 		return Transfer{}, ErrAmountNotPositive
 	}
 
 	newTransfer := Transfer{
-		Id:                   newTransferId(),
-		AccountOriginId:      originId,
-		AccountDestinationId: destinationId,
+		ID:                   newTransferID(),
+		AccountOriginID:      originID,
+		AccountDestinationID: destinationID,
 		Amount:               amount,
 		CreatedAt:            time.Now(),
 	}
@@ -42,12 +41,12 @@ func NewTransfer(amount money.Money, originId, destinationId account.AccountId) 
 	return newTransfer, nil
 }
 
-func newTransferId() TransferId {
-
-	return TransferId(uuid.New())
+func newTransferID() ID {
+	return ID(uuid.New())
 }
 
-func (id TransferId) String() string {
+func (id ID) String() string {
 	parsedToUUID := uuid.UUID(id)
+
 	return parsedToUUID.String()
 }

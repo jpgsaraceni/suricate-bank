@@ -17,18 +17,18 @@ func TestSign(t *testing.T) {
 
 	type testCase struct {
 		name string
-		id   account.AccountId
+		id   account.ID
 		want string
 		err  error
 	}
 
-	var testId = account.AccountId(uuid.New())
+	testID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "successfully generate token",
-			id:   testId,
-			want: testId.String(),
+			id:   testID,
+			want: testID.String(),
 		},
 	}
 
@@ -50,13 +50,13 @@ func TestSign(t *testing.T) {
 			claims, ok := parsedToken.Claims.(*jwtClaimsSchema)
 
 			if ok && parsedToken.Valid {
-				log.Printf("%v %v", claims.AccountId, claims.RegisteredClaims.ExpiresAt)
+				log.Printf("%v %v", claims.AccountID, claims.RegisteredClaims.ExpiresAt)
 			} else {
 				t.Fatal("failed to parse token")
 			}
 
-			if claims.AccountId != tt.want {
-				t.Errorf("got %s expected %s", claims.AccountId, tt.want)
+			if claims.AccountID != tt.want {
+				t.Errorf("got %s expected %s", claims.AccountID, tt.want)
 			}
 		})
 	}
@@ -72,14 +72,14 @@ func TestVerify(t *testing.T) {
 		err   error
 	}
 
-	var testId = account.AccountId(uuid.New())
+	testID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "successfully verify token",
 			token: func() string {
 				claims := jwtClaimsSchema{
-					testId.String(),
+					testID.String(),
 					jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
 						Issuer:    "suricate bank",
@@ -92,13 +92,13 @@ func TestVerify(t *testing.T) {
 
 				return signedToken
 			}(),
-			want: testId.String(),
+			want: testID.String(),
 		},
 		{
 			name: "fail to verify invalid signature",
 			token: func() string {
 				claims := jwtClaimsSchema{
-					testId.String(),
+					testID.String(),
 					jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
 						Issuer:    "suricate bank",
@@ -132,7 +132,7 @@ func TestVerify(t *testing.T) {
 				return signedToken
 			}(),
 			want: uuid.Nil.String(),
-			err:  ErrParseUuid,
+			err:  ErrParseUUID,
 		},
 	}
 
@@ -141,14 +141,14 @@ func TestVerify(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			accountId, err := Verify(tt.token)
+			accountID, err := Verify(tt.token)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)
 			}
 
-			if accountId.String() != tt.want {
-				t.Errorf("got %s expected %s", accountId.String(), tt.want)
+			if accountID.String() != tt.want {
+				t.Errorf("got %s expected %s", accountID.String(), tt.want)
 			}
 		})
 	}

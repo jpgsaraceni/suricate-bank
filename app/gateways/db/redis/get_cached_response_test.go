@@ -36,7 +36,7 @@ func TestGetCachedResponse(t *testing.T) {
 
 	testAccount := func() account.Account {
 		return account.Account{
-			Id:        account.AccountId(uuid.New()),
+			ID:        account.ID(uuid.New()),
 			Name:      "nice name",
 			Cpf:       cpf.Random(),
 			Balance:   money.Money{},
@@ -51,8 +51,8 @@ func TestGetCachedResponse(t *testing.T) {
 		testAccount(),
 	}
 
-	createdAccountJson, _ := json.Marshal(testAccounts[0])
-	badRequestJson, _ := json.Marshal(responses.ErrorPayload{Message: "Great and meaningful error message"})
+	createdAccountJSON, _ := json.Marshal(testAccounts[0])
+	badRequestJSON, _ := json.Marshal(responses.ErrorPayload{Message: "Great and meaningful error message"})
 
 	testKey := uuid.NewString()
 	testKey2 := uuid.NewString()
@@ -68,9 +68,8 @@ func TestGetCachedResponse(t *testing.T) {
 				toCache, err := json.Marshal(schema.CachedResponse{
 					Key:            testKey,
 					ResponseStatus: 201,
-					ResponseBody:   createdAccountJson,
+					ResponseBody:   createdAccountJSON,
 				})
-
 				if err != nil {
 					t.Fatalf("runBefore failed: %s", err)
 				}
@@ -86,7 +85,7 @@ func TestGetCachedResponse(t *testing.T) {
 			response: schema.CachedResponse{
 				Key:            testKey,
 				ResponseStatus: 201,
-				ResponseBody:   createdAccountJson,
+				ResponseBody:   createdAccountJSON,
 			},
 		},
 		{
@@ -98,9 +97,8 @@ func TestGetCachedResponse(t *testing.T) {
 				toCache, err := json.Marshal(schema.CachedResponse{
 					Key:            testKey2,
 					ResponseStatus: 400,
-					ResponseBody:   badRequestJson,
+					ResponseBody:   badRequestJSON,
 				})
-
 				if err != nil {
 					t.Fatalf("runBefore failed: %s", err)
 				}
@@ -116,7 +114,7 @@ func TestGetCachedResponse(t *testing.T) {
 			response: schema.CachedResponse{
 				Key:            testKey2,
 				ResponseStatus: 400,
-				ResponseBody:   badRequestJson,
+				ResponseBody:   badRequestJSON,
 			},
 		},
 		{
@@ -131,7 +129,6 @@ func TestGetCachedResponse(t *testing.T) {
 				conn := testRepo.pool.Get()
 
 				_, err := conn.Do("SET", testKeyEmpty, "")
-
 				if err != nil {
 					t.Fatalf("runBefore failed: %s", err)
 				}
@@ -156,12 +153,10 @@ func TestGetCachedResponse(t *testing.T) {
 			got, err := testRepo.GetCachedResponse(context.Background(), tt.key)
 
 			if !errors.Is(err, tt.err) {
-
 				t.Fatalf("\ngot error: \n%s\nexpected error: \n%s\n", err, tt.err)
 			}
 
 			if !reflect.DeepEqual(got, tt.response) {
-
 				t.Fatalf("got %v expected %v", got, tt.response)
 			}
 		})

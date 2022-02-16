@@ -17,7 +17,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const defaultTimeout = 30
+const (
+	defaultTimeout   = 30
+	containerTimeout = 60
+)
 
 func GetTestPool() (*pgxpool.Pool, func()) {
 	var dbPool *pgxpool.Pool
@@ -47,17 +50,20 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	}
 
 	hostAndPort := resource.GetHostPort("5432/tcp")
-	databaseUrl := fmt.Sprintf("postgres://postgres:secret@%s/suricate?sslmode=disable", hostAndPort)
+	databaseURL := fmt.Sprintf("postgres://postgres:secret@%s/suricate?sslmode=disable", hostAndPort)
 
-	log.Println("Connecting to database on url: ", databaseUrl)
+	log.Println("Connecting to database on url: ", databaseURL)
 
-	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
+	// Tell docker to hard kill the container in 60 seconds
+	if err = resource.Expire(containerTimeout); err != nil {
+		panic(err)
+	}
 
-	dockerPool.MaxWait = timeout() * time.Second
+	dockerPool.MaxWait = timeout()
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
-		dbPool, err = connectTestPool(context.Background(), databaseUrl)
+		dbPool, err = connectTestPool(context.Background(), databaseURL)
 
 		return err
 	}); err != nil {
@@ -67,27 +73,26 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	// tearDown should be called to destroy container at the end of the test
 	tearDown := func() {
 		dbPool.Close()
-		dockerPool.Purge(resource)
+		if err := dockerPool.Purge(resource); err != nil {
+			panic(err)
+		}
 	}
 
 	return dbPool, tearDown
 }
 
-func connectTestPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, error) {
-	config, err := pgxpool.ParseConfig(databaseUrl)
-
+func connectTestPool(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
-
 		return nil, err
 	}
 
 	pool, err := pgxpool.ConnectConfig(ctx, config)
-
 	if err != nil {
 		return nil, err
 	}
 
-	err = migrateTestDb(databaseUrl)
+	err = migrateTestDB(databaseURL)
 
 	if err != nil {
 		return nil, err
@@ -96,19 +101,17 @@ func connectTestPool(ctx context.Context, databaseUrl string) (*pgxpool.Pool, er
 	return pool, nil
 }
 
-func migrateTestDb(databaseUrl string) error {
+func migrateTestDB(databaseURL string) error {
 	migration, err := migrate.New(
 		"file://../migrations",
-		databaseUrl)
-
+		databaseURL)
 	if err != nil {
-		return fmt.Errorf("could not read migration files: %s", err)
+		return fmt.Errorf("could not read migration files: %w", err)
 	}
 
 	err = migration.Up()
 
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-
 		return err
 	}
 
@@ -118,11 +121,9 @@ func migrateTestDb(databaseUrl string) error {
 func timeout() time.Duration {
 	timeoutString := os.Getenv("DOCKERTEST_TIMEOUT")
 	timeout, err := strconv.Atoi(timeoutString)
-
 	if err != nil {
-
-		return time.Duration(defaultTimeout)
+		return time.Duration(defaultTimeout) * time.Second
 	}
 
-	return time.Duration(timeout)
+	return time.Duration(timeout) * time.Second
 }

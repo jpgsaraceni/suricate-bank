@@ -1,0 +1,159 @@
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 5m
+
+linters-settings:
+  dupl:
+    threshold: 200
+  goimports:
+    local-prefixes: github.com/jpgsaraceni/suricate-bank
+  gofumpt:
+    lang-version: "1.17"
+    extra-rules: true
+  gomnd:
+    ignored-numbers:
+      - 100
+  gosimple:
+    go: "1.17"
+  govet:
+    check-shadowing: true
+    enable-all: true
+    disable:
+      - fieldalignment
+  lll:
+    line-length: 160
+  misspell:
+    locale: US
+  staticcheck:
+    go: "1.17"
+  stylecheck:
+    go: "1.17"
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+  unparam:
+    check-exported: true
+  unused:
+    go: "1.17"
+  revive:
+    ignore-generated-header: true
+    rules:
+      - name: atomic
+      - name: bool-literal-in-expr
+      - name: constant-logical-expr
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: defer
+      - name: dot-imports
+      - name: early-return
+      - name: empty-block
+      - name: error-naming
+      - name: error-return
+      - name: error-strings
+      - name: errorf
+      - name: exported
+      - name: if-return
+#      - name: import-shadowing
+      - name: increment-decrement
+      - name: indent-error-flow
+      - name: flag-parameter
+      - name: modifies-parameter
+      - name: package-comments
+      - name: range
+      - name: range-val-address
+      - name: range-val-in-closure
+      - name: receiver-naming
+      - name: redefines-builtin-id
+      - name: struct-tag
+      - name: superfluous-else
+      - name: time-naming
+      - name: unexported-return
+      - name: unnecessary-stmt
+      - name: unreachable-code
+      - name: unused-parameter
+      - name: unused-receiver
+      - name: useless-break
+      - name: var-declaration
+      - name: var-naming
+      - name: waitgroup-by-value
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - dupl
+        - errcheck
+        - gocognit
+        - gocyclo
+        - gosec
+        - gomnd
+    - path: app/gateways/api/http/middlewares/idempotency.go
+      text: "weak cryptographic primitive"
+      linters:
+        - gosec
+
+linters:
+  enable:
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forcetypeassert
+    - gci
+    - gochecknoinits
+#    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+#    - goerr113
+    - gofmt
+    - gofumpt
+    - goimports
+    - gomnd
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ifshort
+    - importas
+    - ineffassign
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nlreturn
+    - noctx
+    - nolintlint
+    - paralleltest
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - tagliatelle
+    - tparallel
+    - typecheck
+    - unconvert
+    - unused
+    - varcheck
+    - wastedassign
+    - whitespace
+#    - wrapcheck

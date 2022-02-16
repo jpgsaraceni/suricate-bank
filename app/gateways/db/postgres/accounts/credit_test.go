@@ -21,7 +21,7 @@ func TestCredit(t *testing.T) {
 	t.Cleanup(tearDown)
 
 	type args struct {
-		accountId account.AccountId
+		accountID account.ID
 		amount    money.Money
 	}
 
@@ -34,8 +34,8 @@ func TestCredit(t *testing.T) {
 	}
 
 	var (
-		testIdCredit10initial0  = account.AccountId(uuid.New())
-		testIdCredit10initial10 = account.AccountId(uuid.New())
+		testIDCredit10initial0  = account.ID(uuid.New())
+		testIDCredit10initial10 = account.ID(uuid.New())
 	)
 
 	testCases := []testCase{
@@ -44,13 +44,13 @@ func TestCredit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdCredit10initial0,
+					testIDCredit10initial0,
 					cpf.Random().Value(),
 					0,
 				)
 			},
 			args: args{
-				accountId: testIdCredit10initial0,
+				accountID: testIDCredit10initial0,
 				amount:    testMoney10,
 			},
 			expectedBalance: 10,
@@ -60,13 +60,13 @@ func TestCredit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdCredit10initial10,
+					testIDCredit10initial10,
 					cpf.Random().Value(),
 					10,
 				)
 			},
 			args: args{
-				accountId: testIdCredit10initial10,
+				accountID: testIDCredit10initial10,
 				amount:    testMoney10,
 			},
 			expectedBalance: 20,
@@ -74,10 +74,10 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit inexistent account",
 			args: args{
-				accountId: account.AccountId(uuid.New()),
+				accountID: account.ID(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: account.ErrIdNotFound,
+			err: account.ErrIDNotFound,
 		},
 	}
 
@@ -88,17 +88,16 @@ func TestCredit(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			if err := testRepo.CreditAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
+			if err := testRepo.CreditAccount(testContext, tt.args.accountID, tt.args.amount); !errors.Is(err, tt.err) {
 				t.Fatalf(" got error: %s expected error: %s", err, tt.err)
 			}
 
-			if gotBalance, _ := testRepo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
+			if gotBalance, _ := testRepo.GetBalance(testContext, tt.args.accountID); gotBalance != tt.expectedBalance {
 				t.Fatalf("got %d expected %d ", gotBalance, tt.expectedBalance)
 			}
 		})

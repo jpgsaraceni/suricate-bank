@@ -5,11 +5,11 @@ import (
 )
 
 type MockService struct {
-	OnAuthenticate func(ctx context.Context, cpfInput string, secret string) (string, error)
+	OnAuthenticate func(ctx context.Context, cpfInput, secret string) (string, error)
 }
 
 var _ Service = (*MockService)(nil)
 
-func (mock MockService) Authenticate(ctx context.Context, cpfInput string, secret string) (string, error) {
+func (mock MockService) Authenticate(ctx context.Context, cpfInput, secret string) (string, error) {
 	return mock.OnAuthenticate(ctx, cpfInput, secret)
 }

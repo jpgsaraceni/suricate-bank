@@ -17,7 +17,6 @@ import (
 func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-
 			requestIdempotencyKey := r.Header.Get("Idempotency-Key")
 
 			if requestIdempotencyKey == "" { // client has not implemented idempotent requests
@@ -34,7 +33,6 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 			}
 
 			idempotentResponse, err := s.GetCachedResponse(r.Context(), requestIdempotencyKey)
-
 			if err != nil {
 				responses.NewResponse(w).InternalServerError(err).SendJSON()
 
@@ -50,7 +48,6 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 
 			if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
 				err := s.Lock(r.Context(), requestIdempotencyKey)
-
 				if err != nil {
 					responses.NewResponse(w).InternalServerError(err).SendJSON()
 
@@ -71,7 +68,6 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				)
 
 				if err != nil {
-
 					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", requestIdempotencyKey, err)
 				}
 
@@ -86,6 +82,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 
 			responses.NewResponse(w).SendCachedResponse(idempotentResponse)
 		}
+
 		return http.HandlerFunc(fn)
 	}
 }
@@ -102,6 +99,7 @@ type ResponseHijack struct {
 func NewResponseHijack(w http.ResponseWriter) *ResponseHijack {
 	bodyBuff := &bytes.Buffer{}
 	multi := io.MultiWriter(bodyBuff, w)
+
 	return &ResponseHijack{
 		w:          w,
 		multi:      multi,
@@ -125,7 +123,6 @@ func (h *ResponseHijack) WriteHeader(i int) {
 func encodeRequestBody(r *http.Request) (string, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-
 		return "", err
 	}
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
@@ -137,5 +134,6 @@ func encodeRequestBody(r *http.Request) (string, error) {
 func hashBytes(b []byte) string {
 	hash := md5.Sum(b)
 	hashEncoding := hex.EncodeToString(hash[:])
+
 	return hashEncoding
 }

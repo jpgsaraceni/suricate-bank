@@ -8,16 +8,14 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (uc usecase) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
+func (uc usecase) GetBalance(ctx context.Context, id account.ID) (int, error) {
 	balance, err := uc.repository.GetBalance(ctx, id)
 
-	if errors.Is(err, account.ErrIdNotFound) {
-
+	if errors.Is(err, account.ErrIDNotFound) {
 		return 0, err
 	}
 
 	if err != nil {
-
 		return 0, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 

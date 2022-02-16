@@ -9,9 +9,7 @@ import (
 
 func (s service) GetCachedResponse(ctx context.Context, key string) (schema.CachedResponse, error) {
 	response, err := s.repository.GetCachedResponse(ctx, key)
-
 	if err != nil {
-
 		return response, fmt.Errorf("%w:%s", ErrRepository, err)
 	}
 

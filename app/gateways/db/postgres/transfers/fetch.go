@@ -19,9 +19,7 @@ func (r Repository) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 	`
 
 	rows, err := r.pool.Query(ctx, query)
-
 	if err != nil {
-
 		return nil, fmt.Errorf("%w: %s", ErrFetch, err.Error())
 	}
 
@@ -31,15 +29,13 @@ func (r Repository) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 	for rows.Next() {
 		var transferReturned transfer.Transfer
 		err := rows.Scan(
-			&transferReturned.Id,
-			&transferReturned.AccountOriginId,
-			&transferReturned.AccountDestinationId,
+			&transferReturned.ID,
+			&transferReturned.AccountOriginID,
+			&transferReturned.AccountDestinationID,
 			&transferReturned.Amount,
 			&transferReturned.CreatedAt,
 		)
-
 		if err != nil {
-
 			return nil, fmt.Errorf("%w: %s", ErrScanningRows, err.Error())
 		}
 

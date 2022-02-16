@@ -14,7 +14,7 @@ func TestLock(t *testing.T) {
 
 	testConn, tearDown := redistest.GetTestPool()
 	testRepo := NewRepository(testConn)
-	os.Setenv("IDEMPOTENCY_TTL", "24")
+	os.Setenv("IDEMPOTENCY_TTL", "84600")
 
 	t.Cleanup(tearDown)
 
@@ -70,8 +70,8 @@ func TestLock(t *testing.T) {
 				if err != nil {
 					t.Fatalf("runBefore failed: %s", err)
 				}
-				if replyInt := reply.(int64); replyInt < 23*60*60 {
-					t.Fatalf("expect TTL > 23 hours, got %d", replyInt)
+				if replyInt, ok := reply.(int64); !ok || replyInt < 84000 {
+					t.Fatalf("expect TTL > 84000, got %d", replyInt)
 				}
 				conn.Close()
 			}

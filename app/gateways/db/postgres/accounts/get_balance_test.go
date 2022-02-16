@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
@@ -21,14 +22,14 @@ func TestGetBalance(t *testing.T) {
 	type testCase struct {
 		name            string
 		runBefore       func() error
-		accountId       account.AccountId
+		accountID       account.ID
 		expectedBalance int
 		err             error
 	}
 
 	var (
-		testIdInitial0  = account.AccountId(uuid.New())
-		testIdInitial10 = account.AccountId(uuid.New())
+		testIDInitial0  = account.ID(uuid.New())
+		testIDInitial10 = account.ID(uuid.New())
 	)
 
 	testCases := []testCase{
@@ -37,12 +38,12 @@ func TestGetBalance(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdInitial0,
+					testIDInitial0,
 					cpf.Random().Value(),
 					0,
 				)
 			},
-			accountId:       testIdInitial0,
+			accountID:       testIDInitial0,
 			expectedBalance: 0,
 		},
 		{
@@ -50,19 +51,19 @@ func TestGetBalance(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdInitial10,
+					testIDInitial10,
 					cpf.Random().Value(),
 					10,
 				)
 			},
-			accountId:       testIdInitial10,
+			accountID:       testIDInitial10,
 			expectedBalance: 10,
 		},
 		{
 			name:            "fail to get balance from inexistent account",
-			accountId:       account.AccountId(uuid.New()),
+			accountID:       account.ID(uuid.New()),
 			expectedBalance: 0,
-			err:             account.ErrIdNotFound,
+			err:             account.ErrIDNotFound,
 		},
 	}
 
@@ -73,13 +74,12 @@ func TestGetBalance(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			gotBalance, err := testRepo.GetBalance(testContext, tt.accountId)
+			gotBalance, err := testRepo.GetBalance(testContext, tt.accountID)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)

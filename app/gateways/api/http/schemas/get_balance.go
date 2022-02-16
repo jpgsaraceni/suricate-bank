@@ -6,13 +6,13 @@ import (
 )
 
 type GetBalanceResponse struct {
-	AccountId string `json:"account_id"`
+	AccountID string `json:"account_id"`
 	Balance   string `json:"balance"`
 }
 
-func BalanceToResponse(accountId account.AccountId, balance int) GetBalanceResponse {
+func BalanceToResponse(accountID account.ID, balance int) GetBalanceResponse {
 	return GetBalanceResponse{
-		AccountId: accountId.String(),
+		AccountID: accountID.String(),
 		Balance:   money.MustParseBRL(balance),
 	}
 }

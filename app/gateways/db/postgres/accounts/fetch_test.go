@@ -24,8 +24,8 @@ func TestFetch(t *testing.T) {
 	}
 
 	var (
-		testIdInitial0   = account.AccountId(uuid.New())
-		testIdInitial10  = account.AccountId(uuid.New())
+		testIDInitial0   = account.ID(uuid.New())
+		testIDInitial10  = account.ID(uuid.New())
 		testCpfInitial0  = cpf.Random()
 		testCpfInitial10 = cpf.Random()
 	)
@@ -36,8 +36,8 @@ func TestFetch(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testIdInitial0,
+					[]account.ID{
+						testIDInitial0,
 					},
 					[]string{
 						testCpfInitial0.Value(),
@@ -49,7 +49,7 @@ func TestFetch(t *testing.T) {
 			},
 			expectedAccounts: []account.Account{
 				{
-					Id:        testIdInitial0,
+					ID:        testIDInitial0,
 					Name:      "nice name",
 					Cpf:       testCpfInitial0,
 					Secret:    testHash,
@@ -63,9 +63,9 @@ func TestFetch(t *testing.T) {
 				return CreateTestAccountBatch(
 
 					testPool,
-					[]account.AccountId{
-						testIdInitial0,
-						testIdInitial10,
+					[]account.ID{
+						testIDInitial0,
+						testIDInitial10,
 					},
 					[]string{
 						testCpfInitial0.Value(),
@@ -79,14 +79,14 @@ func TestFetch(t *testing.T) {
 			},
 			expectedAccounts: []account.Account{
 				{
-					Id:        testIdInitial0,
+					ID:        testIDInitial0,
 					Name:      "nice name",
 					Cpf:       testCpfInitial0,
 					Secret:    testHash,
 					CreatedAt: testTime,
 				},
 				{
-					Id:        testIdInitial10,
+					ID:        testIDInitial10,
 					Name:      "nice name",
 					Cpf:       testCpfInitial10,
 					Secret:    testHash,
@@ -104,8 +104,8 @@ func TestFetch(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testIdInitial0,
+					[]account.ID{
+						testIDInitial0,
 					},
 					[]string{
 						"12345",
@@ -132,7 +132,6 @@ func TestFetch(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(testPool)
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}

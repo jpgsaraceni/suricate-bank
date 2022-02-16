@@ -15,11 +15,11 @@ type usecase struct {
 }
 
 type Debiter interface {
-	DebitAccount(ctx context.Context, id account.AccountId, amount money.Money) error
+	DebitAccount(ctx context.Context, id account.ID, amount money.Money) error
 }
 
 type Crediter interface {
-	CreditAccount(ctx context.Context, id account.AccountId, amount money.Money) error
+	CreditAccount(ctx context.Context, id account.ID, amount money.Money) error
 }
 
 type Usecase interface {

@@ -9,9 +9,7 @@ import (
 
 func (uc usecase) Fetch(ctx context.Context) ([]transfer.Transfer, error) {
 	transferList, err := uc.Repository.Fetch(ctx)
-
 	if err != nil {
-
 		return []transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 

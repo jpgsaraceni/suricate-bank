@@ -229,9 +229,9 @@ func TestScan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			var testMoney = Money{}
+			testMoney := Money{}
 
-			if err := testMoney.Scan(tt.value); err != tt.err {
+			if err := testMoney.Scan(tt.value); !errors.Is(err, tt.err) {
 				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})
@@ -284,7 +284,7 @@ func TestBRL(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			var testMoney = Money{cents: tt.value}
+			testMoney := Money{cents: tt.value}
 			got := testMoney.BRL()
 			if got != tt.expect {
 				t.Errorf("got %s expected %s", got, tt.expect)

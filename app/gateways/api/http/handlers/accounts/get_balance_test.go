@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -31,9 +32,7 @@ func TestGetBalance(t *testing.T) {
 		expectedPayload interface{}
 	}
 
-	var (
-		testId = account.AccountId(uuid.New())
-	)
+	testID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
@@ -42,20 +41,20 @@ func TestGetBalance(t *testing.T) {
 				r: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						fmt.Sprintf("/accounts/%s/balance", testId),
+						fmt.Sprintf("/accounts/%s/balance", testID),
 						nil,
 					)
 				}(),
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.ID) (int, error) {
 					return 10, nil
 				},
 			},
 			expectedStatus: 200,
 			expectedPayload: map[string]interface{}{
-				"account_id": testId.String(),
+				"account_id": testID.String(),
 				"balance":    "R$0,10",
 			},
 		},
@@ -65,20 +64,20 @@ func TestGetBalance(t *testing.T) {
 				r: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						fmt.Sprintf("/accounts/%s/balance", testId),
+						fmt.Sprintf("/accounts/%s/balance", testID),
 						nil,
 					)
 				}(),
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.ID) (int, error) {
 					return 0, nil
 				},
 			},
 			expectedStatus: 200,
 			expectedPayload: map[string]interface{}{
-				"account_id": testId.String(),
+				"account_id": testID.String(),
 				"balance":    "R$0,00",
 			},
 		},
@@ -103,15 +102,15 @@ func TestGetBalance(t *testing.T) {
 				r: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						fmt.Sprintf("/accounts/%s/balance", testId),
+						fmt.Sprintf("/accounts/%s/balance", testID),
 						nil,
 					)
 				}(),
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
-					return 0, account.ErrIdNotFound
+				OnGetBalance: func(ctx context.Context, id account.ID) (int, error) {
+					return 0, account.ErrIDNotFound
 				},
 			},
 			expectedStatus:  404,
@@ -123,14 +122,14 @@ func TestGetBalance(t *testing.T) {
 				r: func() *http.Request {
 					return httptest.NewRequest(
 						http.MethodGet,
-						fmt.Sprintf("/accounts/%s/balance", testId),
+						fmt.Sprintf("/accounts/%s/balance", testID),
 						nil,
 					)
 				}(),
 				w: httptest.NewRecorder(),
 			},
 			usecase: accountuc.MockUsecase{
-				OnGetBalance: func(ctx context.Context, id account.AccountId) (int, error) {
+				OnGetBalance: func(ctx context.Context, id account.ID) (int, error) {
 					return 0, accountuc.ErrRepository
 				},
 			},
@@ -159,7 +158,6 @@ func TestGetBalance(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}
@@ -169,5 +167,4 @@ func TestGetBalance(t *testing.T) {
 			}
 		})
 	}
-
 }

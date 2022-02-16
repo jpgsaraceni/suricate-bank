@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
@@ -20,7 +21,7 @@ func TestDebit(t *testing.T) {
 	t.Cleanup(tearDown)
 
 	type args struct {
-		accountId account.AccountId
+		accountID account.ID
 		amount    money.Money
 	}
 
@@ -33,9 +34,9 @@ func TestDebit(t *testing.T) {
 	}
 
 	var (
-		testIdDebit10initial20 = account.AccountId(uuid.New())
-		testIdDebit30initial30 = account.AccountId(uuid.New())
-		testIdDebit20initial10 = account.AccountId(uuid.New())
+		testIDDebit10initial20 = account.ID(uuid.New())
+		testIDDebit30initial30 = account.ID(uuid.New())
+		testIDDebit20initial10 = account.ID(uuid.New())
 	)
 
 	testCases := []testCase{
@@ -44,13 +45,13 @@ func TestDebit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdDebit10initial20,
+					testIDDebit10initial20,
 					cpf.Random().Value(),
 					20,
 				)
 			},
 			args: args{
-				accountId: testIdDebit10initial20,
+				accountID: testIDDebit10initial20,
 				amount:    testMoney10,
 			},
 			expectedBalance: 10,
@@ -60,13 +61,13 @@ func TestDebit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdDebit30initial30,
+					testIDDebit30initial30,
 					cpf.Random().Value(),
 					30,
 				)
 			},
 			args: args{
-				accountId: testIdDebit30initial30,
+				accountID: testIDDebit30initial30,
 				amount:    testMoney30,
 			},
 			expectedBalance: 0,
@@ -76,13 +77,13 @@ func TestDebit(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdDebit20initial10,
+					testIDDebit20initial10,
 					cpf.Random().Value(),
 					10,
 				)
 			},
 			args: args{
-				accountId: testIdDebit20initial10,
+				accountID: testIDDebit20initial10,
 				amount:    testMoney20,
 			},
 			expectedBalance: 10,
@@ -91,10 +92,10 @@ func TestDebit(t *testing.T) {
 		{
 			name: "fail to debit inexistent account",
 			args: args{
-				accountId: account.AccountId(uuid.New()),
+				accountID: account.ID(uuid.New()),
 				amount:    testMoney10,
 			},
-			err: account.ErrIdNotFound,
+			err: account.ErrIDNotFound,
 		},
 	}
 
@@ -105,17 +106,16 @@ func TestDebit(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			if err := testRepo.DebitAccount(testContext, tt.args.accountId, tt.args.amount); !errors.Is(err, tt.err) {
+			if err := testRepo.DebitAccount(testContext, tt.args.accountID, tt.args.amount); !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)
 			}
 
-			if gotBalance, _ := testRepo.GetBalance(testContext, tt.args.accountId); gotBalance != tt.expectedBalance {
+			if gotBalance, _ := testRepo.GetBalance(testContext, tt.args.accountID); gotBalance != tt.expectedBalance {
 				t.Fatalf("got %d expected %d", gotBalance, tt.expectedBalance)
 			}
 		})

@@ -26,12 +26,12 @@ func TestFetch(t *testing.T) {
 	}
 
 	var (
-		testIdInitial0  = account.AccountId(uuid.New())
-		testIdInitial10 = account.AccountId(uuid.New())
-		testIdInitial20 = account.AccountId(uuid.New())
-		testIdInitial30 = account.AccountId(uuid.New())
-		testTransferId1 = transfer.TransferId(uuid.New())
-		testTransferId2 = transfer.TransferId(uuid.New())
+		testIDInitial0  = account.ID(uuid.New())
+		testIDInitial10 = account.ID(uuid.New())
+		testIDInitial20 = account.ID(uuid.New())
+		testIDInitial30 = account.ID(uuid.New())
+		testTransferID1 = transfer.ID(uuid.New())
+		testTransferID2 = transfer.ID(uuid.New())
 	)
 
 	testCases := []testCase{
@@ -40,9 +40,9 @@ func TestFetch(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				err := accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testIdInitial10,
-						testIdInitial20,
+					[]account.ID{
+						testIDInitial10,
+						testIDInitial20,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -53,21 +53,20 @@ func TestFetch(t *testing.T) {
 						20,
 					},
 				)
-
 				if err != nil {
 					return err
 				}
 
 				return createTestTransferBatch(
 					testPool,
-					[]transfer.TransferId{
-						testTransferId1,
+					[]transfer.ID{
+						testTransferID1,
 					},
-					[]account.AccountId{
-						testIdInitial20,
+					[]account.ID{
+						testIDInitial20,
 					},
-					[]account.AccountId{
-						testIdInitial10,
+					[]account.ID{
+						testIDInitial10,
 					},
 					[]int{
 						10,
@@ -76,9 +75,9 @@ func TestFetch(t *testing.T) {
 			},
 			expectedTransfers: []transfer.Transfer{
 				{
-					Id:                   testTransferId1,
-					AccountOriginId:      testIdInitial20,
-					AccountDestinationId: testIdInitial10,
+					ID:                   testTransferID1,
+					AccountOriginID:      testIDInitial20,
+					AccountDestinationID: testIDInitial10,
 					Amount:               testMoney10,
 					CreatedAt:            testTime,
 				},
@@ -89,11 +88,11 @@ func TestFetch(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				err := accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testIdInitial0,
-						testIdInitial10,
-						testIdInitial20,
-						testIdInitial30,
+					[]account.ID{
+						testIDInitial0,
+						testIDInitial10,
+						testIDInitial20,
+						testIDInitial30,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -108,24 +107,23 @@ func TestFetch(t *testing.T) {
 						30,
 					},
 				)
-
 				if err != nil {
 					return err
 				}
 
 				return createTestTransferBatch(
 					testPool,
-					[]transfer.TransferId{
-						testTransferId1,
-						testTransferId2,
+					[]transfer.ID{
+						testTransferID1,
+						testTransferID2,
 					},
-					[]account.AccountId{
-						testIdInitial20,
-						testIdInitial30,
+					[]account.ID{
+						testIDInitial20,
+						testIDInitial30,
 					},
-					[]account.AccountId{
-						testIdInitial10,
-						testIdInitial0,
+					[]account.ID{
+						testIDInitial10,
+						testIDInitial0,
 					},
 					[]int{
 						10,
@@ -135,16 +133,16 @@ func TestFetch(t *testing.T) {
 			},
 			expectedTransfers: []transfer.Transfer{
 				{
-					Id:                   testTransferId1,
-					AccountOriginId:      testIdInitial20,
-					AccountDestinationId: testIdInitial10,
+					ID:                   testTransferID1,
+					AccountOriginID:      testIDInitial20,
+					AccountDestinationID: testIDInitial10,
 					Amount:               testMoney10,
 					CreatedAt:            testTime,
 				},
 				{
-					Id:                   testTransferId2,
-					AccountOriginId:      testIdInitial30,
-					AccountDestinationId: testIdInitial0,
+					ID:                   testTransferID2,
+					AccountOriginID:      testIDInitial30,
+					AccountDestinationID: testIDInitial0,
 					Amount:               testMoney15,
 					CreatedAt:            testTime,
 				},
@@ -168,7 +166,6 @@ func TestFetch(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(testPool)
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}

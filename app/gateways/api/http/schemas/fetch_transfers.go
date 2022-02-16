@@ -11,9 +11,9 @@ type FetchTransfersResponse struct {
 }
 
 type FetchedTransfer struct {
-	Id                   string    `json:"transfer_id"`
-	AccountOriginId      string    `json:"account_origin_id"`
-	AccountDestinationId string    `json:"account_destination_id"`
+	ID                   string    `json:"transfer_id"`
+	AccountOriginID      string    `json:"account_origin_id"`
+	AccountDestinationID string    `json:"account_destination_id"`
 	Amount               string    `json:"amount"`
 	CreatedAt            time.Time `json:"created_at"`
 }
@@ -22,12 +22,13 @@ func TransfersToResponse(transferList []transfer.Transfer) FetchTransfersRespons
 	transferResponse := make([]FetchedTransfer, 0, len(transferList))
 	for _, transfer := range transferList {
 		transferResponse = append(transferResponse, FetchedTransfer{
-			Id:                   transfer.Id.String(),
-			AccountOriginId:      transfer.AccountOriginId.String(),
-			AccountDestinationId: transfer.AccountDestinationId.String(),
+			ID:                   transfer.ID.String(),
+			AccountOriginID:      transfer.AccountOriginID.String(),
+			AccountDestinationID: transfer.AccountDestinationID.String(),
 			Amount:               transfer.Amount.BRL(),
 			CreatedAt:            transfer.CreatedAt,
 		})
 	}
+
 	return FetchTransfersResponse{Transfers: transferResponse}
 }

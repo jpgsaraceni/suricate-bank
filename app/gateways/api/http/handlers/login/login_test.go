@@ -33,7 +33,7 @@ func TestLogin(t *testing.T) {
 		expectedPayload interface{}
 	}
 
-	var testId = account.AccountId(uuid.New())
+	testID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
@@ -49,14 +49,16 @@ func TestLogin(t *testing.T) {
 			},
 			service: auth.MockService{
 				OnAuthenticate: func(ctx context.Context, cpfInput, secret string) (string, error) {
-					jwt, _ := token.Sign(testId)
+					jwt, _ := token.Sign(testID)
+
 					return jwt.Value(), nil
 				},
 			},
 			expectedStatus: 200,
 			expectedPayload: map[string]interface{}{
 				"token": func() string {
-					jwt, _ := token.Sign(testId)
+					jwt, _ := token.Sign(testID)
+
 					return jwt.Value()
 				}(),
 			},
@@ -135,7 +137,6 @@ func TestLogin(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}

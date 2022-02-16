@@ -8,7 +8,6 @@ import (
 )
 
 func (r Repository) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
-
 	const query = `
 		INSERT INTO
 			transfers (
@@ -33,21 +32,19 @@ func (r Repository) Create(ctx context.Context, transferInstance transfer.Transf
 	err := r.pool.QueryRow(
 		ctx,
 		query,
-		transferInstance.Id,
-		transferInstance.AccountOriginId,
-		transferInstance.AccountDestinationId,
+		transferInstance.ID,
+		transferInstance.AccountOriginID,
+		transferInstance.AccountDestinationID,
 		transferInstance.Amount.Cents(),
 		transferInstance.CreatedAt,
 	).Scan(
-		&transferReturned.Id,
-		&transferReturned.AccountOriginId,
-		&transferReturned.AccountDestinationId,
+		&transferReturned.ID,
+		&transferReturned.AccountOriginID,
+		&transferReturned.AccountDestinationID,
 		&transferReturned.Amount,
 		&transferReturned.CreatedAt,
 	)
-
 	if err != nil {
-
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrCreateTransfer, err.Error())
 	}
 

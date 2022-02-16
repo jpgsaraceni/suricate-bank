@@ -22,9 +22,7 @@ func NewHash(inputSecret string) (Secret, error) {
 	s := Secret{}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(inputSecret), hashCost)
-
 	if err != nil {
-
 		return s, errHash
 	}
 

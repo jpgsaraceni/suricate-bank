@@ -107,7 +107,7 @@ func TestIsValid(t *testing.T) {
 func TestRandom(t *testing.T) {
 	t.Parallel()
 	t.Run("generate random cpf", func(t *testing.T) {
-
+		t.Parallel()
 		generatedCpf := Random()
 
 		isValid := generatedCpf.validate(generatedCpf.value)
@@ -154,9 +154,9 @@ func TestScan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			var testCpf = Cpf{}
+			testCpf := Cpf{}
 
-			if err := testCpf.Scan(tt.value); err != tt.err {
+			if err := testCpf.Scan(tt.value); !errors.Is(err, tt.err) {
 				t.Errorf("got error: %s expected error: %s", err, tt.err)
 			}
 		})

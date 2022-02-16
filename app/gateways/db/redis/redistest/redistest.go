@@ -9,6 +9,13 @@ import (
 	"github.com/ory/dockertest/v3/docker"
 )
 
+const (
+	containerTimeout = 60
+	poolTimeout      = 30
+	maxIdle          = 3
+	idleTimeout      = 240
+)
+
 func GetTestPool() (*redis.Pool, func()) {
 	var dbPool *redis.Pool
 
@@ -33,23 +40,24 @@ func GetTestPool() (*redis.Pool, func()) {
 
 	log.Println("Connecting to redis on: ", hostAndPort)
 
-	resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
+	if err = resource.Expire(containerTimeout); err != nil { // Tell docker to hard kill the container in 60 seconds
+		panic(err)
+	}
 
-	dockerPool.MaxWait = 30 * time.Second
+	dockerPool.MaxWait = poolTimeout * time.Second
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
 		dbPool = &redis.Pool{
-			MaxIdle:     3,
-			IdleTimeout: 240 * time.Second,
+			MaxIdle:     maxIdle,
+			IdleTimeout: idleTimeout * time.Second,
 			Dial: func() (redis.Conn, error) {
-
 				return redis.Dial("tcp", hostAndPort)
 			},
 		}
 
 		dbConn := dbPool.Get()
-		_, err := dbConn.Do("PING")
+		_, err = dbConn.Do("PING")
 
 		return err
 	}); err != nil {
@@ -57,7 +65,9 @@ func GetTestPool() (*redis.Pool, func()) {
 	}
 
 	tearDown := func() {
-		dockerPool.Purge(resource)
+		if err = dockerPool.Purge(resource); err != nil {
+			panic(err)
+		}
 	}
 
 	return dbPool, tearDown

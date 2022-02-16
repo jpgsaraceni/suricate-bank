@@ -16,17 +16,16 @@ import (
 func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 
-	accountId, err := getAccountIdFromRequest(r)
-
+	accountID, err := getAccountIDFromRequest(r)
 	if err != nil {
 		response.BadRequest(responses.ErrInvalidPathParameter).SendJSON()
 
 		return
 	}
 
-	balance, err := h.usecase.GetBalance(r.Context(), accountId)
+	balance, err := h.usecase.GetBalance(r.Context(), accountID)
 
-	if errors.Is(err, account.ErrIdNotFound) {
+	if errors.Is(err, account.ErrIDNotFound) {
 		response.NotFound(responses.ErrAccountNotFound).SendJSON()
 
 		return
@@ -38,19 +37,17 @@ func (h handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Ok(schemas.BalanceToResponse(accountId, balance)).SendJSON()
+	response.Ok(schemas.BalanceToResponse(accountID, balance)).SendJSON()
 }
 
-func getAccountIdFromRequest(r *http.Request) (account.AccountId, error) {
+func getAccountIDFromRequest(r *http.Request) (account.ID, error) {
 	idParam := getPathParam(r.URL.Path)
-	parsedToUuid, err := uuid.Parse(idParam)
-
+	parsedToUUID, err := uuid.Parse(idParam)
 	if err != nil {
-
-		return account.AccountId{}, err
+		return account.ID{}, err
 	}
 
-	return account.AccountId(parsedToUuid), nil
+	return account.ID(parsedToUUID), nil
 }
 
 func getPathParam(url string) string {
@@ -67,7 +64,6 @@ func getPathParamPosition() int {
 	parts := strings.Split(pathPattern, "/")
 	for i := range parts {
 		if re.MatchString(parts[i]) {
-
 			return i
 		}
 	}
