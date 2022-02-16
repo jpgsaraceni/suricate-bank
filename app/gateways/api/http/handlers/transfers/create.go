@@ -28,7 +28,7 @@ import (
 // @Failure 409 {object} responses.ErrorPayload
 // @Failure 422 {object} responses.ErrorPayload
 // @Failure 500 {object} responses.ErrorPayload
-// @Security ApiKeyAuth
+// @Security Access token
 // @Router /transfers [post]
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
