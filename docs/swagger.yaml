@@ -1,0 +1,312 @@
+definitions:
+  responses.ErrorPayload:
+    properties:
+      title:
+        example: Message for some error
+        type: string
+    type: object
+  schemas.CreateAccountRequest:
+    properties:
+      cpf:
+        type: string
+      name:
+        type: string
+      secret:
+        type: string
+    type: object
+  schemas.CreateAccountResponse:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: string
+      cpf:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+    type: object
+  schemas.CreateTransferRequest:
+    properties:
+      account_destination_id:
+        type: string
+      amount:
+        type: integer
+    type: object
+  schemas.CreateTransferResponse:
+    properties:
+      account_destination_id:
+        type: string
+      account_origin_id:
+        type: string
+      amount:
+        type: string
+      created_at:
+        type: string
+      transfer_id:
+        type: string
+    type: object
+  schemas.FetchedAccount:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: string
+      cpf:
+        type: string
+      created_at:
+        type: string
+      name:
+        type: string
+    type: object
+  schemas.FetchedTransfer:
+    properties:
+      account_destination_id:
+        type: string
+      account_origin_id:
+        type: string
+      amount:
+        type: string
+      created_at:
+        type: string
+      transfer_id:
+        type: string
+    type: object
+  schemas.GetBalanceResponse:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: string
+    type: object
+  schemas.LoginRequest:
+    properties:
+      cpf:
+        type: string
+      secret:
+        type: string
+    type: object
+  schemas.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: jpgome@id.uff.br
+    name: João Saraceni
+    url: https://www.linkedin.com/in/joaosaraceni/
+  description: Suricate Bank is an api that creates accounts and transfers money between
+    them.
+  license:
+    name: MIT
+    url: https://github.com/jpgsaraceni/suricate-bank/blob/main/LICENSE
+  title: Suricate Bank API
+  version: 0.2.0
+paths:
+  /accounts:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.FetchedAccount'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get all accounts
+      tags:
+      - Account
+    post:
+      consumes:
+      - application/json
+      description: Creates an account with BRL$10.00 initial balance
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateAccountRequest'
+      - description: Idempotency key
+        in: header
+        name: Idempotency-Key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CreateAccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Create a new account
+      tags:
+      - Account
+  /accounts/{id}/balance:
+    get:
+      consumes:
+      - application/json
+      description: Gets the balance of the account matching account ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetBalanceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get account balance
+      tags:
+      - Account
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Login
+      tags:
+      - Login
+  /transfers:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.FetchedTransfer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Get all transfers
+      tags:
+      - Transfer
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Creates a transfer from origin account matching bearer token account id
+        to account with request body account ID
+      parameters:
+      - description: Transfer
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateTransferRequest'
+      - description: Idempotency key
+        in: header
+        name: Idempotency-Key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CreateTransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorPayload'
+      summary: Create transfer
+      tags:
+      - Transfer
+securityDefinitions:
+  Access token:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
