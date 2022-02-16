@@ -53,6 +53,9 @@ func NewRouter(
 
 	r.Post("/login", loginHandler.Login)
 
+	r.Get("/swagger", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "swagger/index.html", http.StatusMovedPermanently)
+	})
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.ServerPort(), r); err != nil {
