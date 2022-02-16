@@ -249,6 +249,11 @@ const docTemplate_swagger = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Creates a transfer from origin account matching bearer token account ID\nto account with request body account ID.\nAmount must be greater than 0, both accounts exist and origin must have\nbalance greater than amoun.",
                 "consumes": [
                     "application/json"
@@ -515,7 +520,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Suricate Bank API",
-	Description:      "Suricate Bank is an api that creates accounts and transfers money between them.\n### Authorization\nTo create a transfer (`POST /transfer`) you will need to add an Authorization header\nto your request, in the format **Authorization: Bearer <TOKEN>**. You can set this\nclicking on the authorize button and entering \"Bearer YOUR_TOKEN\". You can get your\ntoken from the login response.\n### Idempotent Requests\nCreate transfer and account routes (`POST /transfer` and `POST /account`) support\nidempotent requests (you will always get the same response for the same\nrequest, without creating duplicates). To use, just set an Idempotency-Key on your\nrequest (any string, for example a UUID).",
+	Description:      "Suricate Bank is an api that creates accounts and transfers money between them.\n### Authorization\nTo create a transfer (`POST /transfer`) you will need to add an Authorization header\nto your request, in the format **Authorization: Bearer YOUR_TOKEN**. You can set this\nclicking on the authorize button and entering \"Bearer YOUR_TOKEN\". You can get your\ntoken from the login response.\n### Idempotent Requests\nCreate transfer and account routes (`POST /transfer` and `POST /account`) support\nidempotent requests (you will always get the same response for the same\nrequest, without creating duplicates). To use, just set an Idempotency-Key on your\nrequest (any string, for example a UUID).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate_swagger,
 }
