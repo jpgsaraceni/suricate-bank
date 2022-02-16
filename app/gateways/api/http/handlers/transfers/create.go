@@ -22,7 +22,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	originId, ok := middlewares.OriginIdFromContext(r.Context())
+	originID, ok := middlewares.OriginIDFromContext(r.Context())
 
 	if !ok {
 		response.InternalServerError(errors.New("failed to parse origin id token")).SendJSON()
@@ -30,7 +30,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transferInstance, response := createRequest.Validate(response, originId)
+	transferInstance, response := createRequest.Validate(response, originID)
 
 	if response.IsComplete() {
 		response.SendJSON()
@@ -39,7 +39,6 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	persistedTransfer, err := h.usecase.Create(r.Context(), transferInstance)
-
 	if err != nil {
 		if errors.Is(err, account.ErrInsufficientFunds) {
 			response.UnprocessableEntity(responses.ErrInsuficientFunds).SendJSON()
@@ -47,7 +46,7 @@ func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if errors.Is(err, account.ErrIdNotFound) {
+		if errors.Is(err, account.ErrIDNotFound) {
 			response.NotFound(responses.ErrAccountNotFound).SendJSON()
 
 			return

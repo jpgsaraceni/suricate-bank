@@ -11,7 +11,6 @@ func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 
 	transferList, err := h.usecase.Fetch(r.Context())
-
 	if err != nil {
 		response.InternalServerError(err).SendJSON()
 

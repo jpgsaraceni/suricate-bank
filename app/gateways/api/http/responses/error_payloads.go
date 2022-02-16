@@ -80,7 +80,7 @@ var (
 		Err:     errors.New("invalid request payload"),
 		Payload: ErrorPayload{Message: "Invalid payload. Expecting JSON containing keys account_detination_id and amount"},
 	}
-	ErrInvalidDestinationId = Error{
+	ErrInvalidDestinationID = Error{
 		Err:     errors.New("failed to parse destination id request field to AccountIt"),
 		Payload: ErrorPayload{Message: "Invalid account detination id"},
 	}

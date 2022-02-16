@@ -7,10 +7,15 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+const (
+	maxIdle     = 3
+	idleTimeout = 240
+)
+
 func ConnectPool(addr string) (*redis.Pool, error) {
 	pool := &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
+		MaxIdle:     maxIdle,
+		IdleTimeout: idleTimeout * time.Second,
 		Dial: func() (redis.Conn, error) {
 			log.Printf("attempting to connect to redis on %s...\n", addr)
 
@@ -21,10 +26,7 @@ func ConnectPool(addr string) (*redis.Pool, error) {
 	conn := pool.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("PING") // check if redis server is responsive
-
-	if err != nil {
-
+	if _, err := conn.Do("PING"); err != nil { // check if redis server is responsive
 		return nil, err
 	}
 	log.Println("successfully connected to redis server")

@@ -12,14 +12,19 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
+const (
+	testAmount10 = 10
+	testAmount15 = 15
+)
+
 var (
 	testContext    = context.Background()
 	testTime       = time.Now().Round(time.Hour)
-	testMoney10, _ = money.NewMoney(10)
-	testMoney15, _ = money.NewMoney(15)
+	testMoney10, _ = money.NewMoney(testAmount10)
+	testMoney15, _ = money.NewMoney(testAmount15)
 )
 
-func createTestTransferBatch(pool *pgxpool.Pool, ids []transfer.TransferId, originIds, destinationIds []account.AccountId, amount []int) error {
+func createTestTransferBatch(pool *pgxpool.Pool, ids []transfer.ID, originIds, destinationIds []account.ID, amount []int) error {
 	const query = `
 	INSERT INTO 
 	transfers (
@@ -40,11 +45,10 @@ VALUES
 
 	br := pool.SendBatch(testContext, batch)
 
-	_, err := br.Exec()
-	defer br.Close()
-	if err != nil {
+	if _, err := br.Exec(); err != nil {
 		return err
 	}
+	br.Close()
 
 	return nil
 }

@@ -2,7 +2,7 @@
 // CPFs must contain 11 numeric digits, being the last 2 for validation.
 // For the purpose of this validation, the first 9 digits can be considered random
 // (although there are rules related to the State in which it was emitted, for example).
-// The official refference can be found at http://sa.previdencia.gov.br/site/2015/07/rgrv_RegrasValidacao.pdf.
+// The official reference can be found at http://sa.previdencia.gov.br/site/2015/07/rgrv_RegrasValidacao.pdf.
 package cpf
 
 import (
@@ -39,14 +39,17 @@ var (
 	errScanEmpty = errors.New("scan returned empty")
 )
 
+const (
+	unmaskedCpfLength = 11
+	module            = 11
+	minimumRest       = 2
+)
+
 // NewCpf creates a Cpf struct with value and masked, or empty and returns error if invalid
 func NewCpf(input string) (Cpf, error) {
 	var c Cpf
 
-	ok := c.validate(input)
-
-	if !ok {
-
+	if ok := c.validate(input); !ok {
 		return c, errInvalid
 	}
 
@@ -69,7 +72,7 @@ func Random() Cpf {
 	_, isKnownInvalid := knownInvalids[body]
 
 	for isKnownInvalid {
-		var body string
+		body = ""
 
 		rand.Seed(time.Now().UnixMicro())
 
@@ -104,9 +107,7 @@ func (c *Cpf) Scan(value interface{}) error {
 
 	if value, ok := value.(string); ok {
 		cpf, err := NewCpf(value)
-
 		if err != nil {
-
 			return err
 		}
 
@@ -128,14 +129,12 @@ func (c *Cpf) validate(inputCpf string) bool {
 	unmasked, invalidFormat := removeMask(inputCpf)
 
 	if invalidFormat != nil {
-
 		return false
 	}
 
 	_, isKnownInvalid := knownInvalids[unmasked]
 
 	if isKnownInvalid {
-
 		return false
 	}
 
@@ -153,12 +152,10 @@ func (c *Cpf) validate(inputCpf string) bool {
 
 // removeMask converts a XXX.XXX.XXX-XX or XXXXXXXXXX format CPF to 11 numeric digits.
 func removeMask(masked string) (string, error) {
-
 	// The error here is unnecessary because the regex is being passsed directly.
 	inputIsNumeric, _ := regexp.MatchString(`^\d{11}$`, masked)
 
 	if inputIsNumeric {
-
 		return masked, nil
 	}
 
@@ -167,8 +164,7 @@ func removeMask(masked string) (string, error) {
 	re := regexp.MustCompile(`^(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})`)
 	unmaskedCpf = re.ReplaceAllString(masked, "$1$2$3$4")
 
-	if len(unmaskedCpf) != 11 {
-
+	if len(unmaskedCpf) != unmaskedCpfLength {
 		return "", errInvalid
 	}
 
@@ -177,7 +173,6 @@ func removeMask(masked string) (string, error) {
 
 // mask converts an 11 long numeric string to XXX.XXX.XXX-XX format, without validating
 func mask(cString string) string {
-
 	re := regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})`)
 	masked := re.ReplaceAllString(cString, "$1.$2.$3-$4")
 
@@ -187,12 +182,11 @@ func mask(cString string) string {
 func convertRestToDigit(dividend, divisor int) string {
 	rest := dividend % divisor
 
-	if rest < 2 {
-
+	if rest < minimumRest {
 		return "0"
 	}
 
-	return strconv.Itoa(11 - rest)
+	return strconv.Itoa(module - rest)
 }
 
 func checkVerifyingDigits(cpf string) bool {
@@ -209,17 +203,16 @@ func checkVerifyingDigits(cpf string) bool {
 
 func iterateDigits(cpf string) string {
 	var sum int
-	var factor int = len(cpf) + 1
+	factor := len(cpf) + 1
 
 	for i := 0; i < len(cpf); i++ {
-		var char = string(cpf[i])
+		char := string(cpf[i])
 		digit, _ := strconv.Atoi(char)
 		sum += digit * factor
 		factor--
-
 	}
 
-	digit := convertRestToDigit(sum, 11)
+	digit := convertRestToDigit(sum, module)
 
 	return digit
 }

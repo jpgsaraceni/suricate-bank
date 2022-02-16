@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 )
 
@@ -20,27 +21,26 @@ func TestFetch(t *testing.T) {
 		err        error
 	}
 
-	var testUUID1 = uuid.New()
-	var testUUID2 = uuid.New()
-	var testUUID3 = uuid.New()
-	var testUUID4 = uuid.New()
+	testUUID1 := uuid.New()
+	testUUID2 := uuid.New()
+	testUUID3 := uuid.New()
+	testUUID4 := uuid.New()
 
 	testCases := []testCase{
 		{
 			name: "successfully fetch 1 transfer",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
-
 					return []transfer.Transfer{
 						{
-							Id: transfer.TransferId(testUUID1),
+							ID: transfer.ID(testUUID1),
 						},
 					}, nil
 				},
 			},
 			want: []transfer.Transfer{
 				{
-					Id: transfer.TransferId(testUUID1),
+					ID: transfer.ID(testUUID1),
 				},
 			},
 		},
@@ -48,35 +48,34 @@ func TestFetch(t *testing.T) {
 			name: "successfully fetch 4 transfers",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
-
 					return []transfer.Transfer{
 						{
-							Id: transfer.TransferId(testUUID1),
+							ID: transfer.ID(testUUID1),
 						},
 						{
-							Id: transfer.TransferId(testUUID2),
+							ID: transfer.ID(testUUID2),
 						},
 						{
-							Id: transfer.TransferId(testUUID3),
+							ID: transfer.ID(testUUID3),
 						},
 						{
-							Id: transfer.TransferId(testUUID4),
+							ID: transfer.ID(testUUID4),
 						},
 					}, nil
 				},
 			},
 			want: []transfer.Transfer{
 				{
-					Id: transfer.TransferId(testUUID1),
+					ID: transfer.ID(testUUID1),
 				},
 				{
-					Id: transfer.TransferId(testUUID2),
+					ID: transfer.ID(testUUID2),
 				},
 				{
-					Id: transfer.TransferId(testUUID3),
+					ID: transfer.ID(testUUID3),
 				},
 				{
-					Id: transfer.TransferId(testUUID4),
+					ID: transfer.ID(testUUID4),
 				},
 			},
 		},
@@ -84,7 +83,6 @@ func TestFetch(t *testing.T) {
 			name: "fetch zero transfers",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
-
 					return nil, nil
 				},
 			},
@@ -94,7 +92,6 @@ func TestFetch(t *testing.T) {
 			name: "repository throws error",
 			repository: transfer.MockRepository{
 				OnFetch: func(ctx context.Context) ([]transfer.Transfer, error) {
-
 					return []transfer.Transfer{}, ErrRepository
 				},
 			},

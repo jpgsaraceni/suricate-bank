@@ -11,7 +11,6 @@ import (
 )
 
 func (r Repository) Create(ctx context.Context, accountInstance account.Account) (account.Account, error) {
-
 	const query = `
 		INSERT INTO
 			accounts (
@@ -39,14 +38,14 @@ func (r Repository) Create(ctx context.Context, accountInstance account.Account)
 	err := r.pool.QueryRow(
 		ctx,
 		query,
-		accountInstance.Id,
+		accountInstance.ID,
 		accountInstance.Name,
 		accountInstance.Cpf.Value(),
 		accountInstance.Secret.Value(),
 		accountInstance.Balance.Cents(),
 		accountInstance.CreatedAt,
 	).Scan(
-		&accountReturned.Id,
+		&accountReturned.ID,
 		&accountReturned.Name,
 		&accountReturned.Cpf,
 		&accountReturned.Secret,
@@ -62,7 +61,6 @@ func (r Repository) Create(ctx context.Context, accountInstance account.Account)
 	if err != nil {
 		if errors.As(err, &pgErr) {
 			if pgErr.SQLState() == uniqueKeyViolationCode && pgErr.ConstraintName == cpfConstraint {
-
 				return account.Account{}, account.ErrDuplicateCpf
 			}
 		}

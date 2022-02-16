@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -27,11 +28,12 @@ func TestNewAccount(t *testing.T) {
 		err  error
 	}
 
-	var wantCpf = func(input string) cpf.Cpf {
+	wantCpf := func(input string) cpf.Cpf {
 		newCpf, _ := cpf.NewCpf(input)
+
 		return newCpf
 	}
-	var testMoney, _ = money.NewMoney(1000)
+	testMoney, _ := money.NewMoney(1000)
 
 	testCases := []testCase{
 		{
@@ -146,8 +148,8 @@ func TestNewAccount(t *testing.T) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)
 			}
 
-			if got.Id != AccountId(uuid.Nil) {
-				got.Id = tt.want.Id
+			if got.ID != ID(uuid.Nil) {
+				got.ID = tt.want.ID
 			}
 
 			got.Secret = tt.want.Secret

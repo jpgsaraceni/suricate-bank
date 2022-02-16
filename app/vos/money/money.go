@@ -23,7 +23,6 @@ var (
 
 func NewMoney(amount int) (Money, error) {
 	if amount < 0 {
-
 		return Money{}, ErrNegative
 	}
 
@@ -47,14 +46,13 @@ func (m *Money) Scan(value interface{}) error {
 	valueInt, err := strconv.Atoi(valueString)
 
 	if err == nil {
-		money, err := NewMoney(int(valueInt))
-
+		money, err := NewMoney(valueInt)
 		if err != nil {
-
 			return err
 		}
 
 		*m = money
+
 		return nil
 	}
 
@@ -63,12 +61,10 @@ func (m *Money) Scan(value interface{}) error {
 
 func (m *Money) Add(amount int) error {
 	if amount < 0 {
-
 		return ErrNegative
 	}
 
 	if amount == 0 {
-
 		return ErrChangeByZero
 	}
 	m.cents += amount
@@ -78,17 +74,14 @@ func (m *Money) Add(amount int) error {
 
 func (m *Money) Subtract(amount int) error {
 	if amount < 0 {
-
 		return ErrNegative
 	}
 
 	if amount == 0 {
-
 		return ErrChangeByZero
 	}
 
 	if amount > m.cents {
-
 		return ErrInsuficientFunds
 	}
 	m.cents -= amount
@@ -100,12 +93,13 @@ func (m Money) BRL() string {
 	f := float64(m.cents) / 100
 
 	valueString := fmt.Sprintf("%.2f", f)
-	valueString = strings.Replace(valueString, ".", ",", -1)
+	valueString = strings.ReplaceAll(valueString, ".", ",")
 
 	return fmt.Sprintf("R$%s", valueString)
 }
 
 func MustParseBRL(cents int) string {
 	money, _ := NewMoney(cents)
+
 	return money.BRL()
 }

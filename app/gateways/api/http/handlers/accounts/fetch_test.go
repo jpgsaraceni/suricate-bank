@@ -36,7 +36,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	testAccount1 := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "nice name",
 		Cpf:       cpf.Random(),
 		Secret:    hash.Parse("123456"),
@@ -44,7 +44,7 @@ func TestFetch(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 	testAccount2 := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "nice name",
 		Cpf:       cpf.Random(),
 		Secret:    hash.Parse("123456"),
@@ -52,7 +52,7 @@ func TestFetch(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 	testAccount3 := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "nice name",
 		Cpf:       cpf.Random(),
 		Secret:    hash.Parse("123456"),
@@ -86,21 +86,21 @@ func TestFetch(t *testing.T) {
 			expectedPayload: map[string]interface{}{
 				"accounts": []interface{}{
 					map[string]interface{}{
-						"account_id": testAccount1.Id.String(),
+						"account_id": testAccount1.ID.String(),
 						"name":       testAccount1.Name,
 						"cpf":        testAccount1.Cpf.Masked(),
 						"balance":    testAccount1.Balance.BRL(),
 						"created_at": testAccount1.CreatedAt.Format(time.RFC3339Nano),
 					},
 					map[string]interface{}{
-						"account_id": testAccount2.Id.String(),
+						"account_id": testAccount2.ID.String(),
 						"name":       testAccount2.Name,
 						"cpf":        testAccount2.Cpf.Masked(),
 						"balance":    testAccount2.Balance.BRL(),
 						"created_at": testAccount2.CreatedAt.Format(time.RFC3339Nano),
 					},
 					map[string]interface{}{
-						"account_id": testAccount3.Id.String(),
+						"account_id": testAccount3.ID.String(),
 						"name":       testAccount3.Name,
 						"cpf":        testAccount3.Cpf.Masked(),
 						"balance":    testAccount3.Balance.BRL(),
@@ -173,7 +173,6 @@ func TestFetch(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}

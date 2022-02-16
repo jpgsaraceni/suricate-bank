@@ -14,17 +14,15 @@ import (
 //go:embed migrations/*.sql
 var fs embed.FS
 
-func Migrate(databaseUrl string) error {
+func Migrate(databaseURL string) error {
 	driver, err := iofs.New(fs, "migrations")
-
 	if err != nil {
-		return fmt.Errorf("could not get embeded migration files: %s", err)
+		return fmt.Errorf("could not get embedded migration files: %w", err)
 	}
 
-	migration, err := migrate.NewWithSourceInstance("iofs", driver, databaseUrl)
-
+	migration, err := migrate.NewWithSourceInstance("iofs", driver, databaseURL)
 	if err != nil {
-		return fmt.Errorf("could not read migration files: %s", err)
+		return fmt.Errorf("could not read migration files: %w", err)
 	}
 
 	err = migration.Up()
@@ -35,9 +33,11 @@ func Migrate(databaseUrl string) error {
 
 			return nil
 		}
+
 		return err
 	}
 
 	log.Println("migrations successfully read and run")
+
 	return nil
 }

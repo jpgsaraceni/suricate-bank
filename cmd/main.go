@@ -21,14 +21,14 @@ func main() {
 
 	cfg := config.ReadConfig(".env")
 
-	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.Url())
+	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.URL())
 	if err != nil {
 		panic(err)
 	}
 
 	defer pgPool.Close()
 
-	redisPool, err := redis.ConnectPool(cfg.Redis.Url())
+	redisPool, err := redis.ConnectPool(cfg.Redis.URL())
 	if err != nil {
 		panic(err)
 	}

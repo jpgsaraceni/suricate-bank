@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
@@ -35,7 +36,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	testAccount := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "nice name",
 		Cpf:       cpf.Random(),
 		Balance:   money.Money{},
@@ -61,7 +62,7 @@ func TestCreate(t *testing.T) {
 			},
 			expectedStatus: 201,
 			expectedPayload: map[string]interface{}{
-				"account_id": testAccount.Id.String(),
+				"account_id": testAccount.ID.String(),
 				"name":       testAccount.Name,
 				"cpf":        testAccount.Cpf.Masked(),
 				"balance":    testAccount.Balance.BRL(),
@@ -245,7 +246,6 @@ func TestCreate(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}

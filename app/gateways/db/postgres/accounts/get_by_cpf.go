@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
@@ -29,7 +30,7 @@ func (r Repository) GetByCpf(ctx context.Context, cpf cpf.Cpf) (account.Account,
 	row := r.pool.QueryRow(ctx, query, cpf.Value())
 
 	err := row.Scan(
-		&accountReturned.Id,
+		&accountReturned.ID,
 		&accountReturned.Name,
 		&accountReturned.Cpf,
 		&accountReturned.Secret,
@@ -38,12 +39,10 @@ func (r Repository) GetByCpf(ctx context.Context, cpf cpf.Cpf) (account.Account,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-
 		return account.Account{}, auth.ErrCpfNotFound
 	}
 
 	if err != nil {
-
 		return account.Account{}, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 

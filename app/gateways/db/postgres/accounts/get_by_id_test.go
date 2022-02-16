@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
@@ -22,13 +23,13 @@ func TestGetById(t *testing.T) {
 	type testCase struct {
 		name            string
 		runBefore       func() error
-		idArg           account.AccountId
+		idArg           account.ID
 		expectedAccount account.Account
 		err             error
 	}
 
 	var (
-		testIdCredit10initial0 = account.AccountId(uuid.New())
+		testIDCredit10initial0 = account.ID(uuid.New())
 		testCpf                = cpf.Random()
 	)
 
@@ -38,14 +39,14 @@ func TestGetById(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testIdCredit10initial0,
+					testIDCredit10initial0,
 					testCpf.Value(),
 					0,
 				)
 			},
-			idArg: testIdCredit10initial0,
+			idArg: testIDCredit10initial0,
 			expectedAccount: account.Account{
-				Id:        testIdCredit10initial0,
+				ID:        testIDCredit10initial0,
 				Name:      "nice name",
 				Cpf:       testCpf,
 				Secret:    testHash,
@@ -54,7 +55,7 @@ func TestGetById(t *testing.T) {
 		},
 		{
 			name:            "fail to get an inexixtent account",
-			idArg:           account.AccountId(uuid.New()),
+			idArg:           account.ID(uuid.New()),
 			expectedAccount: account.Account{},
 			err:             ErrQuery,
 		},
@@ -67,13 +68,12 @@ func TestGetById(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
 			}
 
-			gotAccount, err := testRepo.GetById(testContext, tt.idArg)
+			gotAccount, err := testRepo.GetByID(testContext, tt.idArg)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error: %s expected error: %s", err, tt.err)

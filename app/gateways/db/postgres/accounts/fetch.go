@@ -20,9 +20,7 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 	`
 
 	rows, err := r.pool.Query(ctx, query)
-
 	if err != nil {
-
 		return nil, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 
@@ -32,16 +30,14 @@ func (r Repository) Fetch(ctx context.Context) ([]account.Account, error) {
 	for rows.Next() {
 		var accountReturned account.Account
 		err := rows.Scan(
-			&accountReturned.Id,
+			&accountReturned.ID,
 			&accountReturned.Name,
 			&accountReturned.Cpf,
 			&accountReturned.Secret,
 			&accountReturned.Balance,
 			&accountReturned.CreatedAt,
 		)
-
 		if err != nil {
-
 			return nil, fmt.Errorf("%w: %s", ErrScanningRows, err.Error())
 		}
 

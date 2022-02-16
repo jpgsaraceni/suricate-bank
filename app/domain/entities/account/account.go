@@ -12,11 +12,11 @@ import (
 )
 
 type (
-	AccountId uuid.UUID
+	ID uuid.UUID
 )
 
 type Account struct {
-	Id        AccountId
+	ID        ID
 	Name      string
 	Cpf       cpf.Cpf
 	Secret    hash.Secret
@@ -24,35 +24,30 @@ type Account struct {
 	CreatedAt time.Time
 }
 
-func NewAccount(name string, cpfInput string, secret string) (Account, error) {
+func NewAccount(name, cpfInput, secret string) (Account, error) {
 	if len(name) == 0 {
-
 		return Account{}, ErrEmptyName
 	}
 
 	if len(secret) == 0 {
-
 		return Account{}, ErrEmptySecret
 	}
 
 	cpf, err := cpf.NewCpf(cpfInput)
-
 	if err != nil {
-
 		return Account{}, ErrInvalidCpf
 	}
 
 	hashedSecret, err := hash.NewHash(secret)
-
 	if err != nil {
-
 		return Account{}, fmt.Errorf("failed to hash secret: %w", err)
 	}
 
-	newMoney, _ := money.NewMoney(1000)
+	const testMoneyAmount = 1000
+	newMoney, _ := money.NewMoney(testMoneyAmount)
 
 	return Account{
-		Id:        newAccountId(),
+		ID:        newAccountID(),
 		Name:      name,
 		Cpf:       cpf,
 		Secret:    hashedSecret,
@@ -61,22 +56,21 @@ func NewAccount(name string, cpfInput string, secret string) (Account, error) {
 	}, nil
 }
 
-func newAccountId() AccountId {
-
-	return AccountId(uuid.New())
+func newAccountID() ID {
+	return ID(uuid.New())
 }
 
-func (id AccountId) String() string {
+func (id ID) String() string {
 	parsedToUUID := uuid.UUID(id)
+
 	return parsedToUUID.String()
 }
 
-func ParseAccountId(id string) (AccountId, error) {
-	accountId, err := uuid.Parse(id)
-
+func ParseAccountID(id string) (ID, error) {
+	accountID, err := uuid.Parse(id)
 	if err != nil {
-		return AccountId{}, err
+		return ID{}, err
 	}
 
-	return AccountId(accountId), nil
+	return ID(accountID), nil
 }

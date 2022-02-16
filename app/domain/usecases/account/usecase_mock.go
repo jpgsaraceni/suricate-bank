@@ -8,7 +8,7 @@ import (
 
 type MockUsecase struct {
 	OnCreate     func(ctx context.Context, accountInstance account.Account) (account.Account, error)
-	OnGetBalance func(ctx context.Context, id account.AccountId) (int, error)
+	OnGetBalance func(ctx context.Context, id account.ID) (int, error)
 	OnFetch      func(ctx context.Context) ([]account.Account, error)
 }
 
@@ -18,7 +18,7 @@ func (mock MockUsecase) Create(ctx context.Context, accountInstance account.Acco
 	return mock.OnCreate(ctx, accountInstance)
 }
 
-func (mock MockUsecase) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
+func (mock MockUsecase) GetBalance(ctx context.Context, id account.ID) (int, error) {
 	return mock.OnGetBalance(ctx, id)
 }
 

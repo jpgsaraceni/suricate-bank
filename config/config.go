@@ -12,7 +12,7 @@ import (
 
 type Config struct {
 	Postgres   PostgresConfig
-	HttpServer HttpServerConfig
+	HTTPServer HTTPServerConfig
 	Jwt        JwtConfig
 	Dockertest DockertestConfig
 	Redis      RedisConfig
@@ -26,7 +26,7 @@ type PostgresConfig struct {
 	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
 }
 
-type HttpServerConfig struct {
+type HTTPServerConfig struct {
 	Host string `env:"SERVER_HOST" env-default:"localhost"`
 	Port string `env:"SERVER_PORT" env-default:"8080"`
 }
@@ -48,13 +48,13 @@ type RedisConfig struct {
 
 func ReadConfigFromEnv() *Config {
 	var cfg Config
-	err := cleanenv.ReadEnv(&cfg)
-	if err != nil {
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		log.Panicf("failed to load config: %s", err)
 	}
 
 	cfg.setEnvs()
 	log.Println("successfully loaded from env")
+
 	return &cfg
 }
 
@@ -67,19 +67,21 @@ func ReadConfigFromFile(filename string) *Config {
 
 	cfg.setEnvs()
 	log.Println("successfully loaded env variables from .env file")
+
 	return &cfg
 }
 
 func ReadConfig(filename string) *Config {
 	if _, err := os.Stat(filename); errors.Is(err, fs.ErrNotExist) {
 		log.Printf("%s file not found, attempting to load from env", filename)
+
 		return ReadConfigFromEnv()
 	}
 
 	return ReadConfigFromFile(filename)
 }
 
-func (cfg PostgresConfig) Url() string {
+func (cfg PostgresConfig) URL() string {
 	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.User,
 		cfg.Password,
@@ -87,14 +89,15 @@ func (cfg PostgresConfig) Url() string {
 		cfg.Port,
 		cfg.Instance,
 	)
+
 	return url
 }
 
-func (cfg HttpServerConfig) ServerPort() string {
+func (cfg HTTPServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", cfg.Port)
 }
 
-func (cfg RedisConfig) Url() string {
+func (cfg RedisConfig) URL() string {
 	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 }
 

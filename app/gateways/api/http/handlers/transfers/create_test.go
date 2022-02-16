@@ -39,25 +39,25 @@ func TestCreate(t *testing.T) {
 	}
 
 	var (
-		testTransferId = transfer.TransferId(uuid.New())
+		testTransferID = transfer.ID(uuid.New())
 		testTime       = time.Now()
 		testMoney10, _ = money.NewMoney(10)
 	)
 
 	testAccount1 := account.Account{
-		Id:      account.AccountId(uuid.New()),
+		ID:      account.ID(uuid.New()),
 		Balance: testMoney10,
 	}
 
 	testAccount2 := account.Account{
-		Id: account.AccountId(uuid.New()),
+		ID: account.ID(uuid.New()),
 	}
 
 	var (
-		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":10}`, testAccount2.Id.String())
-		requestPayloadZeroAmount     = fmt.Sprintf(`{"account_destination_id":"%s","amount":0}`, testAccount2.Id.String())
-		requestPayloadNegativeAmount = fmt.Sprintf(`{"account_destination_id":"%s","amount":-10}`, testAccount2.Id.String())
-		requestPayloadRepeatedId     = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount1.Id.String())
+		requestPayload               = fmt.Sprintf(`{"account_destination_id":"%s","amount":10}`, testAccount2.ID.String())
+		requestPayloadZeroAmount     = fmt.Sprintf(`{"account_destination_id":"%s","amount":0}`, testAccount2.ID.String())
+		requestPayloadNegativeAmount = fmt.Sprintf(`{"account_destination_id":"%s","amount":-10}`, testAccount2.ID.String())
+		requestPayloadRepeatedID     = fmt.Sprintf(`{"account_destination_id":"%s","amount":5}`, testAccount1.ID.String())
 	)
 
 	testCases := []testCase{
@@ -70,7 +70,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -78,9 +79,9 @@ func TestCreate(t *testing.T) {
 			usecase: transferuc.MockUsecase{
 				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
 					return transfer.Transfer{
-						Id:                   testTransferId,
-						AccountOriginId:      testAccount1.Id,
-						AccountDestinationId: testAccount2.Id,
+						ID:                   testTransferID,
+						AccountOriginID:      testAccount1.ID,
+						AccountDestinationID: testAccount2.ID,
 						Amount:               testMoney10,
 						CreatedAt:            testTime,
 					}, nil
@@ -88,9 +89,9 @@ func TestCreate(t *testing.T) {
 			},
 			expectedStatus: 201,
 			expectedPayload: map[string]interface{}{
-				"transfer_id":            testTransferId.String(),
-				"account_origin_id":      testAccount1.Id.String(),
-				"account_destination_id": testAccount2.Id.String(),
+				"transfer_id":            testTransferID.String(),
+				"account_origin_id":      testAccount1.ID.String(),
+				"account_destination_id": testAccount2.ID.String(),
 				"amount":                 testMoney10.BRL(),
 				"created_at":             testTime.Format(time.RFC3339Nano),
 			},
@@ -120,7 +121,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(`{"account_destination_id":"","amount":5}`),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -139,7 +141,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadZeroAmount),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -158,7 +161,8 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayloadNegativeAmount),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -175,9 +179,10 @@ func TestCreate(t *testing.T) {
 					request := httptest.NewRequest(
 						http.MethodPost,
 						"/transfers",
-						strings.NewReader(requestPayloadRepeatedId),
+						strings.NewReader(requestPayloadRepeatedID),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
+
 					return request
 				}(),
 				w: httptest.NewRecorder(),
@@ -196,7 +201,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
 
 					return request
 				}(),
@@ -221,7 +226,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
 
 					return request
 				}(),
@@ -229,7 +234,7 @@ func TestCreate(t *testing.T) {
 			},
 			usecase: transferuc.MockUsecase{
 				OnCreate: func(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
-					return transfer.Transfer{}, account.ErrIdNotFound
+					return transfer.Transfer{}, account.ErrIDNotFound
 				},
 			},
 			expectedStatus: 404,
@@ -246,7 +251,7 @@ func TestCreate(t *testing.T) {
 						"/transfers",
 						strings.NewReader(requestPayload),
 					)
-					request = request.WithContext(middlewares.WithOriginId(context.Background(), testAccount1.Id))
+					request = request.WithContext(middlewares.WithOriginID(context.Background(), testAccount1.ID))
 
 					return request
 				}(),
@@ -284,7 +289,6 @@ func TestCreate(t *testing.T) {
 
 			var got map[string]interface{}
 			err := json.NewDecoder(recorder.Body).Decode(&got)
-
 			if err != nil {
 				t.Fatalf("failed to decode response body: %s", err)
 			}

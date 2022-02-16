@@ -12,16 +12,22 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
+const (
+	testAmount10 = 10
+	testAmount20 = 20
+	testAmount30 = 30
+)
+
 var (
 	testContext    = context.Background()
 	testHash, _    = hash.NewHash("nicesecret")
 	testTime       = time.Now().Round(time.Hour)
-	testMoney10, _ = money.NewMoney(10)
-	testMoney20, _ = money.NewMoney(20)
-	testMoney30, _ = money.NewMoney(30)
+	testMoney10, _ = money.NewMoney(testAmount10)
+	testMoney20, _ = money.NewMoney(testAmount20)
+	testMoney30, _ = money.NewMoney(testAmount30)
 )
 
-func createTestAccount(pool *pgxpool.Pool, id account.AccountId, cpf string, amount int) error {
+func createTestAccount(pool *pgxpool.Pool, id account.ID, cpf string, amount int) error {
 	const query = `
 		INSERT INTO 
 			accounts (
@@ -46,7 +52,6 @@ func createTestAccount(pool *pgxpool.Pool, id account.AccountId, cpf string, amo
 		amount,
 		testTime,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -54,7 +59,7 @@ func createTestAccount(pool *pgxpool.Pool, id account.AccountId, cpf string, amo
 	return nil
 }
 
-func CreateTestAccountBatch(pool *pgxpool.Pool, ids []account.AccountId, cpfs []string, amount []int) error {
+func CreateTestAccountBatch(pool *pgxpool.Pool, ids []account.ID, cpfs []string, amount []int) error {
 	const query = `
 	INSERT INTO 
 		accounts (
@@ -76,11 +81,10 @@ func CreateTestAccountBatch(pool *pgxpool.Pool, ids []account.AccountId, cpfs []
 
 	br := pool.SendBatch(testContext, batch)
 
-	_, err := br.Exec()
-	defer br.Close()
-	if err != nil {
+	if _, err := br.Exec(); err != nil {
 		return err
 	}
+	br.Close()
 
 	return nil
 }

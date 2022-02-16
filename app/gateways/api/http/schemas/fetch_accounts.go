@@ -11,7 +11,7 @@ type FetchAccountsResponse struct {
 }
 
 type FetchedAccount struct {
-	AccountId string    `json:"account_id"`
+	AccountID string    `json:"account_id"`
 	Name      string    `json:"name"`
 	Cpf       string    `json:"cpf"`
 	Balance   string    `json:"balance"`
@@ -22,12 +22,13 @@ func AccountsToResponse(accountList []account.Account) FetchAccountsResponse {
 	accountResponse := make([]FetchedAccount, 0, len(accountList))
 	for _, account := range accountList {
 		accountResponse = append(accountResponse, FetchedAccount{
-			AccountId: account.Id.String(),
+			AccountID: account.ID.String(),
 			Name:      account.Name,
 			Cpf:       account.Cpf.Masked(),
 			Balance:   account.Balance.BRL(),
 			CreatedAt: account.CreatedAt,
 		})
 	}
+
 	return FetchAccountsResponse{Accounts: accountResponse}
 }

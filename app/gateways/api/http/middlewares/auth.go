@@ -10,11 +10,10 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
 )
 
-type originIdKey struct{}
+type originIDKey struct{}
 
 func Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		response := responses.NewResponse(w)
 
 		authHeader := r.Header.Get("Authorization")
@@ -26,24 +25,24 @@ func Authorize(next http.Handler) http.Handler {
 			return
 		}
 
-		originId, err := token.Verify(requestToken)
-
+		originID, err := token.Verify(requestToken)
 		if err != nil {
 			response.Unauthorized(responses.ErrInvalidToken).SendJSON()
 
 			return
 		}
 
-		ctx := WithOriginId(r.Context(), originId)
+		ctx := WithOriginID(r.Context(), originID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func OriginIdFromContext(ctx context.Context) (account.AccountId, bool) {
-	originId, ok := ctx.Value(originIdKey{}).(account.AccountId)
-	return originId, ok
+func OriginIDFromContext(ctx context.Context) (account.ID, bool) {
+	originID, ok := ctx.Value(originIDKey{}).(account.ID)
+
+	return originID, ok
 }
 
-func WithOriginId(ctx context.Context, originId account.AccountId) context.Context {
-	return context.WithValue(ctx, originIdKey{}, originId)
+func WithOriginID(ctx context.Context, originID account.ID) context.Context {
+	return context.WithValue(ctx, originIDKey{}, originID)
 }

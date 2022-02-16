@@ -6,13 +6,15 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
 
 func TestCacheResponse(t *testing.T) {
+	t.Parallel()
+
 	type testCase struct {
 		name       string
-		key        string
 		repository MockRepository
 		request    schema.CachedResponse
 		err        error
@@ -23,7 +25,6 @@ func TestCacheResponse(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "cache a response",
-			key:  testKey,
 			repository: MockRepository{
 				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil
@@ -35,7 +36,6 @@ func TestCacheResponse(t *testing.T) {
 		},
 		{
 			name: "fail to cache a response that is already cached",
-			key:  testKey,
 			repository: MockRepository{
 				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{
@@ -52,7 +52,6 @@ func TestCacheResponse(t *testing.T) {
 		},
 		{
 			name: "fail due to repository error on getting cached response",
-			key:  testKey,
 			repository: MockRepository{
 				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, errors.New("i am an error :(")
@@ -62,7 +61,6 @@ func TestCacheResponse(t *testing.T) {
 		},
 		{
 			name: "fail due to repository error on caching response",
-			key:  testKey,
 			repository: MockRepository{
 				OnGetCachedResponse: func(context.Context, string) (schema.CachedResponse, error) {
 					return schema.CachedResponse{}, nil

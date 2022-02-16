@@ -12,7 +12,7 @@ type service struct {
 }
 
 type Service interface {
-	Authenticate(ctx context.Context, cpfInput string, secret string) (string, error)
+	Authenticate(ctx context.Context, cpfInput, secret string) (string, error)
 }
 
 func NewService(r account.Repository) Service {

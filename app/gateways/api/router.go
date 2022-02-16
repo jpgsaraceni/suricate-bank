@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,8 +20,10 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
+const requestTimeout = 60
+
 func NewRouter(
-	ctx context.Context,
+	_ context.Context,
 	cfg config.Config,
 	accountUC accountuc.Usecase,
 	transferUC transferuc.Usecase,
@@ -33,7 +36,7 @@ func NewRouter(
 
 	r := chi.NewRouter()
 
-	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(middleware.Timeout(requestTimeout * time.Second))
 
 	r.With(
 		middlewares.Idempotency(idempotencyService),
@@ -49,5 +52,7 @@ func NewRouter(
 
 	r.Post("/login", loginHandler.Login)
 
-	http.ListenAndServe(cfg.HttpServer.ServerPort(), r)
+	if err := http.ListenAndServe(cfg.HTTPServer.ServerPort(), r); err != nil {
+		log.Fatalf("failed to listen and serve: %s", err)
+	}
 }

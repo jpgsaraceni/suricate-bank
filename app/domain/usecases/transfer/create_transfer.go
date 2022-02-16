@@ -3,31 +3,29 @@ package transferuc
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/transfer"
 )
 
 func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer) (transfer.Transfer, error) {
-
-	err := uc.Debiter.DebitAccount(ctx, transferInstance.AccountOriginId, transferInstance.Amount)
-
+	err := uc.Debiter.DebitAccount(ctx, transferInstance.AccountOriginID, transferInstance.Amount)
 	if err != nil {
-
 		return transfer.Transfer{}, fmt.Errorf("failed to debit origin account: %w", err)
 	}
 
-	err = uc.Crediter.CreditAccount(ctx, transferInstance.AccountDestinationId, transferInstance.Amount)
+	err = uc.Crediter.CreditAccount(ctx, transferInstance.AccountDestinationID, transferInstance.Amount)
 
 	if err != nil {
-		rollback(ctx, uc, false, true, transferInstance)
+		rollbackCredit(ctx, uc, transferInstance)
 
 		return transfer.Transfer{}, fmt.Errorf("failed to credit destination account: %w", err)
 	}
 
 	persistedTransfer, err := uc.Repository.Create(ctx, transferInstance)
-
 	if err != nil {
-		rollback(ctx, uc, true, true, transferInstance)
+		rollbackCredit(ctx, uc, transferInstance)
+		rollbackDebit(ctx, uc, transferInstance)
 
 		return transfer.Transfer{}, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
@@ -35,13 +33,15 @@ func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer
 	return persistedTransfer, nil
 }
 
-func rollback(ctx context.Context, uc usecase, hasCredited, hasDebited bool, transfer transfer.Transfer) {
-	if hasCredited {
-		uc.Debiter.DebitAccount(ctx, transfer.AccountOriginId, transfer.Amount)
+func rollbackDebit(ctx context.Context, uc usecase, transfer transfer.Transfer) {
+	if err := uc.Debiter.DebitAccount(ctx, transfer.AccountOriginID, transfer.Amount); err != nil {
+		log.Printf("rollback failed: %s", err)
 	}
+}
 
-	if hasDebited {
-		uc.Crediter.CreditAccount(ctx, transfer.AccountDestinationId, transfer.Amount)
+func rollbackCredit(ctx context.Context, uc usecase, transfer transfer.Transfer) {
+	if err := uc.Crediter.CreditAccount(ctx, transfer.AccountDestinationID, transfer.Amount); err != nil {
+		log.Printf("rollback failed: %s", err)
 	}
 }
 

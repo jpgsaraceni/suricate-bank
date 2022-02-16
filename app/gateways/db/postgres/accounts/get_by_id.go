@@ -7,7 +7,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.Account, error) {
+func (r Repository) GetByID(ctx context.Context, id account.ID) (account.Account, error) {
 	const query = `
 		SELECT 
 			id,
@@ -25,16 +25,14 @@ func (r Repository) GetById(ctx context.Context, id account.AccountId) (account.
 	row := r.pool.QueryRow(ctx, query, id)
 
 	err := row.Scan(
-		&accountReturned.Id,
+		&accountReturned.ID,
 		&accountReturned.Name,
 		&accountReturned.Cpf,
 		&accountReturned.Secret,
 		&accountReturned.Balance,
 		&accountReturned.CreatedAt,
 	)
-
 	if err != nil {
-
 		return account.Account{}, fmt.Errorf("%w: %s", ErrQuery, err.Error())
 	}
 

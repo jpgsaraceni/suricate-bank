@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 )
@@ -24,7 +25,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	testAccount := account.Account{
-		Id:        account.AccountId(uuid.New()),
+		ID:        account.ID(uuid.New()),
 		Name:      "cool name",
 		Cpf:       cpf.Random(),
 		CreatedAt: time.Now(),

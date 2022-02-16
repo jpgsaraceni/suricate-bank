@@ -1,6 +1,14 @@
 DOCKER_USER=saraceni
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: test postgres-start postgres-stop dev dev-build start stop push-container pull-container
+.PHONY: metalint test postgres-start postgres-stop dev dev-build start stop push-container pull-container
+
+# run linter
+metalint:
+ifeq (, $(shell which $$(go env GOPATH)/bin/golangci-lint))
+	@echo "==> installing golangci-lint"
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.44.0
+endif
+	$$(go env GOPATH)/bin/golangci-lint run --fix --allow-parallel-runners -c ./.golangci.yml ./...
 
 # run tests
 test:

@@ -31,6 +31,7 @@ func (r Response) IsComplete() bool {
 func (r Response) Processing() Response {
 	r.Status = http.StatusBadRequest
 	r.Payload = ErrorPayload{Message: "Request is duplicate. Original request is being processed."}
+
 	return r
 }
 
@@ -38,6 +39,7 @@ func (r Response) BadRequest(err Error) Response {
 	r.Status = http.StatusBadRequest
 	r.Error = err.Err
 	r.Payload = err.Payload
+
 	return r
 }
 
@@ -45,6 +47,7 @@ func (r Response) Unauthorized(err Error) Response {
 	r.Status = http.StatusUnauthorized
 	r.Error = err.Err
 	r.Payload = err.Payload
+
 	return r
 }
 
@@ -52,6 +55,7 @@ func (r Response) Forbidden(err Error) Response {
 	r.Status = http.StatusForbidden
 	r.Error = err.Err
 	r.Payload = err.Payload
+
 	return r
 }
 
@@ -59,6 +63,7 @@ func (r Response) NotFound(err Error) Response {
 	r.Status = http.StatusNotFound
 	r.Error = err.Err
 	r.Payload = err.Payload
+
 	return r
 }
 
@@ -66,12 +71,14 @@ func (r Response) UnprocessableEntity(err Error) Response {
 	r.Status = http.StatusUnprocessableEntity
 	r.Error = err.Err
 	r.Payload = err.Payload
+
 	return r
 }
 
 func (r Response) Conflict() Response {
 	r.Status = http.StatusConflict
 	r.Payload = ErrorPayload{Message: `Idempotency-Key already used for a different request`}
+
 	return r
 }
 
@@ -79,18 +86,21 @@ func (r Response) InternalServerError(err error) Response {
 	r.Status = http.StatusInternalServerError
 	r.Error = err
 	r.Payload = ErrInternalServerError.Payload
+
 	return r
 }
 
 func (r Response) Ok(payload interface{}) Response {
 	r.Status = http.StatusOK
 	r.Payload = payload
+
 	return r
 }
 
 func (r Response) Created(payload interface{}) Response {
 	r.Status = http.StatusCreated
 	r.Payload = payload
+
 	return r
 }
 

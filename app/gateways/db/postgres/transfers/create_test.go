@@ -27,14 +27,14 @@ func TestCreate(t *testing.T) {
 	}
 
 	var (
-		testAccountIdInitial0  = account.AccountId(uuid.New())
-		testAccountIdInitial10 = account.AccountId(uuid.New())
+		testAccountIDInitial0  = account.ID(uuid.New())
+		testAccountIDInitial10 = account.ID(uuid.New())
 	)
 
 	testTransfer := transfer.Transfer{
-		Id:                   transfer.TransferId(uuid.New()),
-		AccountOriginId:      testAccountIdInitial10,
-		AccountDestinationId: testAccountIdInitial0,
+		ID:                   transfer.ID(uuid.New()),
+		AccountOriginID:      testAccountIDInitial10,
+		AccountDestinationID: testAccountIDInitial0,
 		Amount:               testMoney10,
 		CreatedAt:            testTime,
 	}
@@ -45,9 +45,9 @@ func TestCreate(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testAccountIdInitial0,
-						testAccountIdInitial10,
+					[]account.ID{
+						testAccountIDInitial0,
+						testAccountIDInitial10,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -67,9 +67,9 @@ func TestCreate(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						account.AccountId(uuid.New()),
-						testAccountIdInitial0,
+					[]account.ID{
+						account.ID(uuid.New()),
+						testAccountIDInitial0,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -90,9 +90,9 @@ func TestCreate(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testAccountIdInitial10,
-						account.AccountId(uuid.New()),
+					[]account.ID{
+						testAccountIDInitial10,
+						account.ID(uuid.New()),
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -113,9 +113,9 @@ func TestCreate(t *testing.T) {
 			runBefore: func(testPool *pgxpool.Pool) error {
 				return accountspg.CreateTestAccountBatch(
 					testPool,
-					[]account.AccountId{
-						testAccountIdInitial0,
-						testAccountIdInitial10,
+					[]account.ID{
+						testAccountIDInitial0,
+						testAccountIDInitial10,
 					},
 					[]string{
 						cpf.Random().Value(),
@@ -128,9 +128,9 @@ func TestCreate(t *testing.T) {
 				)
 			},
 			transferInstance: transfer.Transfer{
-				Id:                   transfer.TransferId(uuid.New()),
-				AccountOriginId:      testAccountIdInitial10,
-				AccountDestinationId: testAccountIdInitial10,
+				ID:                   transfer.ID(uuid.New()),
+				AccountOriginID:      testAccountIDInitial10,
+				AccountDestinationID: testAccountIDInitial10,
 				Amount:               testMoney10,
 				CreatedAt:            testTime,
 			},
@@ -151,7 +151,6 @@ func TestCreate(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore(testPool)
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}
@@ -160,7 +159,6 @@ func TestCreate(t *testing.T) {
 			gotTransfer, err := testRepo.Create(testContext, tt.transferInstance)
 
 			if !errors.Is(err, tt.err) {
-
 				t.Fatalf("\ngot error: \n%s \nexpected error: \n%s", err, tt.err)
 			}
 

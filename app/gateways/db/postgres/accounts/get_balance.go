@@ -9,8 +9,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (r Repository) GetBalance(ctx context.Context, id account.AccountId) (int, error) {
-
+func (r Repository) GetBalance(ctx context.Context, id account.ID) (int, error) {
 	const query = `
 		SELECT balance
 		FROM accounts
@@ -22,12 +21,10 @@ func (r Repository) GetBalance(ctx context.Context, id account.AccountId) (int, 
 	err := r.pool.QueryRow(ctx, query, id).Scan(&balance)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-
-		return 0, account.ErrIdNotFound
+		return 0, account.ErrIDNotFound
 	}
 
 	if err != nil {
-
 		return 0, ErrQuery
 	}
 

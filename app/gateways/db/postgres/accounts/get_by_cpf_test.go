@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/postgrestest"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
@@ -29,7 +30,7 @@ func TestGetByCpf(t *testing.T) {
 	}
 
 	var (
-		testId  = account.AccountId(uuid.New())
+		testID  = account.ID(uuid.New())
 		testCpf = cpf.Random()
 	)
 
@@ -39,14 +40,14 @@ func TestGetByCpf(t *testing.T) {
 			runBefore: func() error {
 				return createTestAccount(
 					testPool,
-					testId,
+					testID,
 					testCpf.Value(),
 					0,
 				)
 			},
 			cpf: testCpf,
 			expectedAccount: account.Account{
-				Id:        testId,
+				ID:        testID,
 				Name:      "nice name",
 				Cpf:       testCpf,
 				Secret:    testHash,
@@ -68,7 +69,6 @@ func TestGetByCpf(t *testing.T) {
 
 			if tt.runBefore != nil {
 				err := tt.runBefore()
-
 				if err != nil {
 					t.Fatalf("runBefore() failed: %s", err)
 				}

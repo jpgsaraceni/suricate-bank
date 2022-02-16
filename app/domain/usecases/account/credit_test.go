@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
@@ -27,17 +28,17 @@ func TestCredit(t *testing.T) {
 		testMoney0, _   = money.NewMoney(0)
 	)
 
-	var testAccountId = account.AccountId(uuid.New())
+	testAccountID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "successfully credit 100 to account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.ID, amount money.Money) error {
 					return nil
 				},
 			},
@@ -46,11 +47,11 @@ func TestCredit(t *testing.T) {
 		{
 			name: "successfully credit 100 to account with 10 initial balance",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney10,
 			},
 			repository: account.MockRepository{
-				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.ID, amount money.Money) error {
 					return nil
 				},
 			},
@@ -59,7 +60,7 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit 0 to account with 10 initial balance",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney10,
 			},
 			amount: testMoney0,
@@ -68,7 +69,7 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit 0 to account with 0 initial balance",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney0,
 			},
 			amount: testMoney0,
@@ -77,25 +78,25 @@ func TestCredit(t *testing.T) {
 		{
 			name: "fail to credit inexistent account",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
-					return account.ErrIdNotFound
+				OnCreditAccount: func(ctx context.Context, id account.ID, amount money.Money) error {
+					return account.ErrIDNotFound
 				},
 			},
 			amount: testMoney100,
-			err:    account.ErrIdNotFound,
+			err:    account.ErrIDNotFound,
 		},
 		{
 			name: "repository error",
 			testAccount: account.Account{
-				Id:      testAccountId,
+				ID:      testAccountID,
 				Balance: testMoney0,
 			},
 			repository: account.MockRepository{
-				OnCreditAccount: func(ctx context.Context, id account.AccountId, amount money.Money) error {
+				OnCreditAccount: func(ctx context.Context, id account.ID, amount money.Money) error {
 					return errors.New("")
 				},
 			},
@@ -111,7 +112,7 @@ func TestCredit(t *testing.T) {
 
 			uc := usecase{tt.repository}
 
-			err := uc.Credit(context.Background(), tt.testAccount.Id, tt.amount)
+			err := uc.Credit(context.Background(), tt.testAccount.ID, tt.amount)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %v expected error %v", err, tt.err)

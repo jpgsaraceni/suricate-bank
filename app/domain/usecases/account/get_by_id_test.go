@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
@@ -16,36 +17,36 @@ func TestGetById(t *testing.T) {
 	type testCase struct {
 		name       string
 		repository account.Repository
-		id         account.AccountId
+		id         account.ID
 		want       account.Account
 		err        error
 	}
 
-	var testAccountId = account.AccountId(uuid.New())
+	testAccountID := account.ID(uuid.New())
 
 	testCases := []testCase{
 		{
 			name: "get account",
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
+				OnGetByID: func(ctx context.Context, id account.ID) (account.Account, error) {
 					return account.Account{
-						Id: id,
+						ID: id,
 					}, nil
 				},
 			},
-			id: testAccountId,
+			id: testAccountID,
 			want: account.Account{
-				Id: testAccountId,
+				ID: testAccountID,
 			},
 		},
 		{
 			name: "fail to get account",
 			repository: account.MockRepository{
-				OnGetById: func(ctx context.Context, id account.AccountId) (account.Account, error) {
+				OnGetByID: func(ctx context.Context, id account.ID) (account.Account, error) {
 					return account.Account{}, errors.New("")
 				},
 			},
-			id:   testAccountId,
+			id:   testAccountID,
 			want: account.Account{},
 			err:  ErrRepository,
 		},
@@ -58,7 +59,7 @@ func TestGetById(t *testing.T) {
 
 			uc := usecase{tt.repository}
 
-			newAccount, err := uc.GetById(context.Background(), tt.id)
+			newAccount, err := uc.GetByID(context.Background(), tt.id)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)

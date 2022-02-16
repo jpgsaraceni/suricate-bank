@@ -7,11 +7,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
+
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/money"
 )
 
-func (r Repository) CreditAccount(ctx context.Context, id account.AccountId, amount money.Money) error {
+func (r Repository) CreditAccount(ctx context.Context, id account.ID, amount money.Money) error {
 	const query = `
 		UPDATE accounts
 		SET balance = balance + $1
@@ -19,14 +20,12 @@ func (r Repository) CreditAccount(ctx context.Context, id account.AccountId, amo
 		RETURNING id;
 	`
 
-	var updateId uuid.UUID
+	var updateID uuid.UUID
 
-	err := r.pool.QueryRow(ctx, query, amount.Cents(), id).Scan(&updateId)
-
+	err := r.pool.QueryRow(ctx, query, amount.Cents(), id).Scan(&updateID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-
-			return account.ErrIdNotFound
+			return account.ErrIDNotFound
 		}
 
 		return fmt.Errorf("%w: %s", ErrQuery, err.Error())

@@ -34,7 +34,7 @@ func TestCacheResponse(t *testing.T) {
 
 	testAccount := func() account.Account {
 		return account.Account{
-			Id:        account.AccountId(uuid.New()),
+			ID:        account.ID(uuid.New()),
 			Name:      "nice name",
 			Cpf:       cpf.Random(),
 			Balance:   money.Money{},
@@ -53,9 +53,9 @@ func TestCacheResponse(t *testing.T) {
 	testKey2 := uuid.NewString()
 	testKey3 := uuid.NewString()
 
-	createdAccountJson, _ := json.Marshal(testAccounts[0])
-	fetchedAccountsJson, _ := json.Marshal(testAccounts)
-	createAccountErrorJson, _ := json.Marshal(responses.ErrorPayload{Message: "Super descriptive error message"})
+	createdAccountJSON, _ := json.Marshal(testAccounts[0])
+	fetchedAccountsJSON, _ := json.Marshal(testAccounts)
+	createAccountErrorJSON, _ := json.Marshal(responses.ErrorPayload{Message: "Super descriptive error message"})
 
 	testCases := []testCase{
 		{
@@ -71,7 +71,7 @@ func TestCacheResponse(t *testing.T) {
 			response: schema.CachedResponse{
 				Key:            testKey,
 				ResponseStatus: 201,
-				ResponseBody:   createdAccountJson,
+				ResponseBody:   createdAccountJSON,
 			},
 		},
 		{
@@ -87,7 +87,7 @@ func TestCacheResponse(t *testing.T) {
 			response: schema.CachedResponse{
 				Key:            testKey2,
 				ResponseStatus: 400,
-				ResponseBody:   createAccountErrorJson,
+				ResponseBody:   createAccountErrorJSON,
 			},
 		},
 		{
@@ -103,7 +103,7 @@ func TestCacheResponse(t *testing.T) {
 			response: schema.CachedResponse{
 				Key:            testKey3,
 				ResponseStatus: 200,
-				ResponseBody:   fetchedAccountsJson,
+				ResponseBody:   fetchedAccountsJSON,
 			},
 		},
 		{
@@ -128,7 +128,6 @@ func TestCacheResponse(t *testing.T) {
 			err := testRepo.CacheResponse(context.Background(), tt.response)
 
 			if !errors.Is(err, tt.err) {
-
 				t.Fatalf("\ngot error: \n%s\nexpected error: \n%s\n", err, tt.err)
 			}
 		})

@@ -7,11 +7,9 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
 )
 
-func (uc usecase) GetById(ctx context.Context, id account.AccountId) (account.Account, error) {
-	account, err := uc.repository.GetById(ctx, id)
-
+func (uc usecase) GetByID(ctx context.Context, id account.ID) (account.Account, error) {
+	account, err := uc.repository.GetByID(ctx, id)
 	if err != nil {
-
 		return account, fmt.Errorf("%w: %s", ErrRepository, err.Error())
 	}
 
