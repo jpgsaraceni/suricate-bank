@@ -16,6 +16,22 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
+// @title Suricate Bank API
+// @version 0.2.0
+// @description Suricate Bank is an api that creates accounts and transfers money between them.
+
+// @contact.name João Saraceni
+// @contact.url https://www.linkedin.com/in/joaosaraceni/
+// @contact.email jpgome@id.uff.br
+
+// @license.name MIT
+// @license.url https://github.com/jpgsaraceni/suricate-bank/blob/main/LICENSE
+
+// @securityDefinitions.apikey Access token
+// @in header
+// @name Authorization
+
+// @host localhost:8080
 func main() {
 	ctx := context.Background()
 

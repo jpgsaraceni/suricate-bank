@@ -10,6 +10,16 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 )
 
+// @Summary Login
+// @Tags Login
+// @Accept json
+// @Produce json
+// @Param credentials body schemas.LoginRequest true "Login Credentials"
+// @Success 200 {object} schemas.LoginResponse
+// @Failure 400 {object} responses.ErrorPayload
+// @Failure 401 {object} responses.ErrorPayload
+// @Failure 500 {object} responses.ErrorPayload
+// @Router /login [post]
 func (h handler) Login(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 

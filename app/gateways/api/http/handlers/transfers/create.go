@@ -11,6 +11,22 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
 
+// @Summary Create transfer
+// @Description Creates a transfer from origin account matching bearer token account id
+// @Description to account with request body account ID
+// @Tags Transfer
+// @Accept json
+// @Produce json
+// @Param transfer body schemas.CreateTransferRequest true "Transfer"
+// @Param Idempotency-Key header string false "Idempotency key"
+// @Success 201 {object} schemas.CreateTransferResponse
+// @Failure 400 {object} responses.ErrorPayload
+// @Failure 401 {object} responses.ErrorPayload
+// @Failure 404 {object} responses.ErrorPayload
+// @Failure 409 {object} responses.ErrorPayload
+// @Failure 422 {object} responses.ErrorPayload
+// @Failure 500 {object} responses.ErrorPayload
+// @Router /transfers [post]
 func (h handler) Create(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 

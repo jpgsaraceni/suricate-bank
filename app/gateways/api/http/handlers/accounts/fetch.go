@@ -7,6 +7,13 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/schemas"
 )
 
+// @Summary Get all accounts
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Success 200 {array} schemas.FetchedAccount
+// @Failure 500 {object} responses.ErrorPayload
+// @Router /accounts [get]
 func (h handler) Fetch(w http.ResponseWriter, r *http.Request) {
 	response := responses.NewResponse(w)
 
