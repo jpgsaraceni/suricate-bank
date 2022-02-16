@@ -41,8 +41,6 @@ import (
 // @securityDefinitions.apikey Access token
 // @in header
 // @name Authorization
-
-// @host localhost:8080
 func main() {
 	ctx := context.Background()
 
