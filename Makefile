@@ -1,6 +1,6 @@
 DOCKER_USER=saraceni
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: metalint test postgres-start postgres-stop dev dev-build start stop push-container pull-container
+.PHONY: metalint test postgres-start postgres-stop dev dev-build start stop push-container pull-container update-docs
 
 # run linter
 metalint:
@@ -41,3 +41,7 @@ push-container:
 	docker push $(DOCKER_USER)/suricate-bank
 pull-container:
 	docker pull saraceni/suricate-bank
+
+# Update swagger docs
+update-docs:
+	swag init -g cmd/main.go
