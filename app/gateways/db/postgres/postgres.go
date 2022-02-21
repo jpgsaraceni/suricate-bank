@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -22,13 +22,13 @@ func ConnectPool(ctx context.Context, databaseURL string) (*pgxpool.Pool, error)
 		return nil, fmt.Errorf("%w: %s", errConfigureDB, err.Error())
 	}
 
-	log.Printf("attempting to connect to postgres on %s...\n", databaseURL)
+	log.Info().Msg(fmt.Sprintf("attempting to connect to postgres on %s...\n", databaseURL))
 	pool, err := pgxpool.ConnectConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", errConnectDB, err.Error())
 	}
 
-	log.Printf("successfully connected to postgres server. running migrations...\n")
+	log.Info().Msg("successfully connected to postgres server. running migrations...")
 	err = Migrate(databaseURL)
 
 	if err != nil {

@@ -1,10 +1,11 @@
 package redis
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -17,7 +18,7 @@ func ConnectPool(addr string) (*redis.Pool, error) {
 		MaxIdle:     maxIdle,
 		IdleTimeout: idleTimeout * time.Second,
 		Dial: func() (redis.Conn, error) {
-			log.Printf("attempting to connect to redis on %s...\n", addr)
+			log.Info().Msg(fmt.Sprintf("attempting to connect to redis on %s...\n", addr))
 
 			return redis.Dial("tcp", addr)
 		},
@@ -27,9 +28,9 @@ func ConnectPool(addr string) (*redis.Pool, error) {
 	defer conn.Close()
 
 	if _, err := conn.Do("PING"); err != nil { // check if redis server is responsive
-		return nil, err
+		return nil, fmt.Errorf("failed to ping redis server: %w", err)
 	}
-	log.Println("successfully connected to redis server")
+	log.Info().Msg("successfully connected to redis server")
 
 	return pool, nil
 }

@@ -1,6 +1,6 @@
 DOCKER_USER=saraceni
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: metalint test postgres-start postgres-stop dev dev-build start stop push-container pull-container update-docs
+.PHONY: metalint test dev dev-build start stop push-container pull-container update-docs
 
 # run linter
 metalint:

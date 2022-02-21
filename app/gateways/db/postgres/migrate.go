@@ -4,11 +4,11 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/rs/zerolog/log"
 )
 
 //go:embed migrations/*.sql
@@ -29,7 +29,7 @@ func Migrate(databaseURL string) error {
 
 	if err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
-			log.Println("migrations successfully read, no changes")
+			log.Info().Msg("migrations successfully read, no changes")
 
 			return nil
 		}
@@ -37,7 +37,7 @@ func Migrate(databaseURL string) error {
 		return err
 	}
 
-	log.Println("migrations successfully read and run")
+	log.Info().Msg("migrations successfully read and run")
 
 	return nil
 }

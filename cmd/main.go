@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
+
+	"github.com/rs/zerolog/log"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
 	transferuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/transfer"
@@ -11,6 +12,7 @@ import (
 	accountspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/accounts"
 	transferspg "github.com/jpgsaraceni/suricate-bank/app/gateways/db/postgres/transfers"
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis"
+	"github.com/jpgsaraceni/suricate-bank/app/infrastructure/logging"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/config"
@@ -42,25 +44,27 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	logging.InitZerolog("debug")
+
 	ctx := context.Background()
 
 	cfg := config.ReadConfig(".env")
 
 	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.URL())
 	if err != nil {
-		panic(err)
+		log.Panic().Stack().Err(err).Msg("")
 	}
 
 	defer pgPool.Close()
 
 	redisPool, err := redis.ConnectPool(cfg.Redis.URL())
 	if err != nil {
-		panic(err)
+		log.Panic().Stack().Err(err).Msg("")
 	}
 
 	defer redisPool.Close()
 
-	log.Printf("\033[34m---- HAPPY BANKING ----\033[37m\n")
+	log.Info().Msg("\033[34m---- HAPPY BANKING ----\033[37m\n")
 
 	accountsRepository := accountspg.NewRepository(pgPool)
 	transfersRepository := transferspg.NewRepository(pgPool)

@@ -11,10 +11,11 @@ require (
 	github.com/jackc/pgconn v1.10.1
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/ory/dockertest/v3 v3.8.1
+	github.com/rs/zerolog v1.26.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/http-swagger v1.2.5
 	github.com/swaggo/swag v1.7.9
-	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
+	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
 )
 
 require (

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -49,11 +49,11 @@ type RedisConfig struct {
 func ReadConfigFromEnv() *Config {
 	var cfg Config
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		log.Panicf("failed to load config: %s", err)
+		log.Fatal().Stack().Err(err).Msg("failed to load config")
 	}
 
 	cfg.setEnvs()
-	log.Println("successfully loaded from env")
+	log.Info().Msg("successfully loaded from env")
 
 	return &cfg
 }
@@ -62,11 +62,11 @@ func ReadConfigFromFile(filename string) *Config {
 	var cfg Config
 	err := cleanenv.ReadConfig(filename, &cfg)
 	if err != nil {
-		log.Panicf("failed to load config: %s", err)
+		log.Fatal().Stack().Err(err).Msg("failed to load config")
 	}
 
 	cfg.setEnvs()
-	log.Println("successfully loaded env variables from .env file")
+	log.Info().Msg("successfully loaded env variables from .env file")
 
 	return &cfg
 }
