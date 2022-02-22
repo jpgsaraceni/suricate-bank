@@ -36,13 +36,13 @@ func (uc usecase) Create(ctx context.Context, transferInstance transfer.Transfer
 
 func rollbackDebit(ctx context.Context, uc usecase, transfer transfer.Transfer) {
 	if err := uc.Debiter.DebitAccount(ctx, transfer.AccountOriginID, transfer.Amount); err != nil {
-		log.Warn().Stack().Err(err).Msg("rollback failed")
+		log.Error().Stack().Err(err).Msg("rollback failed")
 	}
 }
 
 func rollbackCredit(ctx context.Context, uc usecase, transfer transfer.Transfer) {
 	if err := uc.Crediter.CreditAccount(ctx, transfer.AccountDestinationID, transfer.Amount); err != nil {
-		log.Warn().Stack().Err(err).Msg("rollback failed")
+		log.Error().Stack().Err(err).Msg("rollback failed")
 	}
 }
 

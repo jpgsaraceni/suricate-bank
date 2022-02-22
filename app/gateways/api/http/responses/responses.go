@@ -112,7 +112,7 @@ func (r Response) SendJSON() {
 		r.Writer.Header().Set(headerKey, headerValue)
 	}
 	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
-		log.Warn().Stack().Err(err).Msg("failed to encode http response")
+		log.Error().Stack().Err(err).Msg("failed to encode http response")
 	}
 }
 
@@ -120,6 +120,6 @@ func (r Response) SendCachedResponse(cache schema.CachedResponse) {
 	r.Writer.Header().Set("Content-Type", "application/json")
 	r.Writer.WriteHeader(cache.ResponseStatus)
 	if _, err := r.Writer.Write(cache.ResponseBody); err != nil {
-		log.Warn().Stack().Err(err).Msg("failed to write cached http response")
+		log.Error().Stack().Err(err).Msg("failed to write cached http response")
 	}
 }
