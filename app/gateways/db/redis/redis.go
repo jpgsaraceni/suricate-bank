@@ -18,7 +18,7 @@ func ConnectPool(addr string) (*redis.Pool, error) {
 		MaxIdle:     maxIdle,
 		IdleTimeout: idleTimeout * time.Second,
 		Dial: func() (redis.Conn, error) {
-			log.Info().Msg(fmt.Sprintf("attempting to connect to redis on %s...\n", addr))
+			log.Info().Msgf("attempting to connect to redis on %s...\n", addr)
 
 			return redis.Dial("tcp", addr)
 		},
