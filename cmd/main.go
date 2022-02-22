@@ -64,7 +64,7 @@ func main() {
 
 	defer redisPool.Close()
 
-	log.Info().Msg("\033[34m---- HAPPY BANKING ----\033[37m\n")
+	log.Info().Msg("\033[34m---- HAPPY BANKING ----\033[37m")
 
 	accountsRepository := accountspg.NewRepository(pgPool)
 	transfersRepository := transferspg.NewRepository(pgPool)
