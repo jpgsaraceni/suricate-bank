@@ -1,4 +1,4 @@
-# ⚠️ WORK IN PROGRESS (DEVELOPMENT RELEASE) ⚠️
+# Suricate Bank
 
 Suricate Bank is an api that creates accounts and transfers money between them. It is being built following Clean Arch.
 
@@ -44,7 +44,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [migrate](github.com/golang-migrate/migrate) - For running database migrations;
 * [bcrypt](https://golang.org/x/crypto/bcrypt) - For hashing and comparing hashed secrets;
 * [jwt](github.com/golang-jwt/jwt/v4) - For signing and verifying JSON Web Tokens for authenticatioin;
-* [chi](github.com/go-chi/chi) - For routing;
+* [chi](github.com/go-chi/chi) - For routing, panic recovery and requestID tracing;
 * [cleanenv](github.com/ilyakaznacheev/cleanenv) - For reading .env and loading env variables;
 * [redigo](github.com/gomodule/redigo) - For connecting and running commands on Redis (for idempotent HTTP requests);
 * [Swaggo](https://github.com/swaggo) - For generating maintainable Swagger docs and Swagger UI
