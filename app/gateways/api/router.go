@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chiMiddlewares "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -37,8 +37,10 @@ func NewRouter(
 
 	r := chi.NewRouter()
 
-	r.Use(middleware.Timeout(requestTimeout * time.Second))
-	r.Use(middlewares.RequestLogger())
+	r.Use(chiMiddlewares.Timeout(requestTimeout * time.Second))
+	r.Use(chiMiddlewares.Recoverer)
+	r.Use(middlewares.RequestID) // wrapper for chi requestID middleware
+	r.Use(middlewares.RequestLogger)
 
 	r.With(
 		middlewares.Idempotency(idempotencyService),
