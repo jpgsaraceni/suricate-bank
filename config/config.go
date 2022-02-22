@@ -11,11 +11,16 @@ import (
 )
 
 type Config struct {
+	Log        ConfLog
 	Postgres   PostgresConfig
 	HTTPServer HTTPServerConfig
 	Jwt        JwtConfig
 	Dockertest DockertestConfig
 	Redis      RedisConfig
+}
+
+type ConfLog struct {
+	Level string `env:"LOG_LEVEL" env-default:"info"`
 }
 
 type PostgresConfig struct {

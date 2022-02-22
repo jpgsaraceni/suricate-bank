@@ -18,7 +18,7 @@ func InitZerolog(levelInput string) {
 
 	zerolog.SetGlobalLevel(level)
 	log.Logger = log.Output(zerolog.ConsoleWriter{
-		Out:     os.Stderr,
+		Out:     os.Stdout,
 		NoColor: false,
 	})
 

@@ -44,11 +44,11 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	logging.InitZerolog("debug")
-
 	ctx := context.Background()
 
 	cfg := config.ReadConfig(".env")
+
+	logging.InitZerolog(cfg.Log.Level)
 
 	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.URL())
 	if err != nil {
