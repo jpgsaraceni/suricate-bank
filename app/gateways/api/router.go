@@ -38,6 +38,7 @@ func NewRouter(
 	r := chi.NewRouter()
 
 	r.Use(middleware.Timeout(requestTimeout * time.Second))
+	r.Use(middlewares.RequestLogger())
 
 	r.With(
 		middlewares.Idempotency(idempotencyService),
