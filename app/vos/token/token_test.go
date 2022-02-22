@@ -2,7 +2,6 @@ package token
 
 import (
 	"errors"
-	"log"
 	"testing"
 	"time"
 
@@ -49,9 +48,7 @@ func TestSign(t *testing.T) {
 
 			claims, ok := parsedToken.Claims.(*jwtClaimsSchema)
 
-			if ok && parsedToken.Valid {
-				log.Printf("%v %v", claims.AccountID, claims.RegisteredClaims.ExpiresAt)
-			} else {
+			if !ok || !parsedToken.Valid {
 				t.Fatal("failed to parse token")
 			}
 

@@ -73,7 +73,7 @@ func ReadConfigFromFile(filename string) *Config {
 
 func ReadConfig(filename string) *Config {
 	if _, err := os.Stat(filename); errors.Is(err, fs.ErrNotExist) {
-		log.Info().Msgf("%s file not found, attempting to load from env", filename)
+		log.Info().Msg(" file not found, attempting to load from env")
 
 		return ReadConfigFromEnv()
 	}

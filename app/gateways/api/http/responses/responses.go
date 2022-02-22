@@ -2,8 +2,9 @@ package responses
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
 )
@@ -111,7 +112,7 @@ func (r Response) SendJSON() {
 		r.Writer.Header().Set(headerKey, headerValue)
 	}
 	if err := json.NewEncoder(r.Writer).Encode(r.Payload); err != nil {
-		log.Println(err) // TODO: fix after implementing log
+		log.Warn().Stack().Err(err).Msg("failed to encode http response")
 	}
 }
 
@@ -119,6 +120,6 @@ func (r Response) SendCachedResponse(cache schema.CachedResponse) {
 	r.Writer.Header().Set("Content-Type", "application/json")
 	r.Writer.WriteHeader(cache.ResponseStatus)
 	if _, err := r.Writer.Write(cache.ResponseBody); err != nil {
-		log.Println(err)
+		log.Warn().Stack().Err(err).Msg("failed to write cached http response")
 	}
 }

@@ -12,7 +12,6 @@ require (
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/rs/zerolog v1.26.1
-	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/http-swagger v1.2.5
 	github.com/swaggo/swag v1.7.9
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
@@ -55,6 +54,7 @@ require (
 	github.com/jackc/pgproto3/v2 v2.2.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.9.1 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/jackc/puddle v1.2.0 // indirect
 	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/lib/pq v1.10.4 // indirect

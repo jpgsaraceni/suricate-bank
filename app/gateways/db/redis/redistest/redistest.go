@@ -1,12 +1,12 @@
 package redistest
 
 import (
-	"log"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -21,7 +21,7 @@ func GetTestPool() (*redis.Pool, func()) {
 
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Panic().Err(err).Msg("Could not connect to docker")
 	}
 
 	resource, err := dockerPool.RunWithOptions(&dockertest.RunOptions{
@@ -33,12 +33,12 @@ func GetTestPool() (*redis.Pool, func()) {
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
 	})
 	if err != nil {
-		log.Fatalf("Could not start resource: %s", err)
+		log.Panic().Err(err).Msg("Could not start resource")
 	}
 
 	hostAndPort := resource.GetHostPort("6379/tcp")
 
-	log.Println("Connecting to redis on: ", hostAndPort)
+	log.Info().Msgf("Connecting to redis on: ", hostAndPort)
 
 	if err = resource.Expire(containerTimeout); err != nil { // Tell docker to hard kill the container in 60 seconds
 		panic(err)
@@ -61,7 +61,7 @@ func GetTestPool() (*redis.Pool, func()) {
 
 		return err
 	}); err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Panic().Err(err).Msg("Could not connect to docker")
 	}
 
 	tearDown := func() {

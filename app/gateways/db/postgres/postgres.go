@@ -22,7 +22,7 @@ func ConnectPool(ctx context.Context, databaseURL string) (*pgxpool.Pool, error)
 		return nil, fmt.Errorf("%w: %s", errConfigureDB, err.Error())
 	}
 
-	log.Info().Msgf("attempting to connect to postgres on %s...\n", databaseURL)
+	log.Info().Msgf("attempting to connect to postgres on %s...", databaseURL)
 	pool, err := pgxpool.ConnectConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", errConnectDB, err.Error())

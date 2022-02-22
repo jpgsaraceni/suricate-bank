@@ -30,10 +30,10 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * Containerized (Docker and Docker-Compose)
 * Meaningful unit and integration tests
 * Swagger Documentation
+* Structured logging
 
 ## Coming Soon
 
-* Logging, requestID tracing and panic recovery middlewares
 * GitHub Actions
 
 ## Dependencies
@@ -47,8 +47,8 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * [chi](github.com/go-chi/chi) - For routing;
 * [cleanenv](github.com/ilyakaznacheev/cleanenv) - For reading .env and loading env variables;
 * [redigo](github.com/gomodule/redigo) - For connecting and running commands on Redis (for idempotent HTTP requests);
-* [Logrus](https://github.com/sirupsen/logrus) - For logging. This library is used in the dockertest example. I haven't set up logging for the project, so I will decide later if this will actually be used.
 * [Swaggo](https://github.com/swaggo) - For generating maintainable Swagger docs and Swagger UI
+* [zerolog](https://github.com/rs/zerolog) - For structured logging.
 
 ## Getting started
 

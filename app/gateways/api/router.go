@@ -2,12 +2,12 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	accountuc "github.com/jpgsaraceni/suricate-bank/app/domain/usecases/account"
@@ -59,6 +59,6 @@ func NewRouter(
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.ServerPort(), r); err != nil {
-		log.Fatalf("failed to listen and serve: %s", err)
+		log.Panic().Stack().Msg("failed to listen and serve")
 	}
 }

@@ -5,9 +5,10 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"io"
-	"log"
 	"net/http"
 	"reflect"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
@@ -68,7 +69,12 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 				)
 
 				if err != nil {
-					log.Printf("failed to cache response\nIdempotency-Key:%s\nError:%s", requestIdempotencyKey, err)
+					log.
+						Warn().
+						Stack().
+						Err(err).
+						Str("Idempotency-Key", requestIdempotencyKey).
+						Msg("failed to cache response")
 				}
 
 				return
