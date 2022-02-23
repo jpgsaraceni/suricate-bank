@@ -14,7 +14,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -28,7 +28,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Panic().Err(err).Msg("Could not connect to docker")
 	}
 
 	resource, err := dockerPool.RunWithOptions(&dockertest.RunOptions{
@@ -46,13 +46,13 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 		config.RestartPolicy = docker.RestartPolicy{Name: "no"}
 	})
 	if err != nil {
-		log.Fatalf("Could not start resource: %s", err)
+		log.Panic().Err(err).Msg("Could not start resource")
 	}
 
 	hostAndPort := resource.GetHostPort("5432/tcp")
 	databaseURL := fmt.Sprintf("postgres://postgres:secret@%s/suricate?sslmode=disable", hostAndPort)
 
-	log.Println("Connecting to database on url: ", databaseURL)
+	log.Info().Msgf("Connecting to database on url: %s", databaseURL)
 
 	// Tell docker to hard kill the container in 60 seconds
 	if err = resource.Expire(containerTimeout); err != nil {
@@ -67,7 +67,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 
 		return err
 	}); err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Panic().Err(err).Msg("Could not connect to docker")
 	}
 
 	// tearDown should be called to destroy container at the end of the test
