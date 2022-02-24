@@ -1,0 +1,10 @@
+# testing a custom workflow
+
+name: Suricate Bank CI
+
+on: [push]
+
+jobs:
+  golangci:
+    runs-on: ubuntu-latest
+    run: make metalint
