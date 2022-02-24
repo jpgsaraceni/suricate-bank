@@ -7,4 +7,6 @@ on: [push]
 jobs:
   golangci:
     runs-on: ubuntu-latest
-    run: make metalint
+    steps:
+      - uses: actions/checkout@v2
+      - run: make metalint
