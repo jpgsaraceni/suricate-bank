@@ -1,5 +1,3 @@
-# testing a custom workflow
-
 name: Suricate Bank CI
 
 on: [push]
