@@ -1,7 +1,7 @@
-name: Suricate Bank CI
+name: Pull Request CI
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
       paths:
         - '**.go'
@@ -32,10 +32,17 @@ jobs:
         - name: build
           run: go build -v ./...
 
-  build-image:
-
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-      - run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - run: make metalint
