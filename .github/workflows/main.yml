@@ -3,12 +3,12 @@ name: Suricate Bank CI
 on:
   push:
     branches: [ main ]
-      paths:
-        - '**.go'
-        - 'go.mod'
-        - 'go.sum'
-        - '.golangci.yml'
-        - '.github/workflows/*'
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.golangci.yml'
+      - '.github/workflows/*'
 
 jobs:
 

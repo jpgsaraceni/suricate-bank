@@ -3,12 +3,12 @@ name: Pull Request CI
 on:
   pull_request:
     branches: [ main ]
-      paths:
-        - '**.go'
-        - 'go.mod'
-        - 'go.sum'
-        - '.golangci.yml'
-        - '.github/workflows/*'
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.golangci.yml'
+      - '.github/workflows/*'
 
 jobs:
 
