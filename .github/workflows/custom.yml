@@ -5,31 +5,25 @@ on: [push]
 
 jobs:
 
-  setup:
+  go:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-go@v2
           with:
             go-version: 1.17
-            
+          
+        - name: test
+          - run: go test -v ./...
+
+        - name: build
+          - run: go build -v ./...
+
   lint:
     runs-on: ubuntu-latest
-    needs: setup
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
       - run: make metalint
-
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v2
-      - run: go test -v ./...
-  
-  build:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v2
-      - run: go build -v ./...
