@@ -31,10 +31,11 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * Meaningful unit and integration tests
 * Swagger Documentation
 * Structured logging
+* CI with GitHub Actions
 
 ## Coming Soon
 
-* GitHub Actions
+* Apache Kafka events
 
 ## Dependencies
 

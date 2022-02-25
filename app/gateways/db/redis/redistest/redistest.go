@@ -38,7 +38,7 @@ func GetTestPool() (*redis.Pool, func()) {
 
 	hostAndPort := resource.GetHostPort("6379/tcp")
 
-	log.Info().Msgf("Connecting to redis on: ", hostAndPort)
+	log.Info().Msgf("Connecting to redis on: %s", hostAndPort)
 
 	if err = resource.Expire(containerTimeout); err != nil { // Tell docker to hard kill the container in 60 seconds
 		panic(err)
