@@ -55,7 +55,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 
 To run this app in a container, the only requirement is [Docker Compose](https://docs.docker.com/compose/install/).
 
-To run without a container, you will need [Go](https://go.dev/doc/install), [PostgreSQL](https://www.postgresql.org/download/) (configured and running), and optionally [Docker](https://docs.docker.com/get-docker/) to run integration tests.
+To run without a container, you will need [Go](https://go.dev/doc/install), [PostgreSQL](https://www.postgresql.org/download/), [Redis](https://redis.io/topics/quickstart) (configured and running), and optionally [Docker](https://docs.docker.com/get-docker/) to run integration tests.
 
 An image of the application is available on Docker Hub registry [on this repository](https://hub.docker.com/r/saraceni/suricate-bank). You can pull it and use the postgres and redis instances you prefer (directly on your machine or building a container) to run the app. To pull the image, just run `make pull-container`.
 
@@ -89,11 +89,11 @@ make test
 
 The file `/client.http` can be used to test all available routes. I suggest using [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) VS Code extension for this (or any other HTTP request service you prefer).
 
-You can also use Swagger UI for manual testing, as explained [below](#available-routes)
+You can also use Swagger UI for manual testing, as explained [below](#available-routes).
 
 ### Available routes
 
-You check out all routes on Swagger UI. Just access `http://HOST_RUNNING_THIS_APP:PORT_ITS_LISTENING_ON/swagger`. If you are running on the default URL, `http://localhost:8080/swagger`
+You can check out all routes on Swagger UI. Just access `http://HOST_RUNNING_THIS_APP:PORT_ITS_LISTENING_ON/swagger`. If you are running on the default URL, `http://localhost:8080/swagger`
 
 #### POST `/accounts`
 
