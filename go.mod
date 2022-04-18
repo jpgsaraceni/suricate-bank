@@ -12,7 +12,7 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/rs/zerolog v1.26.1
-	github.com/swaggo/http-swagger v1.2.5
+	github.com/swaggo/http-swagger v1.2.6
 	github.com/swaggo/swag v1.8.1
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
 )
