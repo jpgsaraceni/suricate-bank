@@ -32,6 +32,8 @@ start:
 	docker-compose up -d
 	docker-compose logs
 stop:
+	docker-compose stop
+down:
 	docker-compose down
 
 # build and push image to registry (docker hub)
