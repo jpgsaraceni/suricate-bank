@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -20,7 +21,12 @@ func ConnectPool(addr string) (*redis.Pool, error) {
 		Dial: func() (redis.Conn, error) {
 			log.Info().Msgf("attempting to connect to redis on %s...", addr)
 
-			return redis.Dial("tcp", addr)
+			c, err := redis.DialURL(os.Getenv("REDIS_URL"))
+			if err != nil {
+				return redis.Dial("tcp", addr)
+			}
+
+			return c, err
 		},
 	}
 

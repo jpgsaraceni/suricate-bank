@@ -104,12 +104,12 @@ func (cfg PostgresConfig) URL() string {
 	return url
 }
 
-func (cfg HTTPServerConfig) ServerPort() string {
-	return fmt.Sprintf(":%s", cfg.Port)
+func (HTTPServerConfig) ServerPort() string {
+	return fmt.Sprintf(":%s", os.Getenv("PORT"))
 }
 
 func (cfg HTTPServerConfig) HostAndPort() string {
-	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	return fmt.Sprintf("%s:%s", cfg.Host, os.Getenv("PORT"))
 }
 
 func (cfg RedisConfig) URL() string {
