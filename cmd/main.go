@@ -76,7 +76,7 @@ func main() {
 	authService := auth.NewService(accountsRepository)
 	idemppotencyService := idempotency.NewService(idempotencyRepository)
 
-	docs.SwaggerInfo.Host = cfg.HTTPServer.HostAndPort()
+	docs.SwaggerInfo.Host = cfg.HTTPServer.ServerHost()
 
 	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService, idemppotencyService)
 }

@@ -108,6 +108,10 @@ func (HTTPServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", os.Getenv("PORT"))
 }
 
+func (HTTPServerConfig) ServerHost() string {
+	return fmt.Sprintf("%s", os.Getenv("HOST"))
+}
+
 func (HTTPServerConfig) HostAndPort() string {
 	return fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 }
