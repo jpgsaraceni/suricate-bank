@@ -108,8 +108,8 @@ func (HTTPServerConfig) ServerPort() string {
 	return fmt.Sprintf(":%s", os.Getenv("PORT"))
 }
 
-func (cfg HTTPServerConfig) HostAndPort() string {
-	return fmt.Sprintf("%s:%s", cfg.Host, os.Getenv("PORT"))
+func (HTTPServerConfig) HostAndPort() string {
+	return fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 }
 
 func (cfg RedisConfig) URL() string {

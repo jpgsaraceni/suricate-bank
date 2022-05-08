@@ -16,6 +16,7 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/config"
+	"github.com/jpgsaraceni/suricate-bank/docs"
 )
 
 // @title Suricate Bank API
@@ -75,7 +76,7 @@ func main() {
 	authService := auth.NewService(accountsRepository)
 	idemppotencyService := idempotency.NewService(idempotencyRepository)
 
-	// docs.SwaggerInfo.Host = cfg.HTTPServer.HostAndPort()
+	docs.SwaggerInfo.Host = cfg.HTTPServer.HostAndPort()
 
 	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService, idemppotencyService)
 }
