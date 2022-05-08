@@ -59,7 +59,7 @@ func main() {
 
 	redisPool, err := redis.ConnectPool(cfg.Redis.URL())
 	if err != nil {
-		log.Panic().Stack().Err(err).Msg("")
+		log.Warn().Msgf("failed to connect to idempotency server:%s", err)
 	}
 
 	defer redisPool.Close()
