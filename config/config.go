@@ -29,6 +29,7 @@ type PostgresConfig struct {
 	Host     string `env:"DATABASE_HOST" env-default:"localhost"`
 	Port     string `env:"DATABASE_PORT" env-default:"5432"`
 	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
+	FullURL  string `env:"DATABASE_URL"`
 }
 
 type HTTPServerConfig struct {
@@ -49,6 +50,7 @@ type RedisConfig struct {
 	Host              string `env:"REDIS_HOST" env-default:"localhost"`
 	Port              string `env:"REDIS_PORT" env-default:"6379"`
 	IdempotencyKeyTTL string `env:"IDEMPOTENCY_TTL" env-default:"86400"`
+	FullURL           string `env:"REDIS_URL"`
 }
 
 func ReadConfigFromEnv() *Config {
@@ -87,6 +89,10 @@ func ReadConfig(filename string) *Config {
 }
 
 func (cfg PostgresConfig) URL() string {
+	if cfg.FullURL != "" {
+		return cfg.FullURL
+	}
+
 	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.User,
 		cfg.Password,
@@ -107,6 +113,10 @@ func (cfg HTTPServerConfig) HostAndPort() string {
 }
 
 func (cfg RedisConfig) URL() string {
+	if cfg.FullURL != "" {
+		return cfg.FullURL
+	}
+
 	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 }
 
