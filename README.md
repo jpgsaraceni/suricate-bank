@@ -7,6 +7,7 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 ## Contents
 
 * [Features](#features)
+* [Documentation (Swagger UI)](#swagger-ui)
 * [Coming Soon](#coming-soon)
 * [Dependencies](#dependencies)
 * [Getting Started](#getting-started)
@@ -32,6 +33,11 @@ A very special thanks to my Golang and Clean Arch mentor, [Helder](https://githu
 * Swagger Documentation
 * Structured logging
 * CI with GitHub Actions
+
+## Swagger UI
+
+You can try out the API without any instalation by accessing the [Swagger UI of the app deployed on Heroku](https://suricate-bank.herokuapp.com/swagger/index.html).
+You can also use the Swagger UI or any other http client locally to run it on a clean DB, as instructed in the [Getting Started](#getting-started) section below.
 
 ## Coming Soon
 
@@ -93,7 +99,7 @@ You can also use Swagger UI for manual testing, as explained [below](#available-
 
 ### Available routes
 
-You can check out all routes on Swagger UI. Just access `http://HOST_RUNNING_THIS_APP:PORT_ITS_LISTENING_ON/swagger`. If you are running on the default URL, `http://localhost:8080/swagger`
+You can check out all routes on Swagger UI. Just access `http://HOST_RUNNING_THIS_APP:PORT_ITS_LISTENING_ON/swagger`. If you are running on the default URL, [localhost/8080/swagger](http://localhost:8080/swagger)
 
 #### POST `/accounts`
 
