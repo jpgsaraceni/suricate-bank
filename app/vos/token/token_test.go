@@ -9,10 +9,18 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func TestSign(t *testing.T) {
 	t.Parallel()
+
+	cfg := config.Config{
+		JwtConfig: config.JwtConfig{
+			JWTSecret:  "whatever",
+			JWTTimeout: 10000,
+		},
+	}
 
 	type testCase struct {
 		name string
@@ -36,14 +44,14 @@ func TestSign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			generatedToken, err := Sign(tt.id)
+			generatedToken, err := Sign(cfg, tt.id)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)
 			}
 
 			parsedToken, _ := jwt.ParseWithClaims(generatedToken.Value(), &jwtClaimsSchema{}, func(token *jwt.Token) (interface{}, error) {
-				return loadSecret(), nil
+				return loadSecret(cfg), nil
 			})
 
 			claims, ok := parsedToken.Claims.(*jwtClaimsSchema)
@@ -61,6 +69,12 @@ func TestSign(t *testing.T) {
 
 func TestVerify(t *testing.T) {
 	t.Parallel()
+
+	cfg := config.Config{
+		JwtConfig: config.JwtConfig{
+			JWTSecret: "whatever",
+		},
+	}
 
 	type testCase struct {
 		name  string
@@ -85,7 +99,7 @@ func TestVerify(t *testing.T) {
 
 				unsignedToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-				signedToken, _ := unsignedToken.SignedString(loadSecret())
+				signedToken, _ := unsignedToken.SignedString(loadSecret(cfg))
 
 				return signedToken
 			}(),
@@ -124,7 +138,7 @@ func TestVerify(t *testing.T) {
 
 				unsignedToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-				signedToken, _ := unsignedToken.SignedString(loadSecret())
+				signedToken, _ := unsignedToken.SignedString(loadSecret(cfg))
 
 				return signedToken
 			}(),
@@ -138,7 +152,7 @@ func TestVerify(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			accountID, err := Verify(tt.token)
+			accountID, err := Verify(cfg, tt.token)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)

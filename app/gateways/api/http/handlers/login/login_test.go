@@ -15,10 +15,17 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/services/auth"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func TestLogin(t *testing.T) {
 	t.Parallel()
+
+	cfg := config.Config{
+		JwtConfig: config.JwtConfig{
+			JWTSecret: "whatever",
+		},
+	}
 
 	type httpIO struct {
 		r *http.Request
@@ -48,8 +55,8 @@ func TestLogin(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			service: auth.MockService{
-				OnAuthenticate: func(ctx context.Context, cpfInput, secret string) (string, error) {
-					jwt, _ := token.Sign(testID)
+				OnAuthenticate: func(ctx context.Context, _ config.Config, cpfInput, secret string) (string, error) {
+					jwt, _ := token.Sign(cfg, testID)
 
 					return jwt.Value(), nil
 				},
@@ -57,7 +64,7 @@ func TestLogin(t *testing.T) {
 			expectedStatus: 200,
 			expectedPayload: map[string]interface{}{
 				"token": func() string {
-					jwt, _ := token.Sign(testID)
+					jwt, _ := token.Sign(cfg, testID)
 
 					return jwt.Value()
 				}(),
@@ -75,7 +82,7 @@ func TestLogin(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			service: auth.MockService{
-				OnAuthenticate: func(ctx context.Context, cpfInput, secret string) (string, error) {
+				OnAuthenticate: func(ctx context.Context, _ config.Config, cpfInput, secret string) (string, error) {
 					return "", auth.ErrCredentials
 				},
 			},
@@ -108,7 +115,7 @@ func TestLogin(t *testing.T) {
 				w: httptest.NewRecorder(),
 			},
 			service: auth.MockService{
-				OnAuthenticate: func(ctx context.Context, cpfInput, secret string) (string, error) {
+				OnAuthenticate: func(ctx context.Context, _ config.Config, cpfInput, secret string) (string, error) {
 					return "", auth.ErrSignToken
 				},
 			},
@@ -122,7 +129,7 @@ func TestLogin(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			h := NewHandler(tt.service)
+			h := NewHandler(cfg, tt.service)
 
 			h.Login(tt.httpIO.w, tt.httpIO.r)
 

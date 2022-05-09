@@ -12,10 +12,17 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/vos/cpf"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/hash"
 	"github.com/jpgsaraceni/suricate-bank/app/vos/token"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func TestAuthenticate(t *testing.T) {
 	t.Parallel()
+
+	cfg := config.Config{
+		JwtConfig: config.JwtConfig{
+			JWTSecret: "whatever",
+		},
+	}
 
 	type args struct {
 		cpf    cpf.Cpf
@@ -95,13 +102,13 @@ func TestAuthenticate(t *testing.T) {
 
 			s := service{tt.repository}
 
-			gotToken, err := s.Authenticate(context.Background(), tt.args.cpf.Value(), tt.args.secret)
+			gotToken, err := s.Authenticate(context.Background(), cfg, tt.args.cpf.Value(), tt.args.secret)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got %s expected %s", err, tt.err)
 			}
 
-			gotID, _ := token.Verify(gotToken)
+			gotID, _ := token.Verify(cfg, gotToken)
 
 			if !reflect.DeepEqual(gotID, tt.want) {
 				t.Errorf("got %v expected %v", gotID, tt.want)

@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func TestLock(t *testing.T) {
@@ -23,7 +25,7 @@ func TestLock(t *testing.T) {
 			name: "create key in repository",
 			key:  uuid.NewString(),
 			repo: MockRepository{
-				OnLock: func(ctx context.Context, key string) error {
+				OnLock: func(_ context.Context, _ config.Config, _ string) error {
 					return nil
 				},
 			},
@@ -32,7 +34,7 @@ func TestLock(t *testing.T) {
 			name: "repository error",
 			key:  uuid.NewString(),
 			repo: MockRepository{
-				OnLock: func(ctx context.Context, key string) error {
+				OnLock: func(_ context.Context, _ config.Config, _ string) error {
 					return errors.New("bad error")
 				},
 			},
@@ -48,7 +50,7 @@ func TestLock(t *testing.T) {
 
 		s := NewService(tt.repo)
 
-		err := s.Lock(context.Background(), tt.key)
+		err := s.Lock(context.Background(), config.Config{}, tt.key)
 		if !errors.Is(err, tt.err) {
 			t.Fatalf("got error %s expected error %s", err, tt.err)
 		}

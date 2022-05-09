@@ -3,13 +3,12 @@ package token
 import (
 	"errors"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/jpgsaraceni/suricate-bank/app/domain/entities/account"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 const defaultTimeout = 30
@@ -35,10 +34,9 @@ type jwtClaimsSchema struct {
 	jwt.RegisteredClaims
 }
 
-func Sign(accountID account.ID) (Jwt, error) {
-	timeoutString := os.Getenv("JWT_TIMEOUT")
-	timeout, err := strconv.Atoi(timeoutString)
-	if err != nil {
+func Sign(cfg config.Config, accountID account.ID) (Jwt, error) {
+	timeout := cfg.JWTTimeout
+	if timeout == 0 {
 		timeout = defaultTimeout
 	}
 
@@ -52,7 +50,7 @@ func Sign(accountID account.ID) (Jwt, error) {
 
 	unsignedToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	signedToken, err := unsignedToken.SignedString(loadSecret())
+	signedToken, err := unsignedToken.SignedString(loadSecret(cfg))
 	if err != nil {
 		return Jwt{}, fmt.Errorf("%w: %s", ErrSignJWT, err)
 	}
@@ -60,9 +58,9 @@ func Sign(accountID account.ID) (Jwt, error) {
 	return Jwt{token: signedToken}, nil
 }
 
-func Verify(tokenString string) (account.ID, error) {
+func Verify(cfg config.Config, tokenString string) (account.ID, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwtClaimsSchema{}, func(token *jwt.Token) (interface{}, error) {
-		return loadSecret(), nil
+		return loadSecret(cfg), nil
 	})
 	if err != nil {
 		return account.ID{}, ErrJwtSignature
@@ -82,8 +80,8 @@ func Verify(tokenString string) (account.ID, error) {
 	return accountID, nil
 }
 
-func loadSecret() []byte {
-	secret := []byte(os.Getenv("JWT_SECRET"))
+func loadSecret(cfg config.Config) []byte {
+	secret := []byte(cfg.JWTSecret)
 
 	return secret
 }
