@@ -3,10 +3,10 @@ package redis
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/db/redis/redistest"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 func TestLock(t *testing.T) {
@@ -14,13 +14,13 @@ func TestLock(t *testing.T) {
 
 	testConn, tearDown := redistest.GetTestPool()
 	testRepo := NewRepository(testConn)
-	os.Setenv("IDEMPOTENCY_TTL", "84600")
 
 	t.Cleanup(tearDown)
 
 	type testCase struct {
 		name          string
 		runBefore     func()
+		cfg           config.Config
 		key           string
 		shouldSucceed bool
 		err           error
@@ -39,11 +39,21 @@ func TestLock(t *testing.T) {
 				}
 				conn.Close()
 			},
+			cfg: config.Config{
+				RedisConfig: config.RedisConfig{
+					IdempotencyKeyTTL: 84600,
+				},
+			},
 			key: repeatedKey,
 			err: errKeyExists,
 		},
 		{
-			name:          "set a key",
+			name: "set a key",
+			cfg: config.Config{
+				RedisConfig: config.RedisConfig{
+					IdempotencyKeyTTL: 84600,
+				},
+			},
 			key:           "greatkey",
 			shouldSucceed: true,
 		},
@@ -58,7 +68,7 @@ func TestLock(t *testing.T) {
 				tt.runBefore()
 			}
 
-			err := testRepo.Lock(context.Background(), tt.key)
+			err := testRepo.Lock(context.Background(), tt.cfg, tt.key)
 
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("got error %s expected error %s", err, tt.err)

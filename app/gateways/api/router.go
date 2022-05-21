@@ -33,7 +33,7 @@ func NewRouter(
 ) {
 	accountsHandler := accountsroute.NewHandler(accountUC)
 	transfersHandler := transfersroute.NewHandler(transferUC)
-	loginHandler := loginroute.NewHandler(authService)
+	loginHandler := loginroute.NewHandler(cfg, authService)
 
 	r := chi.NewRouter()
 
@@ -43,14 +43,14 @@ func NewRouter(
 	r.Use(middlewares.RequestLogger)
 
 	r.With(
-		middlewares.Idempotency(idempotencyService),
+		middlewares.Idempotency(cfg, idempotencyService),
 	).Post("/accounts", accountsHandler.Create)
 	r.Get("/accounts", accountsHandler.Fetch)
 	r.Get("/accounts/{id}/balance", accountsHandler.GetBalance)
 
 	r.With(
-		middlewares.Authorize,
-		middlewares.Idempotency(idempotencyService),
+		middlewares.Authorize(cfg),
+		middlewares.Idempotency(cfg, idempotencyService),
 	).Post("/transfers", transfersHandler.Create)
 	r.Get("/transfers", transfersHandler.Fetch)
 
@@ -61,7 +61,7 @@ func NewRouter(
 	})
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	if err := http.ListenAndServe(cfg.HTTPServer.ServerPort(), r); err != nil {
-		log.Panic().Stack().Msg("failed to listen and serve")
+	if err := http.ListenAndServe(cfg.GetHTTPPort(), r); err != nil {
+		log.Panic().Stack().Msgf("failed to listen and serve: %s", err)
 	}
 }

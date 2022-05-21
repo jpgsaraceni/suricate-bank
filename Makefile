@@ -22,8 +22,10 @@ db-stop:
 	systemctl stop postgresql
 	redis-cli shutdown
 dev:
+	cp .env.example .env
 	go run cmd/main.go
 dev-build:
+	cp .env.example .env
 	go build -o build/app cmd/main.go
 	./build/app
 

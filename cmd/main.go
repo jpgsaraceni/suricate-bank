@@ -46,18 +46,21 @@ import (
 func main() {
 	ctx := context.Background()
 
-	cfg := config.ReadConfig(".env")
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Panic().Stack().Err(err).Msg("")
+	}
 
-	logging.InitZerolog(cfg.Log.Level)
+	logging.InitZerolog(cfg.LogLevel)
 
-	pgPool, err := postgres.ConnectPool(ctx, cfg.Postgres.URL())
+	pgPool, err := postgres.ConnectPool(ctx, cfg.GetPgURL())
 	if err != nil {
 		log.Panic().Stack().Err(err).Msg("")
 	}
 
 	defer pgPool.Close()
 
-	redisPool, err := redis.ConnectPool(cfg.Redis.URL())
+	redisPool, err := redis.ConnectPool(cfg)
 	if err != nil {
 		log.Warn().Msgf("failed to connect to idempotency server:%s", err)
 	}
@@ -76,7 +79,7 @@ func main() {
 	authService := auth.NewService(accountsRepository)
 	idemppotencyService := idempotency.NewService(idempotencyRepository)
 
-	docs.SwaggerInfo.Host = cfg.HTTPServer.HostAndPort()
+	docs.SwaggerInfo.Host = cfg.GetHTTPHost()
 
-	api.NewRouter(ctx, *cfg, accountsUsecase, transfersUsecase, authService, idemppotencyService)
+	api.NewRouter(ctx, cfg, accountsUsecase, transfersUsecase, authService, idemppotencyService)
 }

@@ -31,7 +31,7 @@ func (h handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := h.service.Authenticate(r.Context(), loginRequest.Cpf, loginRequest.Secret)
+	account, err := h.service.Authenticate(r.Context(), h.Config, loginRequest.Cpf, loginRequest.Secret)
 
 	if errors.Is(err, auth.ErrCredentials) {
 		response.Unauthorized(responses.ErrCredentials).SendJSON()

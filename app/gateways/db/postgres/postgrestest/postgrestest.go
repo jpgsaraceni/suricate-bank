@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -15,6 +13,8 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/rs/zerolog/log"
+
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 const (
@@ -23,6 +23,11 @@ const (
 )
 
 func GetTestPool() (*pgxpool.Pool, func()) {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Panic().Err(err).Msg("could not load env")
+	}
+
 	var dbPool *pgxpool.Pool
 
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
@@ -59,7 +64,7 @@ func GetTestPool() (*pgxpool.Pool, func()) {
 		panic(err)
 	}
 
-	dockerPool.MaxWait = timeout()
+	dockerPool.MaxWait = timeout(cfg)
 	// connects to db in container, with exponential backoff-retry,
 	// because the application in the container might not be ready to accept connections yet
 	if err = dockerPool.Retry(func() error {
@@ -118,10 +123,9 @@ func migrateTestDB(databaseURL string) error {
 	return nil
 }
 
-func timeout() time.Duration {
-	timeoutString := os.Getenv("DOCKERTEST_TIMEOUT")
-	timeout, err := strconv.Atoi(timeoutString)
-	if err != nil {
+func timeout(cfg config.Config) time.Duration {
+	timeout := cfg.DockertestTimeout
+	if timeout == 0 {
 		return time.Duration(defaultTimeout) * time.Second
 	}
 

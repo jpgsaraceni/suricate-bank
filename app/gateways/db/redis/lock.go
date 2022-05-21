@@ -2,19 +2,14 @@ package redis
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"strconv"
+
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
-func (r Repository) Lock(_ context.Context, key string) error {
+func (r Repository) Lock(_ context.Context, cfg config.Config, key string) error {
 	conn := r.pool.Get()
 	defer conn.Close()
-
-	ttl, err := strconv.Atoi(os.Getenv("IDEMPOTENCY_TTL"))
-	if err != nil {
-		return fmt.Errorf("failed to parse env var IDEMPOTENCY_TTL: %w", err)
-	}
+	ttl := cfg.IdempotencyKeyTTL
 
 	reply, err := conn.Do("SET", key, "", "EX", ttl, "NX") // set with ttl and only if not exist
 

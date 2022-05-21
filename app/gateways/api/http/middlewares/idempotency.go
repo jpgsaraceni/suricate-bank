@@ -13,9 +13,10 @@ import (
 	"github.com/jpgsaraceni/suricate-bank/app/gateways/api/http/responses"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency"
 	"github.com/jpgsaraceni/suricate-bank/app/services/idempotency/schema"
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
-func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
+func Idempotency(cfg config.Config, s idempotency.Service) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			requestIdempotencyKey := r.Header.Get("Idempotency-Key")
@@ -48,7 +49,7 @@ func Idempotency(s idempotency.Service) func(next http.Handler) http.Handler {
 			}
 
 			if reflect.DeepEqual(idempotentResponse, schema.CachedResponse{}) { // no cached response
-				err := s.Lock(r.Context(), requestIdempotencyKey)
+				err := s.Lock(r.Context(), cfg, requestIdempotencyKey)
 				if err != nil {
 					responses.NewResponse(w).InternalServerError(err).SendJSON()
 

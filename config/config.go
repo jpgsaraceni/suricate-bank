@@ -1,128 +1,105 @@
 package config
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 
-	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
-	Log        ConfLog
-	Postgres   PostgresConfig
-	HTTPServer HTTPServerConfig
-	Jwt        JwtConfig
-	Dockertest DockertestConfig
-	Redis      RedisConfig
+	ConfLog
+	PostgresConfig
+	HTTPServerConfig
+	JwtConfig
+	DockertestConfig
+	RedisConfig
 }
 
 type ConfLog struct {
-	Level string `env:"LOG_LEVEL" env-default:"info"`
+	LogLevel string `envconfig:"LOG_LEVEL" default:"info"`
 }
 
 type PostgresConfig struct {
-	User     string `env:"DATABASE_USER" env-default:"postgres"`
-	Password string `env:"DATABASE_PASSWORD" env-default:"good-password"`
-	Host     string `env:"DATABASE_HOST" env-default:"localhost"`
-	Port     string `env:"DATABASE_PORT" env-default:"5432"`
-	Instance string `env:"DATABASE_NAME" env-default:"suricate"`
-	FullURL  string `env:"DATABASE_URL"`
+	PgUser     string `envconfig:"DATABASE_USER" default:"postgres"`
+	PgPassword string `envconfig:"DATABASE_PASSWORD" default:"good-password"`
+	PgHost     string `envconfig:"DATABASE_HOST" default:"localhost"`
+	PgPort     string `envconfig:"DATABASE_PORT" default:"5432"`
+	PgDatabase string `envconfig:"DATABASE_NAME" default:"suricate"`
+	PgURL      string `envconfig:"DATABASE_URL"`
 }
 
 type HTTPServerConfig struct {
-	Host string `env:"SERVER_HOST" env-default:"localhost"`
-	Port string `env:"SERVER_PORT" env-default:"8080"`
+	HTTPHost string `envconfig:"HOST" default:"localhost"`
+	HTTPPort string `envconfig:"PORT" default:"8080"`
 }
 
 type JwtConfig struct {
-	Secret  string `env:"JWT_SECRET" env-default:"BAD_SECRET"`
-	Timeout string `env:"JWT_TIMEOUT" env-default:"30"`
+	JWTSecret  string `envconfig:"JWT_SECRET" default:"BAD_SECRET"`
+	JWTTimeout int    `envconfig:"JWT_TIMEOUT" default:"30"`
 }
 
 type DockertestConfig struct {
-	Timeout string `env:"DOCKERTEST_TIMEOUT" env-default:"30"`
+	DockertestTimeout int `envconfig:"DOCKERTEST_TIMEOUT" default:"30"`
 }
 
 type RedisConfig struct {
-	Host              string `env:"REDIS_HOST" env-default:"localhost"`
-	Port              string `env:"REDIS_PORT" env-default:"6379"`
-	IdempotencyKeyTTL string `env:"IDEMPOTENCY_TTL" env-default:"86400"`
-	FullURL           string `env:"REDIS_URL"`
+	RedisHost         string `envconfig:"REDIS_HOST" default:"localhost"`
+	RedisPort         string `envconfig:"REDIS_PORT" default:"6379"`
+	IdempotencyKeyTTL int    `envconfig:"IDEMPOTENCY_TTL" default:"86400"`
+	RedisURL          string `envconfig:"REDIS_URL"`
 }
 
-func ReadConfigFromEnv() *Config {
-	var cfg Config
-	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		log.Fatal().Stack().Err(err).Msg("failed to load config")
-	}
+func LoadConfig() (Config, error) {
+	_ = godotenv.Load()
 
-	cfg.setEnvs()
-	log.Info().Msg("successfully loaded from env")
-
-	return &cfg
-}
-
-func ReadConfigFromFile(filename string) *Config {
-	var cfg Config
-	err := cleanenv.ReadConfig(filename, &cfg)
+	var config Config
+	noPrefix := ""
+	err := envconfig.Process(noPrefix, &config)
 	if err != nil {
-		log.Fatal().Stack().Err(err).Msg("failed to load config")
+		return Config{}, fmt.Errorf("failed loading config: %w", err)
 	}
+	log.Info().Msgf("HTTP server address: %s%s", config.GetHTTPHost(), config.GetHTTPPort())
 
-	cfg.setEnvs()
-	log.Info().Msg("successfully loaded env variables from .env file")
-
-	return &cfg
+	return config, nil
 }
 
-func ReadConfig(filename string) *Config {
-	if _, err := os.Stat(filename); errors.Is(err, fs.ErrNotExist) {
-		log.Info().Msg(" file not found, attempting to load from env")
-
-		return ReadConfigFromEnv()
+func (cfg PostgresConfig) GetPgURL() string {
+	if cfg.PgURL != "" {
+		return cfg.PgURL
 	}
 
-	return ReadConfigFromFile(filename)
-}
-
-func (cfg PostgresConfig) URL() string {
-	if cfg.FullURL != "" {
-		return cfg.FullURL
-	}
-
-	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.User,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Instance,
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.PgUser,
+		cfg.PgPassword,
+		cfg.PgHost,
+		cfg.PgPort,
+		cfg.PgDatabase,
 	)
-
-	return url
 }
 
-func (HTTPServerConfig) ServerPort() string {
-	return fmt.Sprintf(":%s", os.Getenv("PORT"))
-}
-
-func (cfg HTTPServerConfig) HostAndPort() string {
-	return fmt.Sprintf("%s:%s", cfg.Host, os.Getenv("PORT"))
-}
-
-func (cfg RedisConfig) URL() string {
-	if cfg.FullURL != "" {
-		return cfg.FullURL
+func (cfg HTTPServerConfig) GetHTTPPort() string {
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		return fmt.Sprintf(":%s", envPort)
 	}
 
-	return fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	return cfg.HTTPPort
 }
 
-func (cfg Config) setEnvs() {
-	os.Setenv("JWT_SECRET", cfg.Jwt.Secret)
-	os.Setenv("JWT_TIMEOUT", cfg.Jwt.Timeout)
-	os.Setenv("DOCKERTEST_TIMEOUT", cfg.Dockertest.Timeout)
-	os.Setenv("IDEMPOTENCY_TTL", cfg.Redis.IdempotencyKeyTTL)
+func (cfg HTTPServerConfig) GetHTTPHost() string {
+	if envHost := os.Getenv("HOST"); envHost != "" {
+		return envHost
+	}
+
+	return cfg.HTTPHost
+}
+
+func (cfg RedisConfig) GetRedisURL() string {
+	if cfg.RedisURL != "" {
+		return cfg.RedisURL
+	}
+
+	return fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort)
 }

@@ -2,11 +2,12 @@ package redis
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/rs/zerolog/log"
+
+	"github.com/jpgsaraceni/suricate-bank/config"
 )
 
 const (
@@ -14,16 +15,17 @@ const (
 	idleTimeout = 240
 )
 
-func ConnectPool(addr string) (*redis.Pool, error) {
+func ConnectPool(cfg config.Config) (*redis.Pool, error) {
 	pool := &redis.Pool{
 		MaxIdle:     maxIdle,
 		IdleTimeout: idleTimeout * time.Second,
 		Dial: func() (redis.Conn, error) {
-			log.Info().Msgf("attempting to connect to redis on %s...", addr)
+			url := cfg.GetRedisURL()
+			log.Info().Msgf("attempting to connect to redis on %s...", url)
 
-			c, err := redis.DialURL(os.Getenv("REDIS_URL"))
+			c, err := redis.DialURL(url)
 			if err != nil {
-				return redis.Dial("tcp", addr)
+				return redis.Dial("tcp", url)
 			}
 
 			return c, err
