@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/jpgsaraceni/suricate-bank/protos/checking";
+
+package checking;
+
+service Checking {
+    rpc GetBalance(Account) returns (Balance) {}
+}
+
+message Account {
+    string id = 1;
+}
+
+message Balance {
+    int32 amount = 1;
+}

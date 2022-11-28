@@ -1,6 +1,6 @@
 DOCKER_USER=saraceni
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: metalint test dev dev-build start stop push-container pull-container update-docs
+.PHONY: metalint test db-start db-stop dev dev-build start stop down push-container pull-container docs
 
 # run linter
 metalint:
@@ -23,10 +23,10 @@ db-stop:
 	redis-cli shutdown
 dev:
 	cp .env.example .env
-	go run cmd/main.go
+	go run cmd/api/main.go
 dev-build:
 	cp .env.example .env
-	go build -o build/app cmd/main.go
+	go build -o build/app cmd/api/main.go
 	./build/app
 
 # with docker-compose
@@ -47,5 +47,10 @@ pull-container:
 	docker pull saraceni/suricate-bank
 
 # Update swagger docs
-update-docs:
-	swag init -g cmd/main.go
+docs:
+	swag init -g cmd/api/main.go
+
+.PHONY proto:
+	protoc --go_out=. --go_opt=paths=source_relative \
+		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+		protos/checking/checking.proto

@@ -8,13 +8,13 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/main.go
+RUN go build -o api ./cmd/api/main.go
 
 FROM alpine:latest
 
 WORKDIR /
 
-COPY --from=builder /app/main /
+COPY --from=builder /app/api /
 
 EXPOSE 8080
 
