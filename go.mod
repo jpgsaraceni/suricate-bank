@@ -12,7 +12,7 @@ require (
 	github.com/ory/dockertest/v3 v3.8.1
 	github.com/rs/zerolog v1.26.1
 	github.com/swaggo/http-swagger v1.2.8
-	github.com/swaggo/swag v1.8.2
+	github.com/swaggo/swag v1.8.10
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
 )
 
@@ -26,7 +26,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/rs/xid v1.3.0 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
-	golang.org/x/tools v0.1.10 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 )
 
 require (
@@ -66,8 +66,8 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
-	golang.org/x/sys v0.0.0-20220317061510-51cd9980dadf // indirect
+	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
